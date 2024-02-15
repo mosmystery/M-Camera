@@ -42,6 +42,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	target_angle			= 0;			// See .rotate_to(), .rotate_by(), .translate_to(), .translate_by()
 	target_zoom			= 1;			// See .zoom_to(), .zoom_by(), .translate_to(), .translate_by()
 	
+	if (target != self && (is_struct(target) || instance_exists(target)))
+	{
+		target_x	= target.x;
+		target_y	= target.y;
+	}
+	
 	xstart				= target_x;		// See .set_start_values() and .reset()
 	ystart				= target_y;		// See .set_start_values() and .reset()
 	anglestart			= target_angle;		// See .set_start_values() and .reset()
@@ -64,12 +70,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	debug_rotation_points		= [];			// For internal use. Used to store and display the rotation arc in debug mode.
 	
 	// init
-	
-	if (is_struct(target) || instance_exists(target))
-	{
-		target_x	= target.x;
-		target_y	= target.y;
-	}
 	
 	__window_init();					// See .__window_init()
 	
