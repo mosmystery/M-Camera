@@ -1,0 +1,1 @@
+camera.end_step();

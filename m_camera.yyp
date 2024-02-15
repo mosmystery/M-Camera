@@ -1,0 +1,47 @@
+{
+  "resourceType": "GMProject",
+  "resourceVersion": "1.7",
+  "name": "m_camera",
+  "AudioGroups": [
+    {"resourceType":"GMAudioGroup","resourceVersion":"1.3","name":"audiogroup_default","targets":-1,},
+  ],
+  "configs": {
+    "children": [],
+    "name": "Default",
+  },
+  "defaultScriptType": 1,
+  "Folders": [
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Example","folderPath":"folders/Example.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Objects","folderPath":"folders/Example/Objects.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Rooms","folderPath":"folders/Example/Rooms.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Scripts","folderPath":"folders/Example/Scripts.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Sprites","folderPath":"folders/Example/Sprites.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"M-Camera","folderPath":"folders/M-Camera.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"utilities","folderPath":"folders/M-Camera/utilities.yy",},
+  ],
+  "IncludedFiles": [],
+  "isEcma": false,
+  "LibraryEmitters": [],
+  "MetaData": {
+    "IDEVersion": "2023.11.1.129",
+  },
+  "resources": [
+    {"id":{"name":"range_operations","path":"scripts/range_operations/range_operations.yy",},},
+    {"id":{"name":"objMCamera","path":"objects/objMCamera/objMCamera.yy",},},
+    {"id":{"name":"sprBlock","path":"sprites/sprBlock/sprBlock.yy",},},
+    {"id":{"name":"sprMouse","path":"sprites/sprMouse/sprMouse.yy",},},
+    {"id":{"name":"objMouseControl","path":"objects/objMouseControl/objMouseControl.yy",},},
+    {"id":{"name":"game_init","path":"scripts/game_init/game_init.yy",},},
+    {"id":{"name":"pointarray","path":"scripts/pointarray/pointarray.yy",},},
+    {"id":{"name":"array2d","path":"scripts/array2d/array2d.yy",},},
+    {"id":{"name":"MCamera","path":"scripts/MCamera/MCamera.yy",},},
+    {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+  ],
+  "RoomOrderNodes": [
+    {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+  ],
+  "templateType": "game",
+  "TextureGroups": [
+    {"resourceType":"GMTextureGroup","resourceVersion":"1.3","name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"targets":-1,},
+  ],
+}

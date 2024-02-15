@@ -1,0 +1,1 @@
+camera = {}; // Automatically set by Camera()

@@ -1,0 +1,16 @@
+{
+  "FolderOrderSettings": [
+    {"name":"Objects","order":2,"path":"folders/Example/Objects.yy",},
+    {"name":"Scripts","order":1,"path":"folders/Example/Scripts.yy",},
+    {"name":"Sprites","order":5,"path":"folders/Example/Sprites.yy",},
+    {"name":"M-Camera","order":1,"path":"folders/M-Camera.yy",},
+    {"name":"utilities","order":1,"path":"folders/M-Camera/utilities.yy",},
+  ],
+  "ResourceOrderSettings": [
+    {"name":"range_operations","order":1,"path":"scripts/range_operations/range_operations.yy",},
+    {"name":"sprBlock","order":1,"path":"sprites/sprBlock/sprBlock.yy",},
+    {"name":"pointarray","order":3,"path":"scripts/pointarray/pointarray.yy",},
+    {"name":"array2d","order":1,"path":"scripts/array2d/array2d.yy",},
+    {"name":"MCamera","order":2,"path":"scripts/MCamera/MCamera.yy",},
+  ],
+}

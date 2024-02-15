@@ -1,0 +1,1 @@
+camera.room_start();

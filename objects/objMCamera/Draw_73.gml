@@ -1,0 +1,1 @@
+camera.draw_end();
