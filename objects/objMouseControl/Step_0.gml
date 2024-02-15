@@ -25,7 +25,7 @@ var _input = {
 
 if (_input.zoom_in)
 {
-	global.camera.zoom_by(2);			// input 2 to double the camera zoom. "true" indicates instant change. Try "false" for a smooth zoom, or try .zoom_to() to set the zoom factor directly (>1 = zoom in, else 1 = normal, else >0 = zoom out)
+	global.camera.zoom_by(2);		// input 2 to double the camera zoom. "true" indicates instant change. Try "false" for a smooth zoom, or try .zoom_to() to set the zoom factor directly (>1 = zoom in, else 1 = normal, else >0 = zoom out)
 }
 else if (_input.zoom_out)
 {

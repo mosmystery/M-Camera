@@ -26,7 +26,7 @@ function game_init()
 	
 	// camera init
 	
-	global.camera	= new MCamera(undefined, 0, 320, 180, 4, 1, function(){return true});		// no target is set for this mouse demo, because we want the player to control the camera without it trying to follow the mouse position
+	global.camera	= new MCamera(320, 180, 4, 1);
 	
 	var _rotation_anchor = {									// targets and anchors simply need to include an x and y value to work, whether that is an object or a struct (such as a Vector2).
 		x : global.world.width_scaled() / 2,

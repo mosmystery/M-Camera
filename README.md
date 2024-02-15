@@ -15,7 +15,7 @@ Special thanks to Pixelated Pope and Shaun Spalding for their camera tutorials o
 2. Import it into your GMS 2.3+ project via "Tools"->"Import Local Package".
 3. In the create event of the first room, create and set up the camera. Best to make it a global instance for ease of use:
 ``` gml
-global.camera = new MCamera(objPlayer, 0, 320, 180, 4, 1);
+global.camera = new MCamera(320, 180, 4, 1);
 // optionally define other camera settings here
 ```
 4. During the game, translate the camera or access any other methods like so:
