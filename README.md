@@ -1,6 +1,6 @@
 # M-Camera
 A flexible camera system for GMS 2.3+, focused on quick setup and ease of use.
-This has been designed and tested with single-view pixel art games in mind, however it may well work (or grow to work) beyond those contexts.
+This has been designed with single-view pixel art games in mind, however it may well work (or grow to work) beyond those contexts.
 Special thanks to Pixelated Pope and Shaun Spalding for their camera tutorials on YouTube.
 ### Features:
 - Optionally self-managed host object, to streamline setup.
@@ -13,18 +13,19 @@ Special thanks to Pixelated Pope and Shaun Spalding for their camera tutorials o
 ## Quickstart Guide
 1. Download the latest release of the M-Camera package.
 2. Import it into your GMS 2.3+ project via "Tools"->"Import Local Package".
-3. In the create event of the first room, create and set up the camera. Best to make it a global instance for ease of use:
-``` gml
+3. In the create event of the first room, create and set up the camera:
+```gml
 global.camera = new MCamera(320, 180, 4, 1);
+
 // optionally define other camera settings here
+global.camera.set_target(objPlayer);
+global.camera.set_interpolation_values(1/8, 1/4, 1/16);
 ```
 4. During the game, translate the camera or access any other methods like so:
 ```gml
 // example settings
 global.camera.set_start_values(room_width/2, room_height/2, 0, 1);
-global.camera.set_position_interpolation_factor(1/8);
-global.camera.set_angle_interpolation_factor(1/4);
-global.camera.set_zoom_interpolation_factor(1);
+global.camera.set_interpolation_values(1/8, 1/4, 1);
 global.camera.set_debug_mode(true);
 
 // example translation

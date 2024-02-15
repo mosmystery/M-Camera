@@ -13,7 +13,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 {
 	// config
 	
-	host_object			= undefined;		// See _create_host_object_for_me
+	host_object		= undefined;		// See _create_host_object_for_me
 	
 	if (_create_host_object_for_me)
 	{
@@ -21,26 +21,26 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		host_object.camera	= self;
 	}
 	
-	view				= 0;
-	id				= view_camera[view];	// The view port id for this camera. See view_camera in the manual.
-	width				= _width;
-	height				= _height;
-	window_scale			= _window_scale;
-	pixel_scale			= _pixel_scale;
+	view			= 0;
+	id			= view_camera[view];	// The view port id for this camera. See view_camera in the manual.
+	width			= _width;
+	height			= _height;
+	window_scale		= _window_scale;
+	pixel_scale		= _pixel_scale;
 	
 	// state
 	
-	position_boundary		= undefined;					// See .set_position_boundary()
-	should_follow_target		= method(self, function() {return true});	// See .set_target_follow_condition()
+	position_boundary	= undefined;					// See .set_position_boundary()
+	should_follow_target	= method(self, function() {return true});	// See .set_target_follow_condition()
 	
-	target				= self;			// See .set_target()
-	rotation_anchor			= undefined;		// See .set_rotation_anchor()
-	zoom_anchor			= undefined;		// See .set_zoom_anchor()
+	target			= self;			// See .set_target()
+	rotation_anchor		= undefined;		// See .set_rotation_anchor()
+	zoom_anchor		= undefined;		// See .set_zoom_anchor()
 	
-	target_x			= width/2;		// See .move_to() .move_by(), .translate_to(), .translate_by()
-	target_y			= height/2;		// See .move_to() .move_by(), .translate_to(), .translate_by()
-	target_angle			= 0;			// See .rotate_to(), .rotate_by(), .translate_to(), .translate_by()
-	target_zoom			= 1;			// See .zoom_to(), .zoom_by(), .translate_to(), .translate_by()
+	target_x		= width/2;		// See .move_to() .move_by(), .translate_to(), .translate_by()
+	target_y		= height/2;		// See .move_to() .move_by(), .translate_to(), .translate_by()
+	target_angle		= 0;			// See .rotate_to(), .rotate_by(), .translate_to(), .translate_by()
+	target_zoom		= 1;			// See .zoom_to(), .zoom_by(), .translate_to(), .translate_by()
 	
 	if (target != self && (is_struct(target) || instance_exists(target)))
 	{
@@ -48,30 +48,30 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		target_y	= target.y;
 	}
 	
-	xstart				= target_x;		// See .set_start_values() and .reset()
-	ystart				= target_y;		// See .set_start_values() and .reset()
-	anglestart			= target_angle;		// See .set_start_values() and .reset()
-	zoomstart			= target_zoom;		// See .set_start_values() and .reset()
+	xstart			= target_x;		// See .set_start_values() and .reset()
+	ystart			= target_y;		// See .set_start_values() and .reset()
+	anglestart		= target_angle;		// See .set_start_values() and .reset()
+	zoomstart		= target_zoom;		// See .set_start_values() and .reset()
 	
-	x				= xstart;		// The current x position for this camera. Equivalent to the center of the screen in world co-ordinates.
-	y				= ystart;		// The current y position for this camera. Equivalent to the center of the screen in world co-ordinates.
-	angle				= anglestart;		// The current angle for this camera, in degrees.
-	zoom				= zoomstart;		// The current zoom factor for this camera. <1 = zoom in, else 1 = normal, else <0 = zoom out.
-	zoom_min			= 1/16;			// See .set_zoom_limits()
-	zoom_max			= 4;			// See .set_zoom_limits()
+	x			= xstart;		// The current x position for this camera. Equivalent to the center of the screen in world co-ordinates.
+	y			= ystart;		// The current y position for this camera. Equivalent to the center of the screen in world co-ordinates.
+	angle			= anglestart;		// The current angle for this camera, in degrees.
+	zoom			= zoomstart;		// The current zoom factor for this camera. <1 = zoom in, else 1 = normal, else <0 = zoom out.
+	zoom_min		= 1/16;			// See .set_zoom_limits()
+	zoom_max		= 4;			// See .set_zoom_limits()
 	
-	position_interpolation_factor	= 1/8;			// See .set_position_interpolation_factor()
-	angle_interpolation_factor	= 1/4;			// See .set_angle_interpolation_factor()
-	zoom_interpolation_factor	= 1/16;			// See .set_zoom_interpolation_factor()
+	position_interpolation	= 1/8;			// See .set_position_interpolation()
+	angle_interpolation	= 1/4;			// See .set_angle_interpolation()
+	zoom_interpolation	= 1/16;			// See .set_zoom_interpolation()
 	
-	instant_translation		= false;		// See .set_instant_translation()
+	instant_translation	= false;		// See .set_instant_translation()
 	
-	debug				= false;		// See .set_debug_mode()
-	debug_rotation_points		= [];			// For internal use. Used to store and display the rotation arc in debug mode.
+	debug			= false;		// See .set_debug_mode()
+	debug_rotation_points	= [];			// For internal use. Used to store and display the rotation arc in debug mode.
 	
 	// init
 	
-	__window_init();					// See .__window_init()
+	__window_init();				// See .__window_init()
 	
 	
 	
@@ -138,7 +138,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		// update zoom
 		
-		zoom		= lerp(zoom, target_zoom, _instant ? 1 : zoom_interpolation_factor);
+		zoom		= lerp(zoom, target_zoom, _instant ? 1 : zoom_interpolation);
 		
 		// update view to comply with zoom_anchor
 		
@@ -205,7 +205,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			
 			// set angle
 			
-			angle		= lerp(angle, target_angle, angle_interpolation_factor);
+			angle		= lerp(angle, target_angle, angle_interpolation);
 		}
 		
 		// update postion to comply with rotation_anchor
@@ -250,8 +250,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		// update position
 		
-		x = lerp(x, target_x, _instant ? 1 : position_interpolation_factor);
-		y = lerp(y, target_y, _instant ? 1 : position_interpolation_factor);
+		x = lerp(x, target_x, _instant ? 1 : position_interpolation);
+		y = lerp(y, target_y, _instant ? 1 : position_interpolation);
 		
 		__clamp_position_to_boundary();
 		
@@ -502,28 +502,40 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		instant_translation = _instant;
 	};
 	
-	/// @function		set_position_interpolation_factor(_position_interpolation_factor)
+	/// @function		set_position_interpolation(_position_interpolation)
 	/// @description	Sets the interpolation factor for translating the x, y position towards target_x, target_y. Essentially how fast x, y should approach target_x, target_y.
-	/// @param {real}	[_position_interpolation_factor=position_interpolation_factor]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_position_interpolation=position_interpolation]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @returns		N/A
-	static set_position_interpolation_factor = function(_position_interpolation_factor=position_interpolation_factor) {
-		position_interpolation_factor = _position_interpolation_factor;
+	static set_position_interpolation = function(_position_interpolation=position_interpolation) {
+		position_interpolation = _position_interpolation;
 	};
 	
-	/// @function		set_angle_interpolation_factor(_angle_interpolation_factor)
+	/// @function		set_angle_interpolation(_angle_interpolation)
 	/// @description	Sets the interpolation factor for rotating the angle towards target_angle. Essentially how fast angle should approach target_angle.
-	/// @param {real}	[_angle_interpolation_factor=angle_interpolation_factor]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_angle_interpolation=angle_interpolation]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @returns		N/A
-	static set_angle_interpolation_factor = function(_angle_interpolation_factor=angle_interpolation_factor) {
-		angle_interpolation_factor = _angle_interpolation_factor;
+	static set_angle_interpolation = function(_angle_interpolation=angle_interpolation) {
+		angle_interpolation = _angle_interpolation;
 	};
 	
-	/// @function		set_zoom_interpolation_factor(_zoom_interpolation_factor)
+	/// @function		set_zoom_interpolation(_zoom_interpolation)
 	/// @description	Sets the interpolation factor for magnifying the zoom towards target_zoom. Essentially how fast zoom should approach target_zoom.
-	/// @param {real}	[_zoom_interpolation_factor=zoom_interpolation_factor]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_zoom_interpolation=zoom_interpolation]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @returns		N/A
-	static set_zoom_interpolation_factor = function(_zoom_interpolation_factor=zoom_interpolation_factor) {
-		zoom_interpolation_factor = _zoom_interpolation_factor;
+	static set_zoom_interpolation = function(_zoom_interpolation=zoom_interpolation) {
+		zoom_interpolation = _zoom_interpolation;
+	};
+	
+	/// @function		set_interpolation_values(_position_interpolation, _angle_interpolation, _zoom_interpolation)
+	/// @description	Sets the interpolation factors for moving, rotating and zooming the camera. Essentially how fast x, y, angle and zoom should approach their respective target values.
+	/// @param {real}	[_position_interpolation=position_interpolation]	The position interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_angle_interpolation=angle_interpolation]		The angle interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_zoom_interpolation=zoom_interpolation]		The zoom interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @returns		N/A
+	static set_interpolation_values = function(_position_interpolation=position_interpolation, _angle_interpolation=angle_interpolation, _zoom_interpolation=zoom_interpolation) {
+		set_position_interpolation(_position_interpolation);
+		set_angle_interpolation(_angle_interpolation);
+		set_zoom_interpolation(_zoom_interpolation);
 	};
 	
 	/// @function		set_start_values(_xstart, _ystart, _anglestart, _zoomstart)

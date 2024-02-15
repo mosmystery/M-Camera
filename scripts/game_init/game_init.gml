@@ -39,8 +39,7 @@ function game_init()
 	global.camera.reset(true);									// resets the camera to the new start values
 	global.camera.set_debug_mode(false);								// Set to true to see debug display
 	
-	global.camera.set_angle_interpolation_factor(1/4);						// Set to 1 for instant angle change.
-	global.camera.set_zoom_interpolation_factor(1);							// Set to a fraction for gradual zoom change.
+	global.camera.set_interpolation_values(0, 1/4, 1);						// See MCamera.gml for full list of methods and documentation.
 }
 
 
