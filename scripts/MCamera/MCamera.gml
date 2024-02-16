@@ -67,6 +67,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	debug			= false;		// See .set_debug_mode()
 	debug_rotation_points	= [];			// For internal use. Used to store and display the rotation arc in debug mode.
 	
+	// panning
+	
+	panning			= false;		// See .start_panning(), .stop_panning(), .is_panning(), .pan_to()
+	pan_xstart		= xstart;		// See .start_panning(), .stop_panning(), .is_panning(), .pan_to()
+	pan_ystart		= ystart;		// See .start_panning(), .stop_panning(), .is_panning(), .pan_to()
+	
 	// init
 	
 	__window_init();				// See .__window_init()
@@ -136,7 +142,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		// update zoom
 		
-		zoom		= lerp(zoom, target_zoom, _instant ? 1 : zoom_interpolation);
+		zoom	= lerp(zoom, target_zoom, _instant ? 1 : zoom_interpolation);
 		
 		// update view to comply with zoom_anchor
 		
@@ -241,7 +247,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __apply_movement = function(_instant=false, _ignore_target=false) {
 		// comply with target
 		
-		if (!_ignore_target && should_follow_target() && (is_struct(target) || instance_exists(target)))
+		if (!panning && !_ignore_target && should_follow_target() && (is_struct(target) || instance_exists(target)))
 		{
 			move_to(target.x, target.y, false); // true will cause an infinite loop. let the code below handle _instant instead.
 		}
@@ -662,6 +668,58 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		rotate_to(anglestart, _instant);
 		move_to(xstart, ystart, _instant, true);
 	};
+	
+	
+	
+		  /////////////
+		 // panning //
+		/////////////
+	
+	
+	
+	/// @function		is_panning()
+	/// @description	Checks if camera is in panning mode. Useful to check before using .pan_to(). Start panning mode with .start_panning(), stop panning mode with .stop_panning().
+	/// @returns		N/A
+	static is_panning = function() {
+		return panning;
+	};
+	
+	/// @function		start_panning(_from_x, _from_y)
+	/// @description	Starts camera panning mode and sets pan_xstart and pan_ystart. Start panning mode before using .pan_to()
+	/// @param {real}	_from_x		The x co-ordinate from which you wish to pan from. Is used for calculations in .pan_to()
+	/// @param {real}	_from_y		The y co-ordinate from which you wish to pan from. Is used for calculations in .pan_to()
+	/// @returns		N/A
+	static start_panning = function(_from_x, _from_y) {
+		pan_xstart	= _from_x;
+		pan_ystart	= _from_y;
+		
+		panning		= true;
+	};
+	
+	/// @function		stop_panning()
+	/// @description	Stops camera panning mode. Call this method when you have finished panning with .pan_to()
+	/// @returns		N/A
+	static stop_panning = function() {
+		panning		= false;
+	};
+	
+	/// @function		pan_to(_to_x, _to_y, _instant)
+	/// @description	Pans the camera to _to_x, _to_y from pan_xstart and pan_ystart. Only call this function when in panning mode - See .start_panning(), .stop_panning() and .is_panning().
+	/// @param {real}	[_to_x=pan_xstart]	The x co-ordinate to which you wish to pan.
+	/// @param {real}	[_to_y=pan_ystart]	The y co-ordinate to which you wish to pan.
+	/// @param {bool}	[_instant=false]	Whether to apply target_x, target_y instantly (true) or interpolate towards them (false).
+	/// @returns		N/A
+	static pan_to = function(_to_x=pan_xstart, _to_y=pan_ystart, _instant=true) {
+		if (!panning)
+		{
+			throw ("Error: MCamera() attempting to use .pan_to() outside of panning mode. Check panning mode with .is_panning(), start panning mode with .start_panning(), and stop panning mode with .stop_panning()");
+		}
+		
+		target_x -= _to_x - pan_xstart;
+		target_y -= _to_y - pan_ystart;
+		
+		move_to(target_x, target_y, _instant);
+	}
 	
 	
 	

@@ -4,7 +4,7 @@ This has been designed with single-view pixel art games in mind, however it may 
 Special thanks to Pixelated Pope and Shaun Spalding for their camera tutorials on YouTube.
 ### Features:
 - Optionally self-managed host object, to streamline setup.
-- Translate the camera position, angle, and zoom.
+- Camera movement, panning, rotation and zoom.
 - Set interpolation values for smooth translation.
 - Set a target object to follow.
 - Set rotation and zoom anchor points.

@@ -12,7 +12,7 @@ var _input = {
 	rotate_ccw	: keyboard_check_pressed(ord("Z")),
 	rotate_cw	: keyboard_check_pressed(ord("X")),
 	pan_start	: mouse_check_button_pressed(mb_middle),
-	pan_end		: mouse_check_button_pressed(mb_middle),
+	pan_end		: mouse_check_button_released(mb_middle),
 	reset		: keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("R")),
 	toggle_debug	: keyboard_check_pressed(vk_tab) || keyboard_check_pressed(ord("d")),
 	
@@ -21,7 +21,7 @@ var _input = {
 	erase_block	: mouse_check_button(mb_right)
 };
 
-// use inputs to control the camera and place/erase blocks
+// contol the camera
 
 if (_input.zoom_in)
 {
@@ -43,16 +43,20 @@ else if (_input.rotate_ccw)
 
 if (_input.pan_start)
 {
-	
+	global.camera.start_panning(x, y);	// start panning on input press
 }
 else if (_input.pan_end)
 {
-	
+	global.camera.stop_panning();		// end panning on input release
+}
+else if (global.camera.is_panning())
+{
+	global.camera.pan_to(x, y, true);	// pan to desired position when .is_panning(). "true" indicates instant position update. Try "false" for interpolated panning.
 }
 
 if (_input.reset)
 {
-	global.camera.reset(true);			// reset the camera to start values. "false" indicates a smooth change. try "true" for instant reset. try manually resetting the camera with .zoom_to(), .rotate_to() and .move_to() 
+	global.camera.reset(true);		// reset the camera to start values. "false" indicates a smooth change. try "true" for instant reset. try manually resetting the camera with .zoom_to(), .rotate_to() and .move_to() 
 }
 
 if (_input.toggle_debug)
@@ -61,7 +65,7 @@ if (_input.toggle_debug)
 	global.camera.debug = !global.camera.debug;	// toggle camera debug display
 }
 
-// use inputs to edit cells of the level array2d
+// place and erase blocks
 
 if (_input.place_block != _input.erase_block)	// if place_block or erase_block is pressed or otherwise different from eachother ...
 {

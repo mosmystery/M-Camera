@@ -39,7 +39,7 @@ function game_init()
 	global.camera.reset(true);									// resets the camera to the new start values
 	global.camera.set_debug_mode(false);								// Set to true to see debug display
 	
-	global.camera.set_interpolation_values(0, 1/4, 1);						// See MCamera.gml for full list of methods and documentation.
+	global.camera.set_interpolation_values(1/8, 1/4, 1);						// See MCamera.gml for full list of methods and documentation. Try setting zoom interpolation to a fraction.
 }
 
 
