@@ -697,7 +697,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			return find_gui_position(mouse_x, mouse_y).x;
 		}
 		
-		return window_mouse_get_x() / global.camera.window_scale;
+		return window_mouse_get_x() / window_scale;
 	};
 	
 	/// @function		find_gui_mouse_y()
@@ -709,7 +709,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			return find_gui_position(mouse_x, mouse_y).y;
 		}
 		
-		return window_mouse_get_y() / global.camera.window_scale;
+		return window_mouse_get_y() / window_scale;
 	};
 	
 	/// @function		find_gui_position()
