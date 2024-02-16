@@ -64,8 +64,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	angle_interpolation	= 1/4;			// See .set_angle_interpolation()
 	zoom_interpolation	= 1/16;			// See .set_zoom_interpolation()
 	
-	instant_translation	= false;		// See .set_instant_translation()
-	
 	debug			= false;		// See .set_debug_mode()
 	debug_rotation_points	= [];			// For internal use. Used to store and display the rotation arc in debug mode.
 	
@@ -99,9 +97,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	The End Step event. Updates the camera translation.
 	/// @returns		N/A
 	static end_step = function() {
-		__apply_zoom(instant_translation);
-		__apply_rotation(instant_translation);
-		__apply_movement(instant_translation, false);
+		__apply_zoom(false);
+		__apply_rotation(false);
+		__apply_movement(false, false);
 	};
 	
 	/// @function		draw_end()
@@ -131,9 +129,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		__apply_zoom(_instant)
 	/// @description	For internal use. Updates the camera zoom.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_zoom instantly (true) or interpolate towards it (false). Is instant_translation by default.
+	/// @param {bool}	[_instant=false]	Whether to apply target_zoom instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static __apply_zoom = function(_instant=instant_translation) {
+	static __apply_zoom = function(_instant=false) {
 		var _previous_zoom	= zoom;
 		
 		// update zoom
@@ -174,9 +172,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		__apply_rotation(_instant)
 	/// @description	For internal use. Updates the camera angle.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_angle instantly (true) or interpolate towards it (false). Is instant_translation by default.
+	/// @param {bool}	[_instant=false]	Whether to apply target_angle instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static __apply_rotation = function(_instant=instant_translation) {
+	static __apply_rotation = function(_instant=false) {
 		// update angle
 		
 		var _previous_angle	= angle;
@@ -237,10 +235,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		__apply_movement(_instant)
 	/// @description	For internal use. Updates the camera position.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_x / target_y instantly (true) or interpolate towards them (false). Is instant_translation by default.
-	/// @param {bool}	[_ignore_target=false]			Whether ignore the target (true) or not (false). Useful for resetting to the correct start position.
+	/// @param {bool}	[_instant=false]		Whether to apply target_x / target_y instantly (true) or interpolate towards them (false).
+	/// @param {bool}	[_ignore_target=false]		Whether ignore the target (true) or not (false). Useful for resetting to the correct start position.
 	/// @returns		N/A
-	static __apply_movement = function(_instant=instant_translation, _ignore_target=false) {
+	static __apply_movement = function(_instant=false, _ignore_target=false) {
 		// comply with target
 		
 		if (!_ignore_target && should_follow_target() && (is_struct(target) || instance_exists(target)))
@@ -494,14 +492,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		set_instant_translation(_instant)
-	/// @description	Sets instant_translation to _instant. If true, The camera will instantly translate to target_x, target_y, target_angle and target_zoom each frame. Set to false to regain manual control.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_x/target_y/target_angle/target_zoom instantly (true) or interpolate towards them (false). Toggles instant_translation by default.
-	/// @returns		N/A
-	static set_instant_translation = function(_instant=!instant_translation) {
-		instant_translation = _instant;
-	};
-	
 	/// @function		set_position_interpolation(_position_interpolation)
 	/// @description	Sets the interpolation factor for translating the x, y position towards target_x, target_y. Essentially how fast x, y should approach target_x, target_y.
 	/// @param {real}	[_position_interpolation=position_interpolation]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
@@ -556,9 +546,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @function		zoom_to(_target_zoom, _instant)
 	/// @description	Sets the target_zoom factor for the camera.
 	/// @param {real}	[_target_zoom=target_zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_zoom instantly (true) or interpolate towards it (false). Is instant_translation by default.
+	/// @param {bool}	[_instant=false]		Whether to apply target_zoom instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static zoom_to = function(_target_zoom=target_zoom, _instant=instant_translation) {
+	static zoom_to = function(_target_zoom=target_zoom, _instant=false) {
 		target_zoom = clamp(_target_zoom, zoom_min, zoom_max);
 		
 		if (_instant)
@@ -569,19 +559,19 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		zoom_by(_zoom_factor, _instant)
 	/// @description	Sets the target_zoom factor relative to the current target_zoom.
-	/// @param {real}	[_zoom_factor=1]			The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_zoom instantly (true) or interpolate towards it (false). Is instant_translation by default.
+	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
+	/// @param {bool}	[_instant=false]	Whether to apply target_zoom instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static zoom_by = function(_zoom_factor=1, _instant=instant_translation) {
+	static zoom_by = function(_zoom_factor=1, _instant=false) {
 		zoom_to(target_zoom * _zoom_factor, _instant);
 	};
 	
 	/// @function		rotate_to(_target_angle, _instant)
 	/// @description	Sets the target_angle for the camera.
-	/// @param {real}	[_target_angle=target_angle]		The new target angle for the camera, in degrees.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_angle instantly (true) or interpolate towards it (false). Is instant_translation by default.
+	/// @param {real}	[_target_angle=target_angle]	The new target angle for the camera, in degrees.
+	/// @param {bool}	[_instant=false]		Whether to apply target_angle instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static rotate_to = function(_target_angle=target_angle, _instant=instant_translation) {
+	static rotate_to = function(_target_angle=target_angle, _instant=false) {
 		if (debug)
 		{
 			debug_rotation_points = [];
@@ -597,20 +587,20 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		rotate_by(_degrees, _instant)
 	/// @description	Increments camera's target_angle by _degrees.
-	/// @param {real}	[_degrees=0]				How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_angle instantly (true) or interpolate towards it (false). Is instant_translation by default.
+	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
+	/// @param {bool}	[_instant=false]	Whether to apply target_angle instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static rotate_by = function(_degrees=0, _instant=instant_translation) {		
+	static rotate_by = function(_degrees=0, _instant=false) {		
 		rotate_to(target_angle + _degrees, _instant);
 	};
 	
 	/// @function		move_to(_target_x, _target_y, _instant)
 	/// @description	Sets the target_x/target_y for the camera.
-	/// @param {real}	[_target_x=target_x]			The new target_x position for the camera.
-	/// @param {real}	[_target_y=target_y]			The new target_y position for the camera.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false). Is instant_translation by default.
+	/// @param {real}	[_target_x=target_x]		The new target_x position for the camera.
+	/// @param {real}	[_target_y=target_y]		The new target_y position for the camera.
+	/// @param {bool}	[_instant=false]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
 	/// @returns		N/A
-	static move_to = function(_target_x=target_x, _target_y=target_y, _instant=instant_translation, _ignore_target=false) {
+	static move_to = function(_target_x=target_x, _target_y=target_y, _instant=false, _ignore_target=false) {
 		target_x = _target_x;
 		target_y = _target_y;
 		
@@ -624,21 +614,21 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	Moves the camera target_x/target_y by a relative amount.
 	/// @param {real}	[_x=0]					The x value to move target_x by.
 	/// @param {real}	[_y=0]					The y value to move target_y by.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false). Is instant_translation by default.
+	/// @param {bool}	[_instant=false]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
 	/// @returns		N/A
-	static move_by = function(_x=0, _y=0, _instant=instant_translation, _ignore_target=false) {
+	static move_by = function(_x=0, _y=0, _instant=false, _ignore_target=false) {
 		move_to(target_x + _x, target_y + _y, _instant, _ignore_target);
 	};
 	
 	/// @function		translate_to(_target_x, _target_y, _target_angle, _target_zoom, _instant)
 	/// @description	Sets the target_x/target_y/target_angle/target_zoom for the camera.
-	/// @param {real}	[_target_x=target_x]			The new target_x position for the camera.
-	/// @param {real}	[_target_y=target_y]			The new target_y position for the camera.
-	/// @param {real}	[_target_angle=target_angle]		The new target angle for the camera, in degrees.
-	/// @param {real}	[_target_zoom=target_zoom]		The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false). Is instant_translation by default.
+	/// @param {real}	[_target_x=target_x]		The new target_x position for the camera.
+	/// @param {real}	[_target_y=target_y]		The new target_y position for the camera.
+	/// @param {real}	[_target_angle=target_angle]	The new target angle for the camera, in degrees.
+	/// @param {real}	[_target_zoom=target_zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
+	/// @param {bool}	[_instant=false]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
 	/// @returns		N/A
-	static translate_to = function(_target_x=x, _target_y=y, _target_angle=angle, _target_zoom=zoom, _instant=instant_translation) {
+	static translate_to = function(_target_x=x, _target_y=y, _target_angle=angle, _target_zoom=zoom, _instant=false) {
 		zoom_to(_target_zoom, _instant);
 		rotate_to(_target_angle, _instant);
 		move_to(_target_x, _target_y, _instant);
@@ -646,13 +636,13 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		translate_by(_x, _y, _degrees, _zoom_factor, _instant)
 	/// @description	Moves the camera target_x/target_y/target_angle/target_zoom by a relative amount.
-	/// @param {real}	[_x=0]					The x value to move target_x by.
-	/// @param {real}	[_y=0]					The y value to move target_y by.
-	/// @param {real}	[_degrees=0]				How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
-	/// @param {real}	[_zoom_factor=1]			The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false). Is instant_translation by default.
+	/// @param {real}	[_x=0]			The x value to move target_x by.
+	/// @param {real}	[_y=0]			The y value to move target_y by.
+	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
+	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
+	/// @param {bool}	[_instant=false]	Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
 	/// @returns		N/A
-	static translate_by = function(_x=0, _y=0, _degrees=0, _zoom_factor=1, _instant=instant_translation) {
+	static translate_by = function(_x=0, _y=0, _degrees=0, _zoom_factor=1, _instant=false) {
 		zoom_by(_zoom_factor, _instant);
 		rotate_by(_degrees, _instant);
 		move_by(_x, _y, _instant);
@@ -660,9 +650,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		reset(_instant)
 	/// @description	Resets the camera back to the startx/y/angle/zoom values.
-	/// @param {bool}	[_instant=instant_translation]		Whether to apply target_x/target_y/target_angle/target_zoom instantly (true) or interpolate towards them (false). Is instant_translation by default.
+	/// @param {bool}	[_instant=false]	Whether to apply target_x/target_y/target_angle/target_zoom instantly (true) or interpolate towards them (false).
 	/// @returns		N/A
-	static reset = function(_instant=instant_translation) {
+	static reset = function(_instant=false) {
 		if (debug)
 		{
 			debug_rotation_points = [];
