@@ -14,7 +14,7 @@ var _input = {
 	pan_start	: mouse_check_button_pressed(mb_middle),
 	pan_end		: mouse_check_button_released(mb_middle),
 	reset		: keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("R")),
-	toggle_debug	: keyboard_check_pressed(vk_tab) || keyboard_check_pressed(ord("d")),
+	toggle_debug	: keyboard_check_pressed(vk_tab) || keyboard_check_pressed(ord("D")),
 	
 	// editor controls
 	place_block	: mouse_check_button(mb_left),
@@ -62,7 +62,7 @@ if (_input.reset)
 if (_input.toggle_debug)
 {
 	
-	global.camera.debug = !global.camera.debug;	// toggle camera debug display
+	global.camera.set_debug_mode();		// toggle camera debug display
 }
 
 // place and erase blocks

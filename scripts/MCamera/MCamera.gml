@@ -1,13 +1,13 @@
-/// @function						MCamera(_width, _height, _window_scale, _pixel_scale, _create_host_object_for_me);
-/// @description					A system designed to manage the view's scale, resolution, movement, rotation, etc.
-/// @param {real}					[_width=320]				The width of the display in pixels. Recomended to be a division of 1920, such as 1920/6=320, to suit 1920x1080 monitor resolution.
-/// @param {real}					[_height=180]				The height of the display in pixels. Recomended to be a division of 1080, such as 1080/6=180, to suit 1920x1080 monitor resolution.
-/// @param {real}					[_window_scale=4]			The scale to draw the display at when in windowed mode, as a multiple of width and height.
-/// @param {real}					[_pixel_scale=1]			The width and height of each pixel drawn to the screen, in subpixels.
-///												Examples: Pass `1` for true-to-size pixels, `2` for pixels with a resolution of 2x2 subpixels, or pass the same value as _window_scale to match the subpixel size to the actual pixel size on the display.
-/// @param {bool}					[_create_host_object_for_me=true]	Whether to create a permanent host object that runs the event methods automatically (true) or not (false). Useful if you want to run the event methods in a different event or manage the hose object yourself.
-///												If false:	You will need to run this camera's .room_start(), .end_step(), and optionally .draw_end() events in a permanent object for intended results.
-///												If true:	An instance of objMCamera, a shell for this constructor's event methods, will automatically be created and stored in .host_object
+/// @function		MCamera(_width, _height, _window_scale, _pixel_scale, _create_host_object_for_me);
+/// @description	A system designed to manage the view's scale, resolution, movement, rotation, etc.
+/// @param {real}	[_width=320]				The width of the display in pixels. Recomended to be a division of the width of your desired resolution, such as 1920/6=320, to suit 1920x1080 monitor resolution.
+/// @param {real}	[_height=180]				The height of the display in pixels. Recomended to be a division of the height of your desired resolution, such as 1080/6=180, to suit 1920x1080 monitor resolution.
+/// @param {real}	[_window_scale=4]			The scale to draw the display at when in windowed mode, as a multiple of width and height.
+/// @param {real}	[_pixel_scale=1]			The width and height of each pixel, in subpixels. _window_scale needs to be >= _pixel_scale for all sub-pixels to be visible.
+///								Examples: Pass `1` for true-to-size pixels, `2` for pixels with a resolution of 2x2 subpixels, or pass the same value as _window_scale to match the subpixel size to the actual pixel size on the display.
+/// @param {bool}	[_create_host_object_for_me=true]	Whether to create a permanent host object that runs the event methods automatically (true) or not (false). Useful if you want to run the event methods in a different event or manage the hose object yourself.
+///								If false:	You will need to run this camera's .room_start(), .end_step(), and optionally .draw_end() events in a permanent object for intended results.
+///								If true:	An instance of objMCamera, a shell for this constructor's event methods, will automatically be created and stored in .host_object.
 /// @returns {struct.MCamera}
 function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 1, _create_host_object_for_me = true) constructor
 {
