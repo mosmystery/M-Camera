@@ -106,9 +106,18 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	The End Step event. Updates the camera translation.
 	/// @returns		N/A
 	static end_step = function() {
+		// update camera
 		__apply_zoom(false);
 		__apply_rotation(false);
 		__apply_movement(false, false);
+		
+		// update view
+		var _new_width = width/zoom;
+		var _new_height = height/zoom;
+		
+		camera_set_view_size(id, _new_width, _new_height);
+		camera_set_view_pos(id, x - (_new_width/2), y - (_new_height/2));
+		camera_set_view_angle(id, angle);
 	};
 	
 	/// @function		draw_end()
@@ -144,38 +153,21 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		var _previous_zoom	= zoom;
 		
 		// update zoom
-		
 		zoom	= lerp(zoom, target_zoom, _instant ? 1 : zoom_interpolation);
 		
-		// update view to comply with zoom_anchor
-		
+		// update position to comply with zoom_anchor
 		if (zoom != _previous_zoom && (is_struct(zoom_anchor) || instance_exists(zoom_anchor)))
-		{
-			// setup
-			
+		{			
 			var _screen_ratio_w	= (zoom_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);
 			var _screen_ratio_h	= (zoom_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
-			
-			// change size
 			
 			var _view_width		= width/zoom;
 			var _view_height	= height/zoom;
 			
-			camera_set_view_size(id, _view_width, _view_height);
+			var _adjusted_x		= zoom_anchor.x - (_view_width * _screen_ratio_w) + (_view_width/2);
+			var _adjusted_y		= zoom_anchor.y - (_view_height * _screen_ratio_h) + (_view_height/2);
 			
-			// change position
-			
-			var _w2			= _view_width / 2;
-			var _h2			= _view_height / 2;
-	
-			x			= zoom_anchor.x - (_view_width * _screen_ratio_w) + _w2;
-			y			= zoom_anchor.y - (_view_height * _screen_ratio_h) + _h2;
-			
-			camera_set_view_pos(id, x-_w2, y-_h2);
-		}
-		else
-		{
-			camera_set_view_size(id, width/zoom, height/zoom);
+			move_to(_adjusted_x, _adjusted_y, true, true);
 		}
 	};
 	
@@ -184,10 +176,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {bool}	[_instant=false]	Whether to apply target_angle instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
 	static __apply_rotation = function(_instant=false) {
-		// update angle
-		
 		var _previous_angle	= angle;
 		
+		// update angle
 		if (_instant)
 		{
 			angle		= target_angle;
@@ -195,7 +186,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		else
 		{
 			// wrap angle values
-			
 			if (abs(target_angle - angle) == 180)
 			{
 				target_angle = choose(angle-180, angle+180);
@@ -211,12 +201,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			}
 			
 			// set angle
-			
 			angle		= lerp(angle, target_angle, angle_interpolation);
 		}
 		
 		// update postion to comply with rotation_anchor
-		
 		if (angle != _previous_angle && (is_struct(rotation_anchor) || instance_exists(rotation_anchor)))
 		{
 			if (debug && abs(_previous_angle-angle) >= 0.5)
@@ -233,13 +221,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			var _position_x	= lengthdir_x(_distance, _direction);
 			var _position_y	= lengthdir_y(_distance, _direction);
 			
-			x		= rotation_anchor.x + _position_x;
-			y		= rotation_anchor.y + _position_y;
+			var _adjusted_x = rotation_anchor.x + _position_x;
+			var _adjusted_y = rotation_anchor.y + _position_y;
+			
+			move_to(_adjusted_x, _adjusted_y, true, true);
 		}
-		
-		// update view
-		
-		camera_set_view_angle(id, angle);
 	};
 	
 	/// @function		__apply_movement(_instant)
@@ -249,22 +235,16 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns		N/A
 	static __apply_movement = function(_instant=false, _ignore_target=false) {
 		// comply with target
-		
 		if (!panning && !_ignore_target && should_follow_target() && (is_struct(target) || instance_exists(target)))
 		{
 			move_to(target.x, target.y, false); // true will cause an infinite loop. let the code below handle _instant instead.
 		}
 		
 		// update position
-		
 		x = lerp(x, target_x, _instant ? 1 : position_interpolation);
 		y = lerp(y, target_y, _instant ? 1 : position_interpolation);
 		
 		__clamp_position_to_boundary();
-		
-		// update view
-		
-		camera_set_view_pos(id, x - ((width/zoom)/2), y - ((height/zoom)/2));
 	};
 	
 	/// @function			__clamp_position_to_boundary(_instant)
@@ -568,8 +548,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_anglestart=anglestart]	The starting angle.
 	/// @param {real}	[_zoomstart=zoomstart]		The starting zoom.
 	/// @returns		N/A
-	static set_start_values = function(_xstart = xstart, _ystart = ystart, _anglestart = anglestart, _zoomstart = zoomstart)
-	{
+	static set_start_values = function(_xstart = xstart, _ystart = ystart, _anglestart = anglestart, _zoomstart = zoomstart) {
 		xstart		= _xstart;
 		ystart		= _ystart;
 		anglestart	= _anglestart;
