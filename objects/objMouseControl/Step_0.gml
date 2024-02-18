@@ -51,7 +51,7 @@ else if (_input.pan_end)
 }
 else if (global.camera.is_panning())
 {
-	global.camera.pan_to(x, y, true);	// pan to desired position when .is_panning(). "true" indicates instant position update. Try "false" for interpolated panning.
+	global.camera.pan_to(x, y, false);	// pan to desired position when .is_panning(). "true" indicates instant position update. Try "false" for interpolated panning.
 }
 
 if (_input.reset)

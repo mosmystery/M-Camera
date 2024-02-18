@@ -33,13 +33,15 @@ function game_init()
 		y : global.world.height_scaled() / 2,
 	};
 	
-	global.camera.set_rotation_anchor(_rotation_anchor);						// ensure the camera rotates around the center of the level
-	global.camera.set_zoom_anchor(objMouseControl);							// ensure camera zooms towards and away from objMouseControl
-	global.camera.set_start_values(global.world.width_scaled()/2, global.world.height_scaled()/2);	// sets the camera startx and starty to the center of global.world. Also takes optional parameters for anglestart and zoomstart
-	global.camera.reset(true);									// resets the camera to the new start values
-	global.camera.set_debug_mode(false);								// Set to true to see debug display
+	global.camera.set_rotation_anchor(_rotation_anchor);						// ensure the camera rotates around the center of the level.
+	global.camera.set_zoom_anchor(objMouseControl);							// ensure camera zooms towards and away from objMouseControl.
+	global.camera.set_start_values(global.world.width_scaled()/2, global.world.height_scaled()/2);	// sets the camera startx and starty to the center of global.world. Also takes optional parameters for anglestart and zoomstart.
+	global.camera.reset(true);									// resets the camera to the new start values.
 	
-	global.camera.set_interpolation_values(1/8, 1/4, 1);						// See MCamera.gml for full list of methods and documentation. Try setting zoom interpolation to a fraction.
+	global.camera.set_interpolation_values(1/8, 1/4, 1/4);						// See MCamera.gml for full list of methods and documentation. Try setting zoom interpolation to a fraction.
+	
+	var _border	= 1042;
+	global.camera.set_boundary(-_border, -_border, global.world.width_scaled()+_border, global.world.height_scaled()+_border);	// sets a boundary for the camera. Try .set_debug_mode(true) to see it, or try removing this line or calling .unset_boundary() to remove it.
 }
 
 

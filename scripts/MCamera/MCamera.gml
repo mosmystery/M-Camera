@@ -30,7 +30,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	// state
 	
-	position_boundary	= undefined;					// See .set_position_boundary()
+	boundary		= undefined;					// See .set_boundary()
 	should_follow_target	= method(self, function() {return true});	// See .set_target_follow_condition()
 	
 	target			= self;			// See .set_target()
@@ -110,14 +110,15 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		__apply_zoom(false);
 		__apply_rotation(false);
 		__apply_movement(false, false);
+		__clamp_to_boundary(boundary);
 		
 		// update view
 		var _new_width = width/zoom;
 		var _new_height = height/zoom;
 		
 		camera_set_view_size(id, _new_width, _new_height);
-		camera_set_view_pos(id, x - (_new_width/2), y - (_new_height/2));
 		camera_set_view_angle(id, angle);
+		camera_set_view_pos(id, x - (_new_width/2), y - (_new_height/2));
 	};
 	
 	/// @function		draw_end()
@@ -235,7 +236,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns		N/A
 	static __apply_movement = function(_instant=false, _ignore_target=false) {
 		// comply with target
-		if (!panning && !_ignore_target && should_follow_target() && (is_struct(target) || instance_exists(target)))
+		if (!is_panning() && !_ignore_target && should_follow_target() && (is_struct(target) || instance_exists(target)))
 		{
 			move_to(target.x, target.y, false); // true will cause an infinite loop. let the code below handle _instant instead.
 		}
@@ -243,15 +244,13 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		// update position
 		x = lerp(x, target_x, _instant ? 1 : position_interpolation);
 		y = lerp(y, target_y, _instant ? 1 : position_interpolation);
-		
-		__clamp_position_to_boundary();
 	};
 	
-	/// @function			__clamp_position_to_boundary(_instant)
-	/// @description		For internal use. Clamps the camera position to be within position_boundary.
-	/// @param {struct, undefined}	[_rect_or_undefined=position_boundary]	The struct defining the boundary rectangle, or undefined for no clamping. Must contain x1, y1, x2, y2 values. Example: { x1=0, y1=0, x2=width, y2=height }
+	/// @function			__clamp_to_boundary(_instant)
+	/// @description		For internal use. Clamps the camera position to be within boundary.
+	/// @param {struct,undefined}	[_rect_or_undefined=boundary]	The struct defining the boundary rectangle, or undefined for no clamping. Must contain x1, y1, x2, y2 values. Example: { x1=0, y1=0, x2=width, y2=height }
 	/// @returns			N/A
-	static __clamp_position_to_boundary = function(_rect_or_undefined = position_boundary) {
+	static __clamp_to_boundary = function(_rect_or_undefined = boundary) {
 		if (!is_undefined(_rect_or_undefined))
 		{
 			var _view_width			= width/zoom;
@@ -265,8 +264,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			var _boundary_width		= _rect_or_undefined.x2 - _rect_or_undefined.x1;
 			var _boundary_height		= _rect_or_undefined.y2 - _rect_or_undefined.y1;
 			
-			x = (_rotated_width > _boundary_width)		? (_boundary_width/2)	: clamp(x, _rect_or_undefined.x1 + (_rotated_width/2), _rect_or_undefined.x2 - (_rotated_width/2));
-			y = (_rotated_height > _boundary_height)	? (_boundary_height/2)	: clamp(y, _rect_or_undefined.y1 + (_rotated_height/2), _rect_or_undefined.y2 - (_rotated_height/2));
+			var _clamped_x			= (_rotated_width > _boundary_width)	? (_rect_or_undefined.x1 + _boundary_width/2)	: clamp(x, _rect_or_undefined.x1 + (_rotated_width/2), _rect_or_undefined.x2 - (_rotated_width/2));
+			var _clamped_y			= (_rotated_height > _boundary_height)	? (_rect_or_undefined.y1 + _boundary_height/2)	: clamp(y, _rect_or_undefined.y1 + (_rotated_height/2), _rect_or_undefined.y2 - (_rotated_height/2));
+			
+			move_to(_clamped_x, _clamped_y, true, true);
 		}
 	};
 	
@@ -297,9 +298,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		var _po			= 1; // pixel offset
 			
 		// boundary
-		if (!is_undefined(position_boundary))
+		if (!is_undefined(boundary))
 		{
-			draw_rectangle_colour(position_boundary.x1+0.5, position_boundary.y1+0.5, position_boundary.x2-1.5, position_boundary.y2-1.5, _col_boundary, _col_boundary, _col_boundary, _col_boundary, true);
+			draw_rectangle_colour(boundary.x1+0.5, boundary.y1+0.5, boundary.x2-1.5, boundary.y2-1.5, _col_boundary, _col_boundary, _col_boundary, _col_boundary, true);
 		}
 		
 			// dots
@@ -474,15 +475,15 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_anchor = _zoom_anchor_or_undefined;
 	};
 	
-	/// @function		set_position_boundary(_x1, _y1, _x2, _y2)
-	/// @description	Defines the boundary for the camera to clamp to. Useful for keeping the camera within the bounds of a level or area. Unset with .unset_position_boundary(). Note: The outer bounds may be visible while the camera is rotating or zoomed out.
-	/// @param {real}	_x1			The left edge of the boundary.
-	/// @param {real}	_y1			The top edge of the boundary.
-	/// @param {real}	_x2			The right edge of the boundary.
-	/// @param {real}	_y2			The bottom edge of the boundary.
+	/// @function		set_boundary(_x1, _y1, _x2, _y2)
+	/// @description	Defines the boundary for the camera to clamp to. Useful for keeping the camera within the bounds of a level or area. Unset with .unset_boundary(). Note: The outer bounds may be visible while the camera is rotating or zoomed out.
+	/// @param {real}	[_x1=0]			The left edge of the boundary.
+	/// @param {real}	[_y1=0]			The top edge of the boundary.
+	/// @param {real}	[_x2=room_width]	The right edge of the boundary.
+	/// @param {real}	[_y2=room_height]	The bottom edge of the boundary.
 	/// @returns		N/A
-	static set_position_boundary = function(_x1, _y1, _x2, _y2) {
-		position_boundary = {
+	static set_boundary = function(_x1=0, _y1=0, _x2=room_width, _y2=room_height) {
+		boundary = {
 			x1 : _x1,
 			y1 : _y1,
 			x2 : _x2,
@@ -490,11 +491,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		};
 	};
 	
-	/// @function		unset_position_boundary()
-	/// @description	Unsets the position boundary for the camera, ensuring the camera's position is not limited. Set with .set_position_boundary()
+	/// @function		unset_boundary()
+	/// @description	Unsets the position boundary for the camera, ensuring the camera's position is not limited. Set with .set_boundary()
 	/// @returns		N/A
-	static unset_position_boundary = function() {
-		position_boundary = undefined;
+	static unset_boundary = function() {
+		boundary = undefined;
 	};
 	
 	
