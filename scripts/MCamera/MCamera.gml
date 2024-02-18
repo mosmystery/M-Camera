@@ -69,9 +69,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	// panning
 	
-	panning			= false;		// See .start_panning(), .stop_panning(), .is_panning(), .pan_to()
-	pan_xstart		= xstart;		// See .start_panning(), .stop_panning(), .is_panning(), .pan_to()
-	pan_ystart		= ystart;		// See .start_panning(), .stop_panning(), .is_panning(), .pan_to()
+	panning			= false;		// See .is_panning(), .start_panning(), .stop_panning(), .pan_to()
+	pan_from_x		= xstart;		// The user-defined starting x co-ordinate for the pan.
+	pan_from_y		= ystart;		// The user-defined starting y co-ordinate for the pan.
+	pan_xstart		= xstart;		// The camera's starting x co-ordinate for the pan.
+	pan_ystart		= ystart;		// The camera's starting x co-ordinate for the pan.
+	pan_anglestart		= anglestart;		// The camera's starting angle for the pan.
 	
 	// init
 	
@@ -216,7 +219,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		if (angle != _previous_angle && (is_struct(rotation_anchor) || instance_exists(rotation_anchor)))
 		{
-			if (debug && abs(_previous_angle-angle) >= 1)
+			if (debug && abs(_previous_angle-angle) >= 0.5)
 			{
 				array_push(debug_rotation_points, {
 					x : x,
@@ -304,6 +307,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		var _col_target		= c_red;
 		var _col_rot_anchor	= _col_rot_arc;
 		var _col_zoom_anchor	= c_blue;
+		var _col_pan_line	= c_green;
 			
 		var _nav_dots_radius	= 2 / zoom;
 		var _nav_ring_radius	= 16 / zoom;
@@ -335,6 +339,19 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		{
 			draw_circle_color(rotation_anchor.x-_po, rotation_anchor.y-_po, _dot_radius, _col_rot_anchor, _col_rot_anchor, false);
 		}
+		
+		// pan line
+		if (is_panning())
+		{
+			var _x1 = pan_from_x;
+			var _y1 = pan_from_y;
+			var _x2 = target_x + (pan_from_x - pan_xstart);
+			var _y2 = target_y + (pan_from_y - pan_ystart);
+			
+			draw_line_color(_x1, _y1, _x2, _y2, _col_pan_line, _col_pan_line);
+			draw_circle_color(_x1-_po, _y1-_po, _dot_radius, _col_pan_line, _col_pan_line, false);
+			draw_circle_color(_x2-_po, _y2-_po, _dot_radius, _col_pan_line, _col_pan_line, false);
+		}
 			
 		// zoom anchor
 		if (is_struct(zoom_anchor) || instance_exists(zoom_anchor))
@@ -365,6 +382,16 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		__debug_draw_nav_anchor_dot(rotation_anchor, _nav_dots_radius, _nav_dotring_radius, _col_rot_anchor);	// rotation anchor
 		__debug_draw_nav_anchor_dot(zoom_anchor, _nav_dots_radius, _nav_dotring_radius, _col_zoom_anchor);	// zoom anchor
+		
+		if (is_panning())
+		{
+			var _x2 = target_x + (pan_from_x - pan_xstart);
+			var _y2 = target_y + (pan_from_y - pan_ystart);
+			
+			__debug_draw_nav_dot(pan_from_x, pan_from_y, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);	// pan line start
+			__debug_draw_nav_dot(_x2, _y2, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);			// pan line end
+		}
+		
 		__debug_draw_nav_dot(_view_x, _view_y, _nav_dots_radius, _nav_dotring_radius, _col_view);		// view
 		
 		if (is_struct(target) || instance_exists(target))
@@ -690,8 +717,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	_from_y		The y co-ordinate from which you wish to pan from. Is used for calculations in .pan_to()
 	/// @returns		N/A
 	static start_panning = function(_from_x, _from_y) {
-		pan_xstart	= _from_x;
-		pan_ystart	= _from_y;
+		pan_from_x	= _from_x;
+		pan_from_y	= _from_y;
+		
+		pan_xstart	= x;
+		pan_ystart	= y;
+		pan_anglestart	= angle;
 		
 		panning		= true;
 	};
@@ -715,10 +746,19 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			throw ("Error: MCamera() attempting to use .pan_to() outside of panning mode. Check panning mode with .is_panning(), start panning mode with .start_panning(), and stop panning mode with .stop_panning()");
 		}
 		
-		target_x -= _to_x - pan_xstart;
-		target_y -= _to_y - pan_ystart;
+		var _rotation_adjustment_len = point_distance(rotation_anchor.x, rotation_anchor.y, pan_from_x, pan_from_y);
+		var _rotation_adjustment_dir = point_direction(rotation_anchor.x, rotation_anchor.y, pan_from_x, pan_from_y) - (angle - pan_anglestart);
 		
-		move_to(target_x, target_y, _instant);
+		var _rotated_pan_from_x	= rotation_anchor.x + lengthdir_x(_rotation_adjustment_len, _rotation_adjustment_dir);
+		var _rotated_pan_from_y	= rotation_anchor.y + lengthdir_y(_rotation_adjustment_len, _rotation_adjustment_dir);
+		
+		var _relative_to_x = _to_x - _rotated_pan_from_x;
+		var _relative_to_y = _to_y - _rotated_pan_from_y;
+		
+		target_x -= _relative_to_x;
+		target_y -= _relative_to_y;
+		
+		move_to(target_x, target_y, _instant, true);
 	}
 	
 	
