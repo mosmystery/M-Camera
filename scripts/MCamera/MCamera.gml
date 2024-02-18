@@ -685,7 +685,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		is_panning()
 	/// @description	Checks if camera is in panning mode. Useful to check before using .pan_to(). Start panning mode with .start_panning(), stop panning mode with .stop_panning().
-	/// @returns		N/A
+	/// @returns {bool}	Returns panning (true) or not (false).
 	static is_panning = function() {
 		return panning;
 	};
