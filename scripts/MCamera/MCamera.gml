@@ -735,33 +735,39 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		panning		= false;
 	};
 	
-	/// @function		pan_to(_to_x, _to_y, _instant)
+	/// @function		pan_to(_to_x, _to_y)
 	/// @description	Pans the camera to _to_x, _to_y from pan_xstart and pan_ystart. Only call this function when in panning mode - See .start_panning(), .stop_panning() and .is_panning().
 	/// @param {real}	[_to_x=pan_xstart]	The x co-ordinate to which you wish to pan.
 	/// @param {real}	[_to_y=pan_ystart]	The y co-ordinate to which you wish to pan.
-	/// @param {bool}	[_instant=false]	Whether to apply target_x, target_y instantly (true) or interpolate towards them (false).
 	/// @returns		N/A
-	static pan_to = function(_to_x=pan_xstart, _to_y=pan_ystart, _instant=true) {
+	static pan_to = function(_to_x=pan_xstart, _to_y=pan_ystart) {
 		if (!panning)
 		{
 			throw ("Error: MCamera() attempting to use .pan_to() outside of panning mode. Check panning mode with .is_panning(), start panning mode with .start_panning(), and stop panning mode with .stop_panning()");
 		}
 		
-		var _rotation_adjustment_len = point_distance(rotation_anchor.x, rotation_anchor.y, pan_from_x, pan_from_y);
-		var _rotation_adjustment_dir = point_direction(rotation_anchor.x, rotation_anchor.y, pan_from_x, pan_from_y) - (angle - pan_anglestart);
+		var _angle_diff			= angle - pan_anglestart;
 		
-		var _rotated_pan_from_x	= rotation_anchor.x + lengthdir_x(_rotation_adjustment_len, _rotation_adjustment_dir);
-		var _rotated_pan_from_y	= rotation_anchor.y + lengthdir_y(_rotation_adjustment_len, _rotation_adjustment_dir);
+		var _rotation_adjustment_len	= point_distance(rotation_anchor.x, rotation_anchor.y, pan_from_x, pan_from_y);
+		var _rotation_adjustment_dir	= point_direction(rotation_anchor.x, rotation_anchor.y, pan_from_x, pan_from_y) - _angle_diff;
 		
-		var _relative_to_x = _to_x - _rotated_pan_from_x;
-		var _relative_to_y = _to_y - _rotated_pan_from_y;
+		var _rotated_pan_from_x		= rotation_anchor.x + lengthdir_x(_rotation_adjustment_len, _rotation_adjustment_dir);
+		var _rotated_pan_from_y		= rotation_anchor.y + lengthdir_y(_rotation_adjustment_len, _rotation_adjustment_dir);
 		
-		target_x -= _relative_to_x;
-		target_y -= _relative_to_y;
+		var _relative_to_x		= _to_x - _rotated_pan_from_x;
+		var _relative_to_y		= _to_y - _rotated_pan_from_y;
 		
-		x -= _relative_to_x;
-		y -= _relative_to_y;
-	}
+		var _angle_diff_is_cardinal	= (_angle_diff+360) mod 90 <= math_get_epsilon() || (_angle_diff+360) mod 90 >= 90 - math_get_epsilon();
+		
+		_relative_to_x			= _angle_diff_is_cardinal ? _relative_to_x : round(_relative_to_x);	// round co-ordinates at odd relative angles to avoid jitteriness
+		_relative_to_y			= _angle_diff_is_cardinal ? _relative_to_y : round(_relative_to_y);	// round co-ordinates at odd relative angles to avoid jitteriness
+		
+		target_x			-= _relative_to_x;
+		target_y			-= _relative_to_y;
+		
+		x				-= _relative_to_x;
+		y				-= _relative_to_y;
+	};
 	
 	
 	
