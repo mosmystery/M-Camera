@@ -70,11 +70,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	// panning
 	
 	panning			= false;		// See .is_panning(), .start_panning(), .stop_panning(), .pan_to()
-	pan_from_x		= xstart;		// The user-defined starting x co-ordinate for the pan.
-	pan_from_y		= ystart;		// The user-defined starting y co-ordinate for the pan.
-	pan_xstart		= xstart;		// The camera's starting x co-ordinate for the pan.
-	pan_ystart		= ystart;		// The camera's starting x co-ordinate for the pan.
-	pan_anglestart		= anglestart;		// The camera's starting angle for the pan.
+	pan_from_x		= xstart;		// The user-defined starting x co-ordinate for the pan. See .start_panning()
+	pan_from_y		= ystart;		// The user-defined starting y co-ordinate for the pan. See .start_panning()
+	pan_xstart		= xstart;		// The camera's starting x co-ordinate for the pan. For debug drawing.
+	pan_ystart		= ystart;		// The camera's starting y co-ordinate for the pan. For debug drawing.
+	pan_anglestart		= anglestart;		// The camera's starting angle for the pan. See .start_panning()
 	
 	// init
 	
@@ -158,7 +158,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		// update position to comply with zoom_anchor
 		if (zoom != _previous_zoom && (is_struct(zoom_anchor) || instance_exists(zoom_anchor)))
-		{			
+		{
+			// calculate position
 			var _screen_ratio_w	= (zoom_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);
 			var _screen_ratio_h	= (zoom_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
 			
@@ -168,7 +169,19 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			var _adjusted_x		= zoom_anchor.x - (_view_width * _screen_ratio_w) + (_view_width/2);
 			var _adjusted_y		= zoom_anchor.y - (_view_height * _screen_ratio_h) + (_view_height/2);
 			
-			move_to(_adjusted_x, _adjusted_y, true, true);
+			// update position - without move_to() so that x,y can be set conditionally, for panning.
+			var _diff_x		= _adjusted_x-target_x;
+			var _diff_y		= _adjusted_y-target_y;
+			
+			target_x		+= _diff_x;
+			target_y		+= _diff_y;
+			
+			if (!is_panning())
+			{
+				x		+= _diff_x;
+				y		+= _diff_y;
+			}
+			
 		}
 	};
 	
@@ -179,31 +192,23 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __apply_rotation = function(_instant=false) {
 		var _previous_angle	= angle;
 		
-		// update angle
-		if (_instant)
+		// wrap angle values to interpolate in the correct direction
+		if (abs(target_angle - angle) == 180)
 		{
-			angle		= target_angle;
+			target_angle = choose(angle-180, angle+180);
 		}
 		else
 		{
-			// wrap angle values
-			if (abs(target_angle - angle) == 180)
-			{
-				target_angle = choose(angle-180, angle+180);
-			}
-			else
-			{
-				target_angle = wrap(target_angle, 0, 360);
-				
-				if (abs(target_angle - angle) > 180)
-				{
-					angle	= (angle < target_angle) ? angle + 360 : angle - 360;
-				}
-			}
+			target_angle = wrap(target_angle, 0, 360);
 			
-			// set angle
-			angle		= lerp(angle, target_angle, angle_interpolation);
+			while (abs(target_angle - angle) > 180)
+			{
+				angle	= (angle < target_angle) ? angle + 360 : angle - 360;
+			}
 		}
+		
+		// update angle
+		angle	= lerp(angle, target_angle, _instant ? 1 : angle_interpolation);
 		
 		// update postion to comply with rotation_anchor
 		if (angle != _previous_angle && (is_struct(rotation_anchor) || instance_exists(rotation_anchor)))
@@ -216,16 +221,25 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 				});
 			}
 			
+			// calculate position
 			var _distance	= point_distance(rotation_anchor.x, rotation_anchor.y, x, y);
 			var _direction	= point_direction(rotation_anchor.x, rotation_anchor.y, x, y) + (_previous_angle-angle);
 			
-			var _position_x	= lengthdir_x(_distance, _direction);
-			var _position_y	= lengthdir_y(_distance, _direction);
+			var _relative_x	= lengthdir_x(_distance, _direction);
+			var _relative_y	= lengthdir_y(_distance, _direction);
 			
-			var _adjusted_x = rotation_anchor.x + _position_x;
-			var _adjusted_y = rotation_anchor.y + _position_y;
+			var _adjusted_x = rotation_anchor.x + _relative_x;
+			var _adjusted_y = rotation_anchor.y + _relative_y;
 			
-			move_to(_adjusted_x, _adjusted_y, true, true);
+			// update position - without move_to() so that x,y can be relative to previous x,y, to not override panning.
+			var _diff_x	= _adjusted_x-target_x;
+			var _diff_y	= _adjusted_y-target_y;
+			
+			target_x	+= _diff_x;
+			target_y	+= _diff_y;
+			
+			x		+= _diff_x;
+			y		+= _diff_y;
 		}
 	};
 	
@@ -253,21 +267,26 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __clamp_to_boundary = function(_rect_or_undefined = boundary) {
 		if (!is_undefined(_rect_or_undefined))
 		{
-			var _view_width			= width/zoom;
-			var _view_height		= height/zoom;		
-			var _width_ratio		= abs( lengthdir_x(1, angle) );
-			var _height_ratio		= abs( lengthdir_y(1, angle) );
+			var _view_width		= width/zoom;
+			var _view_height	= height/zoom;		
+			var _width_ratio	= abs( lengthdir_x(1, angle) );
+			var _height_ratio	= abs( lengthdir_y(1, angle) );
 			
-			var _rotated_width		= (_width_ratio * _view_width) + (_height_ratio * _view_height);
-			var _rotated_height		= (_width_ratio * _view_height) + (_height_ratio * _view_width);
+			var _rotated_width	= (_width_ratio * _view_width) + (_height_ratio * _view_height);
+			var _rotated_height	= (_width_ratio * _view_height) + (_height_ratio * _view_width);
 		
-			var _boundary_width		= _rect_or_undefined.x2 - _rect_or_undefined.x1;
-			var _boundary_height		= _rect_or_undefined.y2 - _rect_or_undefined.y1;
+			var _boundary_width	= _rect_or_undefined.x2 - _rect_or_undefined.x1;
+			var _boundary_height	= _rect_or_undefined.y2 - _rect_or_undefined.y1;
 			
-			var _clamped_x			= (_rotated_width > _boundary_width)	? (_rect_or_undefined.x1 + _boundary_width/2)	: clamp(x, _rect_or_undefined.x1 + (_rotated_width/2), _rect_or_undefined.x2 - (_rotated_width/2));
-			var _clamped_y			= (_rotated_height > _boundary_height)	? (_rect_or_undefined.y1 + _boundary_height/2)	: clamp(y, _rect_or_undefined.y1 + (_rotated_height/2), _rect_or_undefined.y2 - (_rotated_height/2));
+			var _clamped_x		= (_rotated_width > _boundary_width)	? (_rect_or_undefined.x1 + _boundary_width/2)	: clamp(x, _rect_or_undefined.x1 + (_rotated_width/2), _rect_or_undefined.x2 - (_rotated_width/2));
+			var _clamped_y		= (_rotated_height > _boundary_height)	? (_rect_or_undefined.y1 + _boundary_height/2)	: clamp(y, _rect_or_undefined.y1 + (_rotated_height/2), _rect_or_undefined.y2 - (_rotated_height/2));
 			
-			move_to(_clamped_x, _clamped_y, true, true);
+			// update position - without move_to() to avoid springing while panning.
+			target_x		= _clamped_x;
+			target_y		= _clamped_y;
+			
+			x			= target_x;
+			y			= target_y;
 		}
 	};
 	
@@ -612,6 +631,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_target_x=target_x]		The new target_x position for the camera.
 	/// @param {real}	[_target_y=target_y]		The new target_y position for the camera.
 	/// @param {bool}	[_instant=false]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
+	/// @param {bool}	[_ignore_target=false]		Whether to ignore complying movement with the target object.
 	/// @returns		N/A
 	static move_to = function(_target_x=target_x, _target_y=target_y, _instant=false, _ignore_target=false) {
 		target_x = _target_x;
@@ -625,9 +645,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		move_by(_x, _y, _instant)
 	/// @description	Moves the camera target_x/target_y by a relative amount.
-	/// @param {real}	[_x=0]					The x value to move target_x by.
-	/// @param {real}	[_y=0]					The y value to move target_y by.
+	/// @param {real}	[_x=0]				The x value to move target_x by.
+	/// @param {real}	[_y=0]				The y value to move target_y by.
 	/// @param {bool}	[_instant=false]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
+	/// @param {bool}	[_ignore_target=false]		Whether to ignore complying movement with the target object.
 	/// @returns		N/A
 	static move_by = function(_x=0, _y=0, _instant=false, _ignore_target=false) {
 		move_to(target_x + _x, target_y + _y, _instant, _ignore_target);
@@ -738,7 +759,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		target_x -= _relative_to_x;
 		target_y -= _relative_to_y;
 		
-		move_to(target_x, target_y, _instant, true);
+		x -= _relative_to_x;
+		y -= _relative_to_y;
 	}
 	
 	
@@ -794,7 +816,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	Converts an x,y position in the world to co-ordinates on the GUI and returns it in a struct. Useful for drawing tracking icons on the GUI.
 	/// @param {real}	[_x=0]		The x co-ordinate in the world.
 	/// @param {real}	[_y=0]		The y co-ordinate in the world.
-	/// @returns {struct}	Returns a Vector2 / struct containing an x and y value. 
+	/// @returns {struct}	Returns a Vector2 / struct containing an x and y value.
 	static find_gui_position = function(_x, _y) {
 		var _gui_x = (_x - camera_get_view_x(id)) * zoom;
 		var _gui_y = (_y - camera_get_view_y(id)) * zoom;
