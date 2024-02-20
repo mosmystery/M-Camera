@@ -3,6 +3,8 @@
 /// @returns		N/A
 function game_init()
 {
+	draw_set_font(fntSystem);
+	
 	// world init
 	
 	global.world	= {

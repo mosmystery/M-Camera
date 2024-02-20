@@ -5,6 +5,7 @@
     {"name":"Sprites","order":5,"path":"folders/Example/Sprites.yy",},
     {"name":"M-Camera","order":1,"path":"folders/M-Camera.yy",},
     {"name":"utilities","order":1,"path":"folders/M-Camera/utilities.yy",},
+    {"name":"Fonts","order":7,"path":"folders/Example/Fonts.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"range_operations","order":1,"path":"scripts/range_operations/range_operations.yy",},
