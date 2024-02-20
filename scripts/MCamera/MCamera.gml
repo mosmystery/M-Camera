@@ -181,7 +181,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 				x		+= _diff_x;
 				y		+= _diff_y;
 			}
-			
 		}
 	};
 	
@@ -737,8 +736,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		pan_to(_to_x, _to_y)
 	/// @description	Pans the camera to _to_x, _to_y from pan_xstart and pan_ystart. Only call this function when in panning mode - See .start_panning(), .stop_panning() and .is_panning().
-	/// @param {real}	[_to_x=pan_xstart]	The x co-ordinate to which you wish to pan.
-	/// @param {real}	[_to_y=pan_ystart]	The y co-ordinate to which you wish to pan.
+	/// @param {real}	[_to_x=pan_xstart]	The x co-ordinate to which to pan.
+	/// @param {real}	[_to_y=pan_ystart]	The y co-ordinate to which to pan.
 	/// @returns		N/A
 	static pan_to = function(_to_x=pan_xstart, _to_y=pan_ystart) {
 		if (!panning)
