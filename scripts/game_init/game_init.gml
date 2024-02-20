@@ -26,7 +26,11 @@ function game_init()
 	
 	// camera init
 	
-	global.camera	= new MCamera(320, 180, 4, 1);
+	global.camera	= new MCamera(320, 180, 4, 1);							// Create MCamera. View MCamera() for parameter descriptions. Try setting different parameters.
+	
+	global.camera.set_interpolation_values(1/4, 1/4, 1/4);						// See MCamera.gml for full list of methods and documentation. Try setting zoom interpolation to a fraction.
+	global.camera.set_start_values(global.world.width_scaled()/2, global.world.height_scaled()/2);	// sets the camera startx and starty to the center of global.world. Also takes optional parameters for anglestart and zoomstart.
+	global.camera.reset();										// resets the camera to the new start values.
 	
 	var _rotation_anchor = {									// targets and anchors simply need to include an x and y value to work, whether that is an object or a struct (such as a Vector2).
 		x : global.world.width_scaled() / 2,
@@ -35,13 +39,12 @@ function game_init()
 	
 	global.camera.set_rotation_anchor(_rotation_anchor);						// ensure the camera rotates around the center of the level.
 	global.camera.set_zoom_anchor(objMouseControl);							// ensure camera zooms towards and away from objMouseControl.
-	global.camera.set_start_values(global.world.width_scaled()/2, global.world.height_scaled()/2);	// sets the camera startx and starty to the center of global.world. Also takes optional parameters for anglestart and zoomstart.
-	global.camera.reset(true);									// resets the camera to the new start values.
-	
-	global.camera.set_interpolation_values(1/4, 1/4, 1/4);						// See MCamera.gml for full list of methods and documentation. Try setting zoom interpolation to a fraction.
 	
 	var _border	= 1024;
+	
 	global.camera.set_boundary(-_border, -_border, global.world.width_scaled()+_border, global.world.height_scaled()+_border);	// sets a boundary for the camera. Try .set_debug_mode(true) to see it, or try removing this line or calling .unset_boundary() to remove it.
+	
+	global.camera.set_debug_mode(true)								// Turn debug mode on. Try setting to false or removing line.
 }
 
 

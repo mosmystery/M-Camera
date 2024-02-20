@@ -107,9 +107,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns		N/A
 	static end_step = function() {
 		// update camera
-		__apply_zoom(false);
-		__apply_rotation(false);
-		__apply_movement(false, false);
+		__apply_zoom();
+		__apply_rotation();
+		__apply_movement();
 		__clamp_to_boundary(boundary);
 		
 		// update view
@@ -146,15 +146,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		window_center();
 	};
 	
-	/// @function		__apply_zoom(_instant)
+	/// @function		__apply_zoom()
 	/// @description	For internal use. Updates the camera zoom.
-	/// @param {bool}	[_instant=false]	Whether to apply target_zoom instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static __apply_zoom = function(_instant=false) {
+	static __apply_zoom = function() {
 		var _previous_zoom	= zoom;
 		
 		// update zoom
-		zoom	= lerp(zoom, target_zoom, _instant ? 1 : zoom_interpolation);
+		zoom	= lerp(zoom, target_zoom, zoom_interpolation);
 		
 		// update position to comply with zoom_anchor
 		if (zoom != _previous_zoom && (is_struct(zoom_anchor) || instance_exists(zoom_anchor)))
@@ -184,11 +183,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function		__apply_rotation(_instant)
+	/// @function		__apply_rotation()
 	/// @description	For internal use. Updates the camera angle.
-	/// @param {bool}	[_instant=false]	Whether to apply target_angle instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static __apply_rotation = function(_instant=false) {
+	static __apply_rotation = function() {
 		var _previous_angle	= angle;
 		
 		// wrap angle values to interpolate in the correct direction
@@ -207,7 +205,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 		
 		// update angle
-		angle	= lerp(angle, target_angle, _instant ? 1 : angle_interpolation);
+		angle	= lerp(angle, target_angle, angle_interpolation);
 		
 		// update postion to comply with rotation_anchor
 		if (angle != _previous_angle && (is_struct(rotation_anchor) || instance_exists(rotation_anchor)))
@@ -242,24 +240,22 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function		__apply_movement(_instant)
+	/// @function		__apply_movement()
 	/// @description	For internal use. Updates the camera position.
-	/// @param {bool}	[_instant=false]		Whether to apply target_x / target_y instantly (true) or interpolate towards them (false).
-	/// @param {bool}	[_ignore_target=false]		Whether ignore the target (true) or not (false). Useful for resetting to the correct start position.
 	/// @returns		N/A
-	static __apply_movement = function(_instant=false, _ignore_target=false) {
+	static __apply_movement = function() {
 		// comply with target
-		if (!is_panning() && !_ignore_target && should_follow_target() && (is_struct(target) || instance_exists(target)))
+		if (!is_panning() && should_follow_target() && (is_struct(target) || instance_exists(target)))
 		{
-			move_to(target.x, target.y, false); // true will cause an infinite loop. let the code below handle _instant instead.
+			move_to(target.x, target.y);
 		}
 		
 		// update position
-		x = lerp(x, target_x, _instant ? 1 : position_interpolation);
-		y = lerp(y, target_y, _instant ? 1 : position_interpolation);
+		x = lerp(x, target_x, position_interpolation);
+		y = lerp(y, target_y, position_interpolation);
 	};
 	
-	/// @function			__clamp_to_boundary(_instant)
+	/// @function			__clamp_to_boundary(_rect_or_undefined)
 	/// @description		For internal use. Clamps the camera position to be within boundary.
 	/// @param {struct,undefined}	[_rect_or_undefined=boundary]	The struct defining the boundary rectangle, or undefined for no clamping. Must contain x1, y1, x2, y2 values. Example: { x1=0, y1=0, x2=width, y2=height }
 	/// @returns			N/A
@@ -574,126 +570,108 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoomstart	= _zoomstart;
 	};
 	
-	/// @function		zoom_to(_target_zoom, _instant)
+	/// @function		zoom_to(_target_zoom)
 	/// @description	Sets the target_zoom factor for the camera.
 	/// @param {real}	[_target_zoom=target_zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
-	/// @param {bool}	[_instant=false]		Whether to apply target_zoom instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static zoom_to = function(_target_zoom=target_zoom, _instant=false) {
+	static zoom_to = function(_target_zoom=target_zoom) {
 		target_zoom = clamp(_target_zoom, zoom_min, zoom_max);
-		
-		if (_instant)
-		{
-			__apply_zoom(_instant);
-		}
 	};
 	
-	/// @function		zoom_by(_zoom_factor, _instant)
+	/// @function		zoom_by(_zoom_factor)
 	/// @description	Sets the target_zoom factor relative to the current target_zoom.
 	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
-	/// @param {bool}	[_instant=false]	Whether to apply target_zoom instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static zoom_by = function(_zoom_factor=1, _instant=false) {
-		zoom_to(target_zoom * _zoom_factor, _instant);
+	static zoom_by = function(_zoom_factor=1) {
+		zoom_to(target_zoom * _zoom_factor);
 	};
 	
-	/// @function		rotate_to(_target_angle, _instant)
+	/// @function		rotate_to(_target_angle)
 	/// @description	Sets the target_angle for the camera.
 	/// @param {real}	[_target_angle=target_angle]	The new target angle for the camera, in degrees.
-	/// @param {bool}	[_instant=false]		Whether to apply target_angle instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static rotate_to = function(_target_angle=target_angle, _instant=false) {
+	static rotate_to = function(_target_angle=target_angle) {
 		if (debug)
 		{
 			debug_rotation_points = [];
 		}
 		
 		target_angle	= _target_angle;
-		
-		if (_instant)
-		{
-			__apply_rotation(_instant);
-		}
 	};
 	
-	/// @function		rotate_by(_degrees, _instant)
+	/// @function		rotate_by(_degrees)
 	/// @description	Increments camera's target_angle by _degrees.
 	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
-	/// @param {bool}	[_instant=false]	Whether to apply target_angle instantly (true) or interpolate towards it (false).
 	/// @returns		N/A
-	static rotate_by = function(_degrees=0, _instant=false) {		
-		rotate_to(target_angle + _degrees, _instant);
+	static rotate_by = function(_degrees=0) {
+		rotate_to(target_angle + _degrees);
 	};
 	
-	/// @function		move_to(_target_x, _target_y, _instant)
+	/// @function		move_to(_target_x, _target_y)
 	/// @description	Sets the target_x/target_y for the camera.
 	/// @param {real}	[_target_x=target_x]		The new target_x position for the camera.
 	/// @param {real}	[_target_y=target_y]		The new target_y position for the camera.
-	/// @param {bool}	[_instant=false]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
-	/// @param {bool}	[_ignore_target=false]		Whether to ignore complying movement with the target object.
 	/// @returns		N/A
-	static move_to = function(_target_x=target_x, _target_y=target_y, _instant=false, _ignore_target=false) {
+	static move_to = function(_target_x=target_x, _target_y=target_y) {
 		target_x = _target_x;
 		target_y = _target_y;
-		
-		if (_instant)
-		{
-			__apply_movement(_instant, _ignore_target);
-		}
 	};
 	
-	/// @function		move_by(_x, _y, _instant)
+	/// @function		move_by(_x, _y)
 	/// @description	Moves the camera target_x/target_y by a relative amount.
 	/// @param {real}	[_x=0]				The x value to move target_x by.
 	/// @param {real}	[_y=0]				The y value to move target_y by.
-	/// @param {bool}	[_instant=false]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
-	/// @param {bool}	[_ignore_target=false]		Whether to ignore complying movement with the target object.
 	/// @returns		N/A
-	static move_by = function(_x=0, _y=0, _instant=false, _ignore_target=false) {
-		move_to(target_x + _x, target_y + _y, _instant, _ignore_target);
+	static move_by = function(_x=0, _y=0) {
+		move_to(target_x + _x, target_y + _y);
 	};
 	
-	/// @function		translate_to(_target_x, _target_y, _target_angle, _target_zoom, _instant)
+	/// @function		translate_to(_target_x, _target_y, _target_angle, _target_zoom)
 	/// @description	Sets the target_x/target_y/target_angle/target_zoom for the camera.
 	/// @param {real}	[_target_x=target_x]		The new target_x position for the camera.
 	/// @param {real}	[_target_y=target_y]		The new target_y position for the camera.
 	/// @param {real}	[_target_angle=target_angle]	The new target angle for the camera, in degrees.
 	/// @param {real}	[_target_zoom=target_zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
-	/// @param {bool}	[_instant=false]		Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
 	/// @returns		N/A
-	static translate_to = function(_target_x=x, _target_y=y, _target_angle=angle, _target_zoom=zoom, _instant=false) {
-		zoom_to(_target_zoom, _instant);
-		rotate_to(_target_angle, _instant);
-		move_to(_target_x, _target_y, _instant);
+	static translate_to = function(_target_x=x, _target_y=y, _target_angle=angle, _target_zoom=zoom) {
+		zoom_to(_target_zoom);
+		rotate_to(_target_angle);
+		move_to(_target_x, _target_y);
 	};
 	
-	/// @function		translate_by(_x, _y, _degrees, _zoom_factor, _instant)
+	/// @function		translate_by(_x, _y, _degrees, _zoom_factor)
 	/// @description	Moves the camera target_x/target_y/target_angle/target_zoom by a relative amount.
 	/// @param {real}	[_x=0]			The x value to move target_x by.
 	/// @param {real}	[_y=0]			The y value to move target_y by.
 	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
 	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
-	/// @param {bool}	[_instant=false]	Whether to apply target_x/target_y instantly (true) or interpolate towards them (false).
 	/// @returns		N/A
-	static translate_by = function(_x=0, _y=0, _degrees=0, _zoom_factor=1, _instant=false) {
-		zoom_by(_zoom_factor, _instant);
-		rotate_by(_degrees, _instant);
-		move_by(_x, _y, _instant);
+	static translate_by = function(_x=0, _y=0, _degrees=0, _zoom_factor=1) {
+		zoom_by(_zoom_factor);
+		rotate_by(_degrees);
+		move_by(_x, _y);
 	};
 	
-	/// @function		reset(_instant)
-	/// @description	Resets the camera back to the startx/y/angle/zoom values.
-	/// @param {bool}	[_instant=false]	Whether to apply target_x/target_y/target_angle/target_zoom instantly (true) or interpolate towards them (false).
+	/// @function		reset()
+	/// @description	Resets the camera back to the startx/y/angle/zoom values and stops panning.
 	/// @returns		N/A
-	static reset = function(_instant=false) {
+	static reset = function() {
 		if (debug)
 		{
 			debug_rotation_points = [];
 		}
 		
-		zoom_to(zoomstart, _instant);
-		rotate_to(anglestart, _instant);
-		move_to(xstart, ystart, _instant, true);
+		stop_panning();
+		
+		target_x	= xstart;
+		target_y	= ystart;
+		target_angle	= anglestart;
+		target_zoom	= zoomstart;
+		
+		x		= target_x;
+		y		= target_y;
+		angle		= target_angle;
+		zoom		= target_zoom;
 	};
 	
 	

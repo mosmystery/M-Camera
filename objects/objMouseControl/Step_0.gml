@@ -25,7 +25,7 @@ var _input = {
 
 if (_input.zoom_in)
 {
-	global.camera.zoom_by(2);		// input 2 to double the camera zoom. "true" indicates instant change. Try "false" for a smooth zoom, or try .zoom_to() to set the zoom factor directly (>1 = zoom in, else 1 = normal, else >0 = zoom out)
+	global.camera.zoom_by(2);		// input 2 to double the camera zoom. Try .zoom_to() to set the taget zoom factor directly (>1 = zoom in, else 1 = normal, else >0 = zoom out)
 }
 else if (_input.zoom_out)
 {
@@ -51,12 +51,12 @@ else if (_input.pan_end)
 }
 else if (global.camera.is_panning())
 {
-	global.camera.pan_to(x, y);		// pan to desired position when .is_panning(). "true" indicates instant position update. Try "false" for interpolated panning.
+	global.camera.pan_to(x, y);		// pan to desired position when .is_panning()
 }
 
 if (_input.reset)
 {
-	global.camera.reset(true);		// reset the camera to start values. "false" indicates a smooth change. try "true" for instant reset. try manually resetting the camera with .zoom_to(), .rotate_to() and .move_to() 
+	global.camera.reset();			// reset the camera to start values. Try manually resetting the camera with .zoom_to(), .rotate_to() and .move_to() 
 }
 
 if (_input.toggle_debug)
