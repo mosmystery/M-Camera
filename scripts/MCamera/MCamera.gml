@@ -232,22 +232,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	For internal use. Updates the camera angle.
 	/// @returns		N/A
 	static __apply_rotation = function() {
-		// wrap angle values to interpolate in the correct direction
-		if (abs(target.angle - angle) == 180)
-		{
-			target.angle = choose(angle-180, angle+180);
-		}
-		else
-		{
-			target.angle = wrap(target.angle, 0, 360);
-			
-			while (abs(target.angle - angle) > 180)
-			{
-				angle	= (angle < target.angle) ? angle + 360 : angle - 360;
-			}
-		}
-		
-		// update angle
 		angle	= interpolation.fn_angle(angle, target.angle, interpolation.angle);
 		
 		// update postion to comply with anchors.angle
@@ -637,6 +621,21 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 		
 		target.angle	= _target_angle;
+		
+		// wrap angle values to interpolate in the correct direction
+		if (abs(target.angle - angle) == 180)
+		{
+			target.angle = choose(angle-180, angle+180);
+		}
+		else
+		{
+			target.angle = wrap(target.angle, 0, 360);
+			
+			while (abs(target.angle - angle) > 180)
+			{
+				angle	= (angle < target.angle) ? angle + 360 : angle - 360;
+			}
+		}
 	};
 	
 	/// @function		rotate_by(_degrees)
