@@ -55,9 +55,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		position	: 1/8,		// See .set_position_interpolation()
 		angle		: 1/4,		// See .set_angle_interpolation()
 		zoom		: 1/16,		// See .set_zoom_interpolation()
-		fn_position	: lerp,		// See .set_position_interpolation()
-		fn_angle	: lerp,		// See .set_angle_interpolation()
-		fn_zoom		: lerp		// See .set_zoom_interpolation()
+		fn_position	: lerp,		// Custom interpolation function. See .set_position_interpolation()
+		fn_angle	: lerp,		// Custom interpolation function. See .set_angle_interpolation()
+		fn_zoom		: lerp		// Custom interpolation function. See .set_zoom_interpolation()
 	};
 	
 	// constraints
@@ -530,9 +530,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-		  ////////////////////
-		 // transformation //
-		////////////////////
+		  ///////////////////////////////
+		 // transformation - settings //
+		///////////////////////////////
 	
 	
 	
@@ -550,27 +550,55 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		start.zoom	= _zoomstart;
 	};
 	
-	/// @function		reset()
-	/// @description	Resets the camera back to the startx/y/angle/zoom values and stops panning.
+	/// @function		set_position_interpolation(_value, _fn_interpolate)
+	/// @description	Sets the interpolation factor and function for transforming the x, y position towards target.x/.y. Essentially how fast x/y should approach target.x/.y.
+	/// @param {real}	[_value=interpolation.position]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {function}	[_fn_interpolate=interpolation.fn_position]	Optional custom interpolation function for updating the camera's x and y values. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
-	static reset = function() {
-		if (is_debugging())
-		{
-			debug.rotation.points = [];
-		}
-		
-		stop_panning();
-		
-		target.x	= start.x;
-		target.y	= start.y;
-		target.angle	= start.angle;
-		target.zoom	= start.zoom;
-		
-		x		= target.x;
-		y		= target.y;
-		angle		= target.angle;
-		zoom		= target.zoom;
+	static set_position_interpolation = function(_value=interpolation.position, _fn_interpolate=interpolation.fn_position) {
+		interpolation.position		= _value;
+		interpolation.fn_position	= _fn_interpolate;
 	};
+	
+	/// @function		set_angle_interpolation(_value, _fn_interpolate)
+	/// @description	Sets the interpolation factor and function for transforming the angle towards target.angle. Essentially how fast angle should approach target.angle.
+	/// @param {real}	[_value=interpolation.angle]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {function}	[_fn_interpolate=interpolation.fn_angle]	Optional custom interpolation function for updating the camera's angle. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
+	/// @returns		N/A
+	static set_angle_interpolation = function(_value=interpolation.angle, _fn_interpolate=interpolation.fn_angle) {
+		interpolation.angle	= _value;
+		interpolation.fn_angle	= _fn_interpolate;
+	};
+	
+	/// @function		set_zoom_interpolation(_value, _fn_interpolate)
+	/// @description	Sets the interpolation factor and function for transforming the zoom towards target.zoom. Essentially how fast zoom should approach target.zoom.
+	/// @param {real}	[_value=interpolation.zoom]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {function}	[_fn_interpolate=interpolation.fn_zoom]	Optional custom interpolation function for updating the camera's zoom. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
+	/// @returns		N/A
+	static set_zoom_interpolation = function(_value=interpolation.zoom, _fn_interpolate=interpolation.fn_angle) {
+		interpolation.zoom	= _value;
+		interpolation.fn_zoom	= _fn_interpolate;
+	};
+	
+	/// @function		set_interpolation_values(_position_interpolation, _angle_interpolation, _zoom_interpolation)
+	/// @description	Sets the interpolation factors for moving, rotating and zooming the camera. Essentially how fast x, y, angle and zoom should approach their respective target values.
+	/// @param {real}	[_position_interpolation=interpolation.position]	The position interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_angle_interpolation=interpolation.angle]		The angle interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_zoom_interpolation=interpolation.zoom]		The zoom interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @returns		N/A
+	static set_interpolation_values = function(_position_interpolation=interpolation.position, _angle_interpolation=interpolation.angle, _zoom_interpolation=interpolation.zoom) {
+		set_position_interpolation(_position_interpolation);
+		set_angle_interpolation(_angle_interpolation);
+		set_zoom_interpolation(_zoom_interpolation);
+	};
+	
+	
+	
+		  ////////////////////
+		 // transformation //
+		////////////////////
+	
+	
 	
 	/// @function		move_to(_target_x, _target_y)
 	/// @description	Sets the target.x/.y for the camera.
@@ -669,53 +697,33 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_by(_zoom_factor);
 	};
 	
-	/// @function		set_position_interpolation(_value, _fn_interpolate)
-	/// @description	Sets the interpolation factor and function for transforming the x, y position towards target.x/.y. Essentially how fast x/y should approach target.x/.y.
-	/// @param {real}	[_value=interpolation.position]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {function}	[_fn_interpolate=interpolation.fn_position]	Optional custom interpolation function for updating the camera's x and y values. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
+	/// @function		reset()
+	/// @description	Resets the camera back to the start values and stops panning. See .set_start_values() and .stop_panning()
 	/// @returns		N/A
-	static set_position_interpolation = function(_value=interpolation.position, _fn_interpolate=interpolation.fn_position) {
-		interpolation.position		= _value;
-		interpolation.fn_position	= _fn_interpolate;
-	};
-	
-	/// @function		set_angle_interpolation(_value, _fn_interpolate)
-	/// @description	Sets the interpolation factor and function for transforming the angle towards target.angle. Essentially how fast angle should approach target.angle.
-	/// @param {real}	[_value=interpolation.angle]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {function}	[_fn_interpolate=interpolation.fn_angle]	Optional custom interpolation function for updating the camera's angle. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
-	/// @returns		N/A
-	static set_angle_interpolation = function(_value=interpolation.angle, _fn_interpolate=interpolation.fn_angle) {
-		interpolation.angle	= _value;
-		interpolation.fn_angle	= _fn_interpolate;
-	};
-	
-	/// @function		set_zoom_interpolation(_value, _fn_interpolate)
-	/// @description	Sets the interpolation factor and function for transforming the zoom towards target.zoom. Essentially how fast zoom should approach target.zoom.
-	/// @param {real}	[_value=interpolation.zoom]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {function}	[_fn_interpolate=interpolation.fn_zoom]	Optional custom interpolation function for updating the camera's zoom. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
-	/// @returns		N/A
-	static set_zoom_interpolation = function(_value=interpolation.zoom, _fn_interpolate=interpolation.fn_angle) {
-		interpolation.zoom	= _value;
-		interpolation.fn_zoom	= _fn_interpolate;
-	};
-	
-	/// @function		set_interpolation_values(_position_interpolation, _angle_interpolation, _zoom_interpolation)
-	/// @description	Sets the interpolation factors for moving, rotating and zooming the camera. Essentially how fast x, y, angle and zoom should approach their respective target values.
-	/// @param {real}	[_position_interpolation=interpolation.position]	The position interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {real}	[_angle_interpolation=interpolation.angle]		The angle interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {real}	[_zoom_interpolation=interpolation.zoom]		The zoom interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @returns		N/A
-	static set_interpolation_values = function(_position_interpolation=interpolation.position, _angle_interpolation=interpolation.angle, _zoom_interpolation=interpolation.zoom) {
-		set_position_interpolation(_position_interpolation);
-		set_angle_interpolation(_angle_interpolation);
-		set_zoom_interpolation(_zoom_interpolation);
+	static reset = function() {
+		if (is_debugging())
+		{
+			debug.rotation.points = [];
+		}
+		
+		stop_panning();
+		
+		target.x	= start.x;
+		target.y	= start.y;
+		target.angle	= start.angle;
+		target.zoom	= start.zoom;
+		
+		x		= target.x;
+		y		= target.y;
+		angle		= target.angle;
+		zoom		= target.zoom;
 	};
 	
 	
 	
-		  /////////////
-		 // panning //
-		/////////////
+		  //////////////////////////////
+		 // transformation - panning //
+		//////////////////////////////
 	
 	
 	
