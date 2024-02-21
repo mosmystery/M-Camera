@@ -158,6 +158,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	The End Step event. Updates the camera translation.
 	/// @returns		N/A
 	static end_step = function() {
+		previous.x	= x;
+		previous.y	= y;
+		previous.angle	= angle;
+		previous.zoom	= zoom;
+		
 		// update camera
 		__apply_zoom();
 		__apply_rotation();
@@ -191,9 +196,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @function		__apply_zoom()
 	/// @description	For internal use. Updates the camera zoom.
 	/// @returns		N/A
-	static __apply_zoom = function() {
-		previous.zoom	= zoom;
-		
+	static __apply_zoom = function() {		
 		// update zoom
 		zoom		= interpolation.fn_zoom(zoom, target.zoom, interpolation.zoom);
 		
@@ -229,8 +232,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	For internal use. Updates the camera angle.
 	/// @returns		N/A
 	static __apply_rotation = function() {
-		previous.angle	= angle;
-		
 		// wrap angle values to interpolate in the correct direction
 		if (abs(target.angle - angle) == 180)
 		{
@@ -286,9 +287,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	For internal use. Updates the camera position.
 	/// @returns		N/A
 	static __apply_movement = function() {
-		previous.x	= x;
-		previous.y	= y;
-		
 		// comply with target
 		if (!is_panning() && !is_undefined(anchors.position))
 		{
