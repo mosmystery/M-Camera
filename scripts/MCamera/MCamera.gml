@@ -11,74 +11,98 @@
 /// @returns {struct.MCamera}
 function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 1, _create_host_object_for_me = true) constructor
 {
-	// config
+	// camera
 	
-	host_object		= undefined;		// See _create_host_object_for_me
+	host_object	= undefined;		// See .create()
 	
-	if (_create_host_object_for_me)
-	{
-		host_object		= instance_create_depth(0, 0, -1, objMCamera);
-		host_object.camera	= self;
-	}
+	view		= 0;			// See .set_view()
+	id		= view_camera[view];	// The view port id for this camera. See view_camera in the manual.
 	
-	view			= 0;
-	id			= view_camera[view];	// The view port id for this camera. See view_camera in the manual.
-	width			= _width;
-	height			= _height;
-	window_scale		= _window_scale;
-	pixel_scale		= _pixel_scale;
+	width		= _width;		// The base, unscaled width of the view
+	height		= _height;		// The base, unscaled height of the view
+	window_scale	= _window_scale;	// The scale of width, height to apply to the window.
+	pixel_scale	= _pixel_scale;		// The detail (width, height) of each pixel. Scales the application surface, but not the window or view. Only noticable at window scales higher than 1.
 	
-	// state
+	x		= width/2;		// The current x position for this camera. Equivalent to the center of the screen in world co-ordinates.
+	y		= height/2;		// The current y position for this camera. Equivalent to the center of the screen in world co-ordinates.
+	angle		= 0;			// The current angle for this camera, in degrees.
+	zoom		= 1;			// The current zoom factor for this camera. <1 = zoom in, else 1 = normal, else <0 = zoom out.
 	
-	boundary		= undefined;					// See .set_boundary()
-	should_follow_target	= method(self, function() {return true});	// See .set_target_follow_condition()
+	// transform
 	
-	target			= self;			// See .set_target()
-	rotation_anchor		= undefined;		// See .set_rotation_anchor()
-	zoom_anchor		= undefined;		// See .set_zoom_anchor()
+	start		= {
+		x	: x,
+		y	: y,
+		angle	: angle,
+		zoom	: zoom
+	};					// See .set_start_values() .reset()
 	
-	target_x		= width/2;		// See .move_to() .move_by(), .translate_to(), .translate_by()
-	target_y		= height/2;		// See .move_to() .move_by(), .translate_to(), .translate_by()
-	target_angle		= 0;			// See .rotate_to(), .rotate_by(), .translate_to(), .translate_by()
-	target_zoom		= 1;			// See .zoom_to(), .zoom_by(), .translate_to(), .translate_by()
+	previous	= {
+		x	: x,
+		y	: y,
+		angle	: angle,
+		zoom	: zoom
+	};					// The transform values from the previous step.
 	
-	if (target != self && (is_struct(target) || instance_exists(target)))
-	{
-		target_x	= target.x;
-		target_y	= target.y;
-	}
+	target		= {
+		x	: x,			// See .move_to(),	.move_by()
+		y	: y,			// See .move_to(),	.move_by()
+		angle	: angle,		// See .rotate_to(),	.rotate_by()
+		zoom	: zoom			// See .zoom_to(),	.zoom_by()
+	};					// See .translate_to(),	.translate_by()
 	
-	xstart			= target_x;		// See .set_start_values() and .reset()
-	ystart			= target_y;		// See .set_start_values() and .reset()
-	anglestart		= target_angle;		// See .set_start_values() and .reset()
-	zoomstart		= target_zoom;		// See .set_start_values() and .reset()
+	interpolation	= {
+		position	: 1/8,		// See .set_position_interpolation()
+		angle		: 1/4,		// See .set_angle_interpolation()
+		zoom		: 1/16,		// See .set_zoom_interpolation()
+		fn_position	: lerp,
+		fn_angle	: lerp,
+		fn_zoom		: lerp
+	};
 	
-	x			= xstart;		// The current x position for this camera. Equivalent to the center of the screen in world co-ordinates.
-	y			= ystart;		// The current y position for this camera. Equivalent to the center of the screen in world co-ordinates.
-	angle			= anglestart;		// The current angle for this camera, in degrees.
-	zoom			= zoomstart;		// The current zoom factor for this camera. <1 = zoom in, else 1 = normal, else <0 = zoom out.
-	zoom_min		= 1/16;			// See .set_zoom_limits()
-	zoom_max		= 4;			// See .set_zoom_limits()
+	// contraints
 	
-	position_interpolation	= 1/8;			// See .set_position_interpolation()
-	angle_interpolation	= 1/4;			// See .set_angle_interpolation()
-	zoom_interpolation	= 1/16;			// See .set_zoom_interpolation()
+	zoom_min	= 1/16;			// See .set_zoom_limits()
+	zoom_max	= 4;			// See .set_zoom_limits()
 	
-	debug			= false;		// See .set_debug_mode()
-	debug_rotation_points	= [];			// For internal use. Used to store and display the rotation arc in debug mode.
+	anchors		= {
+		position	: undefined,	// See .set_position_anchor()
+		angle		: undefined,	// See .set_rotation_anchor()
+		zoom		: undefined	// See .set_zoom_anchor()
+	};
+	
+	boundary	= undefined;		// See .set_boundary()
 	
 	// panning
 	
-	panning			= false;		// See .is_panning(), .start_panning(), .stop_panning(), .pan_to()
-	pan_from_x		= xstart;		// The user-defined starting x co-ordinate for the pan. See .start_panning()
-	pan_from_y		= ystart;		// The user-defined starting y co-ordinate for the pan. See .start_panning()
-	pan_xstart		= xstart;		// The camera's starting x co-ordinate for the pan. For debug drawing.
-	pan_ystart		= ystart;		// The camera's starting y co-ordinate for the pan. For debug drawing.
-	pan_anglestart		= anglestart;		// The camera's starting angle for the pan. See .start_panning()
+	panning		= {
+		active	: false,		// Whether panning mode is active or not. See .is_panning()
+		start	: {
+			x	: x,
+			y	: y,
+			angle	: angle,
+			zoom	: zoom
+		},				// The user-defined starting transform values for the pan. See .start_panning()
+		target	: {
+			x	: x,
+			y	: y,
+			angle	: angle,
+			zoom	: zoom
+		}				// The user-defined target transform values for the pan. See .start_panning()
+	};					// See .is_panning(), .start_panning(), .stop_panning(), .pan_to()
 	
-	// init
+	// debug
 	
-	__window_init();				// See .__window_init()
+	debug		= {
+		active		: false,	// See .is_debugging(), .set_debugging()
+		rotation	: {
+			points	: []		// For internal use. Used to store and display the rotation arc in debug mode.
+		},
+		panning		: {
+			camera_start_x	: x,	// The camera's starting x co-ordinate during panning.
+			camera_start_y	: y	// The camera's starting y co-ordinate during panning.
+		}
+	};
 	
 	
 	
@@ -93,6 +117,34 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		////////////
 	
 	
+	
+	/// @function		create(_create_host_object_for_me)
+	/// @description	The Create event. Initialises the camera.
+	/// @param {bool}	[_create_host_object_for_me=true]	Whether to create a permanent host object that runs the event methods automatically (true) or not (false). Useful if you want to run the event methods in a different event or manage the hose object yourself.
+	///								If false:	You will need to run this camera's .room_start(), .end_step(), and optionally .draw_end() events in a permanent object for intended results.
+	///								If true:	An instance of objMCamera, a shell for this constructor's event methods, will automatically be created and stored in .host_object.
+	/// @returns		N/A
+	static create = function(_create_host_object_for_me = true) {
+		// create host object
+		if (_create_host_object_for_me)
+		{
+			host_object		= instance_create_depth(0, 0, -1, objMCamera);
+			host_object.camera	= self;
+		}
+	
+		// set target position
+		if (!is_undefined(anchors.position))
+		{
+			target.x	= anchors.position.x;
+			target.y	= anchors.position.y;
+		}
+		
+		// initialise window
+		surface_resize(application_surface, width * pixel_scale, height * pixel_scale);
+		display_set_gui_size(width, height);
+		window_set_size(width * window_scale, height * window_scale);
+		window_center();
+	};
 	
 	/// @function		room_start()
 	/// @description	The Room Start event. Enables the view for this room.
@@ -136,44 +188,34 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		__window_init()
-	/// @description	For internal use. Initialises the application_surface, display, and window sizes, and centers the window.
-	/// @returns		N/A
-	static __window_init = function() {
-		surface_resize(application_surface, width * pixel_scale, height * pixel_scale);
-		display_set_gui_size(width, height);
-		window_set_size(width * window_scale, height * window_scale);
-		window_center();
-	};
-	
 	/// @function		__apply_zoom()
 	/// @description	For internal use. Updates the camera zoom.
 	/// @returns		N/A
 	static __apply_zoom = function() {
-		var _previous_zoom	= zoom;
+		previous.zoom	= zoom;
 		
 		// update zoom
-		zoom	= lerp(zoom, target_zoom, zoom_interpolation);
+		zoom		= interpolation.fn_zoom(zoom, target.zoom, interpolation.zoom);
 		
-		// update position to comply with zoom_anchor
-		if (zoom != _previous_zoom && (is_struct(zoom_anchor) || instance_exists(zoom_anchor)))
+		// update position to comply with anchors.zoom
+		if (zoom != previous.zoom && !is_undefined(anchors.zoom))
 		{
 			// calculate position
-			var _screen_ratio_w	= (zoom_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);
-			var _screen_ratio_h	= (zoom_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
+			var _screen_ratio_w	= (anchors.zoom.x - camera_get_view_x(id)) / camera_get_view_width(id);
+			var _screen_ratio_h	= (anchors.zoom.y - camera_get_view_y(id)) / camera_get_view_height(id);
 			
 			var _view_width		= width/zoom;
 			var _view_height	= height/zoom;
 			
-			var _adjusted_x		= zoom_anchor.x - (_view_width * _screen_ratio_w) + (_view_width/2);
-			var _adjusted_y		= zoom_anchor.y - (_view_height * _screen_ratio_h) + (_view_height/2);
+			var _adjusted_x		= anchors.zoom.x - (_view_width * _screen_ratio_w) + (_view_width/2);
+			var _adjusted_y		= anchors.zoom.y - (_view_height * _screen_ratio_h) + (_view_height/2);
 			
 			// update position - without move_to() so that x,y can be set conditionally, for panning.
-			var _diff_x		= _adjusted_x-target_x;
-			var _diff_y		= _adjusted_y-target_y;
+			var _diff_x		= _adjusted_x-target.x;
+			var _diff_y		= _adjusted_y-target.y;
 			
-			target_x		+= _diff_x;
-			target_y		+= _diff_y;
+			target.x		+= _diff_x;
+			target.y		+= _diff_y;
 			
 			if (!is_panning())
 			{
@@ -187,53 +229,53 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	For internal use. Updates the camera angle.
 	/// @returns		N/A
 	static __apply_rotation = function() {
-		var _previous_angle	= angle;
+		previous.angle	= angle;
 		
 		// wrap angle values to interpolate in the correct direction
-		if (abs(target_angle - angle) == 180)
+		if (abs(target.angle - angle) == 180)
 		{
-			target_angle = choose(angle-180, angle+180);
+			target.angle = choose(angle-180, angle+180);
 		}
 		else
 		{
-			target_angle = wrap(target_angle, 0, 360);
+			target.angle = wrap(target.angle, 0, 360);
 			
-			while (abs(target_angle - angle) > 180)
+			while (abs(target.angle - angle) > 180)
 			{
-				angle	= (angle < target_angle) ? angle + 360 : angle - 360;
+				angle	= (angle < target.angle) ? angle + 360 : angle - 360;
 			}
 		}
 		
 		// update angle
-		angle	= lerp(angle, target_angle, angle_interpolation);
+		angle	= interpolation.fn_angle(angle, target.angle, interpolation.angle);
 		
-		// update postion to comply with rotation_anchor
-		if (angle != _previous_angle && (is_struct(rotation_anchor) || instance_exists(rotation_anchor)))
+		// update postion to comply with anchors.angle
+		if (angle != previous.angle && !is_undefined(anchors.angle))
 		{
-			if (debug && abs(_previous_angle-angle) >= 0.5)
+			if (is_debugging() && abs(previous.angle-angle) >= 0.5)
 			{
-				array_push(debug_rotation_points, {
+				array_push(debug.rotation.points, {
 					x : x,
 					y : y
 				});
 			}
 			
 			// calculate position
-			var _distance	= point_distance(rotation_anchor.x, rotation_anchor.y, x, y);
-			var _direction	= point_direction(rotation_anchor.x, rotation_anchor.y, x, y) + (_previous_angle-angle);
+			var _distance	= point_distance(anchors.angle.x, anchors.angle.y, x, y);
+			var _direction	= point_direction(anchors.angle.x, anchors.angle.y, x, y) + (previous.angle-angle);
 			
 			var _relative_x	= lengthdir_x(_distance, _direction);
 			var _relative_y	= lengthdir_y(_distance, _direction);
 			
-			var _adjusted_x = rotation_anchor.x + _relative_x;
-			var _adjusted_y = rotation_anchor.y + _relative_y;
+			var _adjusted_x = anchors.angle.x + _relative_x;
+			var _adjusted_y = anchors.angle.y + _relative_y;
 			
 			// update position - without move_to() so that x,y can be relative to previous x,y, to not override panning.
-			var _diff_x	= _adjusted_x-target_x;
-			var _diff_y	= _adjusted_y-target_y;
+			var _diff_x	= _adjusted_x-target.x;
+			var _diff_y	= _adjusted_y-target.y;
 			
-			target_x	+= _diff_x;
-			target_y	+= _diff_y;
+			target.x	+= _diff_x;
+			target.y	+= _diff_y;
 			
 			x		+= _diff_x;
 			y		+= _diff_y;
@@ -244,15 +286,18 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	For internal use. Updates the camera position.
 	/// @returns		N/A
 	static __apply_movement = function() {
+		previous.x	= x;
+		previous.y	= y;
+		
 		// comply with target
-		if (!is_panning() && should_follow_target() && (is_struct(target) || instance_exists(target)))
+		if (!is_panning() && !is_undefined(anchors.position))
 		{
-			move_to(target.x, target.y);
+			move_to(anchors.position.x, anchors.position.y);
 		}
 		
 		// update position
-		x = lerp(x, target_x, position_interpolation);
-		y = lerp(y, target_y, position_interpolation);
+		x = lerp(x, target.x, interpolation.position);
+		y = lerp(y, target.y, interpolation.position);
 	};
 	
 	/// @function			__clamp_to_boundary(_rect_or_undefined)
@@ -277,11 +322,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			var _clamped_y		= (_rotated_height > _boundary_height)	? (_rect_or_undefined.y1 + _boundary_height/2)	: clamp(y, _rect_or_undefined.y1 + (_rotated_height/2), _rect_or_undefined.y2 - (_rotated_height/2));
 			
 			// update position - without move_to() to avoid springing while panning.
-			target_x		= _clamped_x;
-			target_y		= _clamped_y;
+			target.x		= _clamped_x;
+			target.y		= _clamped_y;
 			
-			x			= target_x;
-			y			= target_y;
+			x			= target.x;
+			y			= target.y;
 		}
 	};
 	
@@ -289,7 +334,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	For internal use. Draws the debug display.
 	/// @returns		N/A
 	static __debug_draw = function() {
-		if (!debug)
+		if (!is_debugging())
 		{
 			return;
 		}
@@ -320,28 +365,28 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			// dots
 		
 		// rotation arc
-		var _rot_arc_length = array_length(debug_rotation_points);
+		var _rot_arc_length = array_length(debug.rotation.points);
 			
 		if (_rot_arc_length >= 1)
 		{
-			draw_pointarray(0, 0, debug_rotation_points, false, pr_linestrip, _col_rot_arc);
-			draw_circle_color(debug_rotation_points[0].x-_po, debug_rotation_points[0].y-_po, _dot_radius, _col_rot_arc, _col_rot_arc, false);
-			draw_circle_color(debug_rotation_points[_rot_arc_length-1].x-_po, debug_rotation_points[_rot_arc_length-1].y-_po, _dot_radius, _col_rot_arc, _col_rot_arc, false);
+			draw_pointarray(0, 0, debug.rotation.points, false, pr_linestrip, _col_rot_arc);
+			draw_circle_color(debug.rotation.points[0].x-_po, debug.rotation.points[0].y-_po, _dot_radius, _col_rot_arc, _col_rot_arc, false);
+			draw_circle_color(debug.rotation.points[_rot_arc_length-1].x-_po, debug.rotation.points[_rot_arc_length-1].y-_po, _dot_radius, _col_rot_arc, _col_rot_arc, false);
 		}
 			
 		// rotation anchor
-		if (is_struct(rotation_anchor) || instance_exists(rotation_anchor))
+		if (!is_undefined(anchors.angle))
 		{
-			draw_circle_color(rotation_anchor.x-_po, rotation_anchor.y-_po, _dot_radius, _col_rot_anchor, _col_rot_anchor, false);
+			draw_circle_color(anchors.angle.x-_po, anchors.angle.y-_po, _dot_radius, _col_rot_anchor, _col_rot_anchor, false);
 		}
 		
 		// pan line
 		if (is_panning())
 		{
-			var _x1 = pan_from_x;
-			var _y1 = pan_from_y;
-			var _x2 = target_x + (pan_from_x - pan_xstart);
-			var _y2 = target_y + (pan_from_y - pan_ystart);
+			var _x1 = panning.start.x;
+			var _y1 = panning.start.y;
+			var _x2 = target.x + (panning.start.x - debug.panning.camera_start_x);
+			var _y2 = target.y + (panning.start.y - debug.panning.camera_start_y);
 			
 			draw_line_color(_x1, _y1, _x2, _y2, _col_pan_line, _col_pan_line);
 			draw_circle_color(_x1-_po, _y1-_po, _dot_radius, _col_pan_line, _col_pan_line, false);
@@ -349,9 +394,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 			
 		// zoom anchor
-		if (is_struct(zoom_anchor) || instance_exists(zoom_anchor))
+		if (!is_undefined(anchors.zoom))
 		{
-			draw_circle_color(zoom_anchor.x-_po, zoom_anchor.y-_po, _dot_radius, _col_zoom_anchor, _col_zoom_anchor, false);
+			draw_circle_color(anchors.zoom.x-_po, anchors.zoom.y-_po, _dot_radius, _col_zoom_anchor, _col_zoom_anchor, false);
 		}
 			
 		// view
@@ -361,9 +406,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		draw_circle_color(_view_x-_po, _view_y-_po, _dot_radius, _col_view, _col_view, false);
 			
 		// position target dot
-		if (is_struct(target) || instance_exists(target))
+		if (!is_undefined(anchors.position))
 		{
-			draw_circle_color(target_x-_po, target_y-_po, _dot_radius, _col_target, _col_target, false);
+			draw_circle_color(anchors.position.x-_po, anchors.position.y-_po, _dot_radius, _col_target, _col_target, false);
 		}
 		
 			// nav ring
@@ -371,19 +416,19 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		// dots
 		if (_rot_arc_length >= 1)
 		{
-			__debug_draw_nav_dot(debug_rotation_points[0].x, debug_rotation_points[0].y, _nav_dots_radius, _nav_dotring_radius, _col_rot_arc);					// rotation arc start
-			__debug_draw_nav_dot(debug_rotation_points[_rot_arc_length-1].x, debug_rotation_points[_rot_arc_length-1].y, _nav_dots_radius, _nav_dotring_radius, _col_rot_arc);	// rotation arc end
+			__debug_draw_nav_dot(debug.rotation.points[0].x, debug.rotation.points[0].y, _nav_dots_radius, _nav_dotring_radius, _col_rot_arc);					// rotation arc start
+			__debug_draw_nav_dot(debug.rotation.points[_rot_arc_length-1].x, debug.rotation.points[_rot_arc_length-1].y, _nav_dots_radius, _nav_dotring_radius, _col_rot_arc);	// rotation arc end
 		}
 		
-		__debug_draw_nav_anchor_dot(rotation_anchor, _nav_dots_radius, _nav_dotring_radius, _col_rot_anchor);	// rotation anchor
-		__debug_draw_nav_anchor_dot(zoom_anchor, _nav_dots_radius, _nav_dotring_radius, _col_zoom_anchor);	// zoom anchor
+		__debug_draw_nav_anchor_dot(anchors.angle, _nav_dots_radius, _nav_dotring_radius, _col_rot_anchor);	// rotation anchor
+		__debug_draw_nav_anchor_dot(anchors.zoom, _nav_dots_radius, _nav_dotring_radius, _col_zoom_anchor);	// zoom anchor
 		
 		if (is_panning())
 		{
-			var _x2 = target_x + (pan_from_x - pan_xstart);
-			var _y2 = target_y + (pan_from_y - pan_ystart);
+			var _x2 = target.x + (panning.start.x - debug.panning.camera_start_x);
+			var _y2 = target.y + (panning.start.y - debug.panning.camera_start_y);
 			
-			__debug_draw_nav_dot(pan_from_x, pan_from_y, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);	// pan line start
+			__debug_draw_nav_dot(panning.start.x, panning.start.y, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);	// pan line start
 			__debug_draw_nav_dot(_x2, _y2, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);			// pan line end
 		}
 		
@@ -391,7 +436,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		if (is_struct(target) || instance_exists(target))
 		{
-			__debug_draw_nav_dot(target_x, target_y, _nav_dots_radius, _nav_dotring_radius, _col_target);	// target
+			__debug_draw_nav_dot(target.x, target.y, _nav_dots_radius, _nav_dotring_radius, _col_target);	// target
 		}
 		
 		// ring
@@ -454,21 +499,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_max = clamp(_zoom_max, max(_min, _zoom_min), _max);
 	};
 	
-	/// @function							set_target(_target)
-	/// @description						Sets the target for the camera to follow.
-	/// @param {struct, id.Instance, asset.GMObject, undefined}	[_target=target]	The target to follow. If not undefined, must contain an x and y value.
-	///											Note: If you are not translating the position manually or with a target, set to self to maintain x,y as the target_x/target_y, otherwise the last target_x/target_y will remain, which may affect rotate/zoom.
+	/// @function							set_position_anchor(_position_anchor)
+	/// @description						Sets the position anchor (target object or struct) for the camera to follow.
+	/// @param {struct, id.Instance, asset.GMObject, undefined}	[_position_anchor=anchors.position]	The position anchor to follow. If not undefined, must contain an x and y value.
 	/// @returns							N/A
-	static set_target = function(_target=target) {
-		target = _target;
-	};
-	
-	/// @function		set_target_follow_condition(_fn_follow_target_while)
-	/// @description	Sets the follow condition for the target. The target is followed when this function returns true. Useful if you only want the camera to follow the target given a certain circumstance, for example when the game is not paused.
-	/// @param {function}	[_fn_follow_target_while]	The function returning true when the target object should be followed. By default, a function always returning true is passed.
-	/// @returns		N/A
-	static set_target_follow_condition = function(_fn_follow_target_while=function(){return true}) {
-		should_follow_target = method(self, _fn_follow_target_while);
+	static set_position_anchor = function(_target=target) {
+		anchors.position = _target;
 	};
 	
 	/// @function							set_rotation_anchor(_rotation_anchor_or_undefined)
@@ -477,7 +513,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct, id.Instance, asset.GMObject, undefined}	[_rotation_anchor_or_undefined=undefined]	The rotation anchor. Must contain an x and y value if not undefined. If undefined, the MCamera object's position will be used.
 	/// @returns							N/A
 	static set_rotation_anchor = function(_rotation_anchor_or_undefined=undefined) {
-		rotation_anchor = _rotation_anchor_or_undefined;
+		anchors.angle = _rotation_anchor_or_undefined;
 	};
 	
 	/// @function							set_zoom_anchor(set_zoom_anchor_or_undefined)
@@ -486,7 +522,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct, id.Instance, asset.GMObject, undefined}	[_zoom_anchor_or_undefined=undefined]		The zoom anchor. Must contain an x and y value if not undefined. If undefined, the MCamera object's position will be used.
 	/// @returns							N/A
 	static set_zoom_anchor = function(_zoom_anchor_or_undefined=undefined) {
-		zoom_anchor = _zoom_anchor_or_undefined;
+		anchors.zoom = _zoom_anchor_or_undefined;
 	};
 	
 	/// @function		set_boundary(_x1, _y1, _x2, _y2)
@@ -521,36 +557,36 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	/// @function		set_position_interpolation(_position_interpolation)
-	/// @description	Sets the interpolation factor for translating the x, y position towards target_x, target_y. Essentially how fast x, y should approach target_x, target_y.
-	/// @param {real}	[_position_interpolation=position_interpolation]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @description	Sets the interpolation factor for translating the x, y position towards target.x/.y. Essentially how fast x/y should approach target.x/.y.
+	/// @param {real}	[_position_interpolation=interpolation.position]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @returns		N/A
-	static set_position_interpolation = function(_position_interpolation=position_interpolation) {
-		position_interpolation = _position_interpolation;
+	static set_position_interpolation = function(_position_interpolation=interpolation.position) {
+		interpolation.position = _position_interpolation;
 	};
 	
 	/// @function		set_angle_interpolation(_angle_interpolation)
-	/// @description	Sets the interpolation factor for rotating the angle towards target_angle. Essentially how fast angle should approach target_angle.
-	/// @param {real}	[_angle_interpolation=angle_interpolation]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @description	Sets the interpolation factor for rotating the angle towards target.angle. Essentially how fast angle should approach target.angle.
+	/// @param {real}	[_angle_interpolation=interpolation.angle]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @returns		N/A
-	static set_angle_interpolation = function(_angle_interpolation=angle_interpolation) {
-		angle_interpolation = _angle_interpolation;
+	static set_angle_interpolation = function(_angle_interpolation=interpolation.angle) {
+		interpolation.angle = _angle_interpolation;
 	};
 	
 	/// @function		set_zoom_interpolation(_zoom_interpolation)
-	/// @description	Sets the interpolation factor for magnifying the zoom towards target_zoom. Essentially how fast zoom should approach target_zoom.
-	/// @param {real}	[_zoom_interpolation=zoom_interpolation]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @description	Sets the interpolation factor for magnifying the zoom towards target.zoom. Essentially how fast zoom should approach target.zoom.
+	/// @param {real}	[_zoom_interpolation=interpolation.zoom]	The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @returns		N/A
-	static set_zoom_interpolation = function(_zoom_interpolation=zoom_interpolation) {
-		zoom_interpolation = _zoom_interpolation;
+	static set_zoom_interpolation = function(_zoom_interpolation=interpolation.zoom) {
+		interpolation.zoom = _zoom_interpolation;
 	};
 	
 	/// @function		set_interpolation_values(_position_interpolation, _angle_interpolation, _zoom_interpolation)
 	/// @description	Sets the interpolation factors for moving, rotating and zooming the camera. Essentially how fast x, y, angle and zoom should approach their respective target values.
-	/// @param {real}	[_position_interpolation=position_interpolation]	The position interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {real}	[_angle_interpolation=angle_interpolation]		The angle interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {real}	[_zoom_interpolation=zoom_interpolation]		The zoom interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_position_interpolation=interpolation.position]	The position interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_angle_interpolation=interpolation.angle]		The angle interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @param {real}	[_zoom_interpolation=interpolation.zoom]		The zoom interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @returns		N/A
-	static set_interpolation_values = function(_position_interpolation=position_interpolation, _angle_interpolation=angle_interpolation, _zoom_interpolation=zoom_interpolation) {
+	static set_interpolation_values = function(_position_interpolation=interpolation.position, _angle_interpolation=interpolation.angle, _zoom_interpolation=interpolation.zoom) {
 		set_position_interpolation(_position_interpolation);
 		set_angle_interpolation(_angle_interpolation);
 		set_zoom_interpolation(_zoom_interpolation);
@@ -558,80 +594,80 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function		set_start_values(_xstart, _ystart, _anglestart, _zoomstart)
 	/// @description	Sets the start values for the camera. These values are used by .reset(), so they are useful if you want to, for example, change where the camera should reset to.
-	/// @param {real}	[_xstart=xstart]		The starting x position.
-	/// @param {real}	[_ystart=ystart]		The starting y position.
-	/// @param {real}	[_anglestart=anglestart]	The starting angle.
-	/// @param {real}	[_zoomstart=zoomstart]		The starting zoom.
+	/// @param {real}	[_xstart=start.x]		The starting x position.
+	/// @param {real}	[_ystart=start.y]		The starting y position.
+	/// @param {real}	[_anglestart=start.angle]	The starting angle.
+	/// @param {real}	[_zoomstart=start.zoom]		The starting zoom.
 	/// @returns		N/A
-	static set_start_values = function(_xstart = xstart, _ystart = ystart, _anglestart = anglestart, _zoomstart = zoomstart) {
-		xstart		= _xstart;
-		ystart		= _ystart;
-		anglestart	= _anglestart;
-		zoomstart	= _zoomstart;
+	static set_start_values = function(_xstart = start.x, _ystart = start.y, _anglestart = start.angle, _zoomstart = start.zoom) {
+		start.x		= _xstart;
+		start.y		= _ystart;
+		start.angle	= _anglestart;
+		start.zoom	= _zoomstart;
 	};
 	
 	/// @function		zoom_to(_target_zoom)
-	/// @description	Sets the target_zoom factor for the camera.
-	/// @param {real}	[_target_zoom=target_zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
+	/// @description	Sets the target.zoom factor for the camera.
+	/// @param {real}	[_target_zoom=target.zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
 	/// @returns		N/A
-	static zoom_to = function(_target_zoom=target_zoom) {
-		target_zoom = clamp(_target_zoom, zoom_min, zoom_max);
+	static zoom_to = function(_target_zoom=target.zoom) {
+		target.zoom = clamp(_target_zoom, zoom_min, zoom_max);
 	};
 	
 	/// @function		zoom_by(_zoom_factor)
-	/// @description	Sets the target_zoom factor relative to the current target_zoom.
+	/// @description	Sets the target.zoom factor relative to the current target.zoom.
 	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
 	/// @returns		N/A
 	static zoom_by = function(_zoom_factor=1) {
-		zoom_to(target_zoom * _zoom_factor);
+		zoom_to(target.zoom * _zoom_factor);
 	};
 	
 	/// @function		rotate_to(_target_angle)
-	/// @description	Sets the target_angle for the camera.
-	/// @param {real}	[_target_angle=target_angle]	The new target angle for the camera, in degrees.
+	/// @description	Sets the target.angle for the camera.
+	/// @param {real}	[_target_angle=target.angle]	The new target angle for the camera, in degrees.
 	/// @returns		N/A
-	static rotate_to = function(_target_angle=target_angle) {
-		if (debug)
+	static rotate_to = function(_target_angle=target.angle) {
+		if (is_debugging())
 		{
-			debug_rotation_points = [];
+			debug.rotation.points = [];
 		}
 		
-		target_angle	= _target_angle;
+		target.angle	= _target_angle;
 	};
 	
 	/// @function		rotate_by(_degrees)
-	/// @description	Increments camera's target_angle by _degrees.
+	/// @description	Increments camera's target.angle by _degrees.
 	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
 	/// @returns		N/A
 	static rotate_by = function(_degrees=0) {
-		rotate_to(target_angle + _degrees);
+		rotate_to(target.angle + _degrees);
 	};
 	
 	/// @function		move_to(_target_x, _target_y)
-	/// @description	Sets the target_x/target_y for the camera.
-	/// @param {real}	[_target_x=target_x]		The new target_x position for the camera.
-	/// @param {real}	[_target_y=target_y]		The new target_y position for the camera.
+	/// @description	Sets the target.x/.y for the camera.
+	/// @param {real}	[_target_x=target.x]		The new target.x position for the camera.
+	/// @param {real}	[_target_y=target.y]		The new target.y position for the camera.
 	/// @returns		N/A
-	static move_to = function(_target_x=target_x, _target_y=target_y) {
-		target_x = _target_x;
-		target_y = _target_y;
+	static move_to = function(_target_x=target.x, _target_y=target.y) {
+		target.x = _target_x;
+		target.y = _target_y;
 	};
 	
 	/// @function		move_by(_x, _y)
-	/// @description	Moves the camera target_x/target_y by a relative amount.
-	/// @param {real}	[_x=0]				The x value to move target_x by.
-	/// @param {real}	[_y=0]				The y value to move target_y by.
+	/// @description	Moves the camera target.x/.y by a relative amount.
+	/// @param {real}	[_x=0]				The x value to move target.x by.
+	/// @param {real}	[_y=0]				The y value to move target.y by.
 	/// @returns		N/A
 	static move_by = function(_x=0, _y=0) {
-		move_to(target_x + _x, target_y + _y);
+		move_to(target.x + _x, target.y + _y);
 	};
 	
 	/// @function		translate_to(_target_x, _target_y, _target_angle, _target_zoom)
-	/// @description	Sets the target_x/target_y/target_angle/target_zoom for the camera.
-	/// @param {real}	[_target_x=target_x]		The new target_x position for the camera.
-	/// @param {real}	[_target_y=target_y]		The new target_y position for the camera.
-	/// @param {real}	[_target_angle=target_angle]	The new target angle for the camera, in degrees.
-	/// @param {real}	[_target_zoom=target_zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
+	/// @description	Sets the target values for the camera.
+	/// @param {real}	[_target_x=target.x]		The new target.x position for the camera.
+	/// @param {real}	[_target_y=target.y]		The new target.y position for the camera.
+	/// @param {real}	[_target_angle=target.angle]	The new target angle for the camera, in degrees.
+	/// @param {real}	[_target_zoom=target.zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
 	/// @returns		N/A
 	static translate_to = function(_target_x=x, _target_y=y, _target_angle=angle, _target_zoom=zoom) {
 		zoom_to(_target_zoom);
@@ -640,9 +676,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @function		translate_by(_x, _y, _degrees, _zoom_factor)
-	/// @description	Moves the camera target_x/target_y/target_angle/target_zoom by a relative amount.
-	/// @param {real}	[_x=0]			The x value to move target_x by.
-	/// @param {real}	[_y=0]			The y value to move target_y by.
+	/// @description	Sets the camera target by a relative amount.
+	/// @param {real}	[_x=0]			The x value to move target.x by.
+	/// @param {real}	[_y=0]			The y value to move target.y by.
 	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
 	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
 	/// @returns		N/A
@@ -656,22 +692,22 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	Resets the camera back to the startx/y/angle/zoom values and stops panning.
 	/// @returns		N/A
 	static reset = function() {
-		if (debug)
+		if (is_debugging())
 		{
-			debug_rotation_points = [];
+			debug.rotation.points = [];
 		}
 		
 		stop_panning();
 		
-		target_x	= xstart;
-		target_y	= ystart;
-		target_angle	= anglestart;
-		target_zoom	= zoomstart;
+		target.x	= start.x;
+		target.y	= start.y;
+		target.angle	= start.angle;
+		target.zoom	= start.zoom;
 		
-		x		= target_x;
-		y		= target_y;
-		angle		= target_angle;
-		zoom		= target_zoom;
+		x		= target.x;
+		y		= target.y;
+		angle		= target.angle;
+		zoom		= target.zoom;
 	};
 	
 	
@@ -686,61 +722,61 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	Checks if camera is in panning mode. Useful to check before using .pan_to(). Start panning mode with .start_panning(), stop panning mode with .stop_panning().
 	/// @returns {bool}	Returns panning (true) or not (false).
 	static is_panning = function() {
-		return panning;
+		return panning.active;
 	};
 	
 	/// @function		start_panning(_from_x, _from_y)
-	/// @description	Starts camera panning mode and sets pan_xstart and pan_ystart. Start panning mode before using .pan_to()
+	/// @description	Starts camera panning mode and sets start values. Start panning mode before using .pan_to()
 	/// @param {real}	_from_x		The x co-ordinate from which you wish to pan from. Is used for calculations in .pan_to()
 	/// @param {real}	_from_y		The y co-ordinate from which you wish to pan from. Is used for calculations in .pan_to()
 	/// @returns		N/A
 	static start_panning = function(_from_x, _from_y) {
-		pan_from_x	= _from_x;
-		pan_from_y	= _from_y;
+		panning.active		= true;
+		panning.start.x		= _from_x;
+		panning.start.y		= _from_y;
+		panning.start.angle	= angle;
+		panning.start.zoom	= zoom;
 		
-		pan_xstart	= x;
-		pan_ystart	= y;
-		pan_anglestart	= angle;
-		
-		panning		= true;
+		debug.panning.camera_start_x	= x;
+		debug.panning.camera_start_y	= y;
 	};
 	
 	/// @function		stop_panning()
 	/// @description	Stops camera panning mode. Call this method when you have finished panning with .pan_to()
 	/// @returns		N/A
 	static stop_panning = function() {
-		panning		= false;
+		panning.active		= false;
 	};
 	
 	/// @function		pan_to(_to_x, _to_y)
-	/// @description	Pans the camera to _to_x, _to_y from pan_xstart and pan_ystart. Only call this function when in panning mode - See .start_panning(), .stop_panning() and .is_panning().
-	/// @param {real}	[_to_x=pan_xstart]	The x co-ordinate to which to pan.
-	/// @param {real}	[_to_y=pan_ystart]	The y co-ordinate to which to pan.
+	/// @description	Pans the camera to _to_x, _to_y from panning.start.x and panning.start.y. Only call this function when in panning mode - See .start_panning(), .stop_panning() and .is_panning().
+	/// @param {real}	[_to_x=panning.start.x]	The x co-ordinate to which to pan.
+	/// @param {real}	[_to_y=panning.start.y]	The y co-ordinate to which to pan.
 	/// @returns		N/A
-	static pan_to = function(_to_x=pan_xstart, _to_y=pan_ystart) {
-		if (!panning)
+	static pan_to = function(_to_x=panning.start.x, _to_y=panning.start.y) {
+		if (!is_panning())
 		{
 			throw ("Error: MCamera() attempting to use .pan_to() outside of panning mode. Check panning mode with .is_panning(), start panning mode with .start_panning(), and stop panning mode with .stop_panning()");
 		}
 		
-		var _angle_diff			= angle - pan_anglestart;
+		var _angle_diff			= angle - panning.start.angle;
 		
-		var _rotation_adjustment_len	= point_distance(rotation_anchor.x, rotation_anchor.y, pan_from_x, pan_from_y);
-		var _rotation_adjustment_dir	= point_direction(rotation_anchor.x, rotation_anchor.y, pan_from_x, pan_from_y) - _angle_diff;
+		var _rotation_adjustment_len	= point_distance(anchors.angle.x, anchors.angle.y, panning.start.x, panning.start.y);
+		var _rotation_adjustment_dir	= point_direction(anchors.angle.x, anchors.angle.y, panning.start.x, panning.start.y) - _angle_diff;
 		
-		var _rotated_pan_from_x		= rotation_anchor.x + lengthdir_x(_rotation_adjustment_len, _rotation_adjustment_dir);
-		var _rotated_pan_from_y		= rotation_anchor.y + lengthdir_y(_rotation_adjustment_len, _rotation_adjustment_dir);
+		var _rotated_pan_start_x	= anchors.angle.x + lengthdir_x(_rotation_adjustment_len, _rotation_adjustment_dir);
+		var _rotated_pan_start_y	= anchors.angle.y + lengthdir_y(_rotation_adjustment_len, _rotation_adjustment_dir);
 		
-		var _relative_to_x		= _to_x - _rotated_pan_from_x;
-		var _relative_to_y		= _to_y - _rotated_pan_from_y;
+		var _relative_to_x		= _to_x - _rotated_pan_start_x;
+		var _relative_to_y		= _to_y - _rotated_pan_start_y;
 		
 		var _angle_diff_is_cardinal	= (_angle_diff+360) mod 90 <= math_get_epsilon() || (_angle_diff+360) mod 90 >= 90 - math_get_epsilon();
 		
 		_relative_to_x			= _angle_diff_is_cardinal ? _relative_to_x : round(_relative_to_x);	// round co-ordinates at odd relative angles to avoid jitteriness
 		_relative_to_y			= _angle_diff_is_cardinal ? _relative_to_y : round(_relative_to_y);	// round co-ordinates at odd relative angles to avoid jitteriness
 		
-		target_x			-= _relative_to_x;
-		target_y			-= _relative_to_y;
+		target.x			-= _relative_to_x;
+		target.y			-= _relative_to_y;
 		
 		x				-= _relative_to_x;
 		y				-= _relative_to_y;
@@ -754,12 +790,19 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		set_debug_mode(_is_debug_mode)
-	/// @description	Sets debug to _is_debug_mode. When debug mode is active, the debug display is drawn to the screen.
-	/// @param {bool}	[_is_debug_mode]	Whether to turn debug mode on (true) or off (false). Toggles debug by default.
+	/// @function		is_debugging()
+	/// @description	Returns if debug mode is active (true) or not (false).
+	/// @returns {bool}	Returns if debug mode is active (true) or not (false).
+	static is_debugging = function() {
+		return debug.active;
+	};
+	
+	/// @function		set_debugging(_is_debugging)
+	/// @description	Activates or deactivates debug mode. When debug mode is active, the debug display is drawn to the screen.
+	/// @param {bool}	[_is_debugging]		Whether to turn debug mode on (true) or off (false). Toggles on/off by default.
 	/// @returns		N/A
-	static set_debug_mode = function(_is_debug_mode=!debug) {
-		debug = _is_debug_mode;
+	static set_debugging = function(_is_debugging=!debug.active) {
+		debug.active = _is_debugging;
 	};
 	
 	/// @function		set_view(_view)
@@ -818,4 +861,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			y : _gui_center_y + _rotated_y
 		};
 	};
+	
+	
+	
+	// init
+	
+	create(_create_host_object_for_me);
 }
