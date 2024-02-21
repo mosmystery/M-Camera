@@ -158,15 +158,21 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	The End Step event. Updates the camera translation.
 	/// @returns		N/A
 	static end_step = function() {
+		// update transform
 		previous.x	= x;
 		previous.y	= y;
 		previous.angle	= angle;
 		previous.zoom	= zoom;
 		
-		// update camera
-		__apply_zoom();
-		__apply_rotation();
-		__apply_movement();
+		x		= interpolation.fn_position(x, target.x, interpolation.position);
+		y		= interpolation.fn_position(y, target.y, interpolation.position);
+		angle		= interpolation.fn_angle(angle, target.angle, interpolation.angle);
+		zoom		= interpolation.fn_zoom(zoom, target.zoom, interpolation.zoom);
+		
+		// apply constraints
+		__enforce_zoom_anchor(anchors.zoom);
+		__enforce_angle_anchor(anchors.angle);
+		__enforce_position_anchor(anchors.position);
 		__clamp_to_boundary(boundary);
 		
 		// update view
@@ -193,25 +199,22 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		__apply_zoom()
-	/// @description	For internal use. Updates the camera zoom.
-	/// @returns		N/A
-	static __apply_zoom = function() {		
-		// update zoom
-		zoom		= interpolation.fn_zoom(zoom, target.zoom, interpolation.zoom);
-		
-		// update position to comply with anchors.zoom
-		if (zoom != previous.zoom && !is_undefined(anchors.zoom))
+	/// @function							__enforce_zoom_anchor(_anchor)
+	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting zoom.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
+	/// @returns							N/A
+	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
+		if (zoom != previous.zoom && !is_undefined(_anchor))
 		{
 			// calculate position
-			var _screen_ratio_w	= (anchors.zoom.x - camera_get_view_x(id)) / camera_get_view_width(id);
-			var _screen_ratio_h	= (anchors.zoom.y - camera_get_view_y(id)) / camera_get_view_height(id);
+			var _screen_ratio_w	= (_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);
+			var _screen_ratio_h	= (_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
 			
 			var _view_width		= width/zoom;
 			var _view_height	= height/zoom;
 			
-			var _adjusted_x		= anchors.zoom.x - (_view_width * _screen_ratio_w) + (_view_width/2);
-			var _adjusted_y		= anchors.zoom.y - (_view_height * _screen_ratio_h) + (_view_height/2);
+			var _adjusted_x		= _anchor.x - (_view_width * _screen_ratio_w) + (_view_width/2);
+			var _adjusted_y		= _anchor.y - (_view_height * _screen_ratio_h) + (_view_height/2);
 			
 			// update position - without move_to() so that x,y can be set conditionally, for panning.
 			var _diff_x		= _adjusted_x-target.x;
@@ -228,14 +231,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function		__apply_rotation()
-	/// @description	For internal use. Updates the camera angle.
-	/// @returns		N/A
-	static __apply_rotation = function() {
-		angle	= interpolation.fn_angle(angle, target.angle, interpolation.angle);
-		
-		// update postion to comply with anchors.angle
-		if (angle != previous.angle && !is_undefined(anchors.angle))
+	/// @function							__enforce_angle_anchor(_anchor)
+	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting angle.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
+	/// @returns							N/A
+	static __enforce_angle_anchor = function(_anchor=anchors.angle) {
+		if (angle != previous.angle && !is_undefined(_anchor))
 		{
 			if (is_debugging() && abs(previous.angle-angle) >= 0.5)
 			{
@@ -246,14 +247,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			}
 			
 			// calculate position
-			var _distance	= point_distance(anchors.angle.x, anchors.angle.y, x, y);
-			var _direction	= point_direction(anchors.angle.x, anchors.angle.y, x, y) + (previous.angle-angle);
+			var _distance	= point_distance(_anchor.x, _anchor.y, x, y);
+			var _direction	= point_direction(_anchor.x, _anchor.y, x, y) + (previous.angle-angle);
 			
 			var _relative_x	= lengthdir_x(_distance, _direction);
 			var _relative_y	= lengthdir_y(_distance, _direction);
 			
-			var _adjusted_x = anchors.angle.x + _relative_x;
-			var _adjusted_y = anchors.angle.y + _relative_y;
+			var _adjusted_x = _anchor.x + _relative_x;
+			var _adjusted_y = _anchor.y + _relative_y;
 			
 			// update position - without move_to() so that x,y can be relative to previous x,y, to not override panning.
 			var _diff_x	= _adjusted_x-target.x;
@@ -267,19 +268,15 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function		__apply_movement()
-	/// @description	For internal use. Updates the camera position.
-	/// @returns		N/A
-	static __apply_movement = function() {
-		// comply with target
-		if (!is_panning() && !is_undefined(anchors.position))
+	/// @function							__enforce_position_anchor(_anchor)
+	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting position.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.position]	The position anchor. Must contain an x and y value if not undefined.
+	/// @returns							N/A
+	static __enforce_position_anchor = function(_anchor=anchors.position) {
+		if (!is_panning() && !is_undefined(_anchor))
 		{
-			move_to(anchors.position.x, anchors.position.y);
+			move_to(_anchor.x, _anchor.y);
 		}
-		
-		// update position
-		x = lerp(x, target.x, interpolation.position);
-		y = lerp(y, target.y, interpolation.position);
 	};
 	
 	/// @function			__clamp_to_boundary(_rect_or_undefined)
