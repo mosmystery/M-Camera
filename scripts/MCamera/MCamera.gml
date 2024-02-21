@@ -49,7 +49,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		y	: y,			// See .move_to(),	.move_by()
 		angle	: angle,		// See .rotate_to(),	.rotate_by()
 		zoom	: zoom			// See .zoom_to(),	.zoom_by()
-	};					// See .translate_to(),	.translate_by()
+	};					// See .transform_to(),	.transform_by()
 	
 	interpolation	= {
 		position	: 1/8,		// See .set_position_interpolation()
@@ -60,7 +60,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		fn_zoom		: lerp		// See .set_zoom_interpolation()
 	};
 	
-	// contraints
+	// constraints
 	
 	zoom_min	= 1/16;			// See .set_zoom_limits()
 	zoom_max	= 4;			// See .set_zoom_limits()
@@ -155,7 +155,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @function		end_step()
-	/// @description	The End Step event. Updates the camera translation.
+	/// @description	The End Step event. Updates the camera tranform.
 	/// @returns		N/A
 	static end_step = function() {
 		// update transform
@@ -530,14 +530,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-		  /////////////////
-		 // translation //
-		/////////////////
+		  ////////////////////
+		 // transformation //
+		////////////////////
 	
 	
 	
 	/// @function		set_position_interpolation(_value, _fn_interpolate)
-	/// @description	Sets the interpolation factor and function for translating the x, y position towards target.x/.y. Essentially how fast x/y should approach target.x/.y.
+	/// @description	Sets the interpolation factor and function for transforming the x, y position towards target.x/.y. Essentially how fast x/y should approach target.x/.y.
 	/// @param {real}	[_value=interpolation.position]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @param {function}	[_fn_interpolate=interpolation.fn_position]	Optional custom interpolation function for updating the camera's x and y values. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
@@ -547,7 +547,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @function		set_angle_interpolation(_value, _fn_interpolate)
-	/// @description	Sets the interpolation factor and function for rotating the angle towards target.angle. Essentially how fast angle should approach target.angle.
+	/// @description	Sets the interpolation factor and function for transforming the angle towards target.angle. Essentially how fast angle should approach target.angle.
 	/// @param {real}	[_value=interpolation.angle]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @param {function}	[_fn_interpolate=interpolation.fn_angle]	Optional custom interpolation function for updating the camera's angle. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
@@ -557,7 +557,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @function		set_zoom_interpolation(_value, _fn_interpolate)
-	/// @description	Sets the interpolation factor and function for magnifying the zoom towards target.zoom. Essentially how fast zoom should approach target.zoom.
+	/// @description	Sets the interpolation factor and function for transforming the zoom towards target.zoom. Essentially how fast zoom should approach target.zoom.
 	/// @param {real}	[_value=interpolation.zoom]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @param {function}	[_fn_interpolate=interpolation.fn_zoom]	Optional custom interpolation function for updating the camera's zoom. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
@@ -663,30 +663,30 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_to(target.zoom * _zoom_factor);
 	};
 	
-	/// @function		translate_to(_target_x, _target_y, _target_angle, _target_zoom)
+	/// @function		transform_to(_target_x, _target_y, _target_angle, _target_zoom)
 	/// @description	Sets the target values for the camera.
 	/// @param {real}	[_target_x=target.x]		The new target.x position for the camera.
 	/// @param {real}	[_target_y=target.y]		The new target.y position for the camera.
 	/// @param {real}	[_target_angle=target.angle]	The new target angle for the camera, in degrees.
 	/// @param {real}	[_target_zoom=target.zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
 	/// @returns		N/A
-	static translate_to = function(_target_x=x, _target_y=y, _target_angle=angle, _target_zoom=zoom) {
-		zoom_to(_target_zoom);
-		rotate_to(_target_angle);
+	static transform_to = function(_target_x=x, _target_y=y, _target_angle=angle, _target_zoom=zoom) {
 		move_to(_target_x, _target_y);
+		rotate_to(_target_angle);
+		zoom_to(_target_zoom);
 	};
 	
-	/// @function		translate_by(_x, _y, _degrees, _zoom_factor)
+	/// @function		transform_by(_x, _y, _degrees, _zoom_factor)
 	/// @description	Sets the camera target by a relative amount.
 	/// @param {real}	[_x=0]			The x value to move target.x by.
 	/// @param {real}	[_y=0]			The y value to move target.y by.
 	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
 	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
 	/// @returns		N/A
-	static translate_by = function(_x=0, _y=0, _degrees=0, _zoom_factor=1) {
-		zoom_by(_zoom_factor);
-		rotate_by(_degrees);
+	static transform_by = function(_x=0, _y=0, _degrees=0, _zoom_factor=1) {
 		move_by(_x, _y);
+		rotate_by(_degrees);
+		zoom_by(_zoom_factor);
 	};
 	
 	/// @function		reset()
