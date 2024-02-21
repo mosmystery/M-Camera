@@ -199,35 +199,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function							__enforce_zoom_anchor(_anchor)
-	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting zoom.
-	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
+	/// @function							__enforce_position_anchor(_anchor)
+	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting position.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.position]	The position anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
-	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
-		if (zoom != previous.zoom && !is_undefined(_anchor))
+	static __enforce_position_anchor = function(_anchor=anchors.position) {
+		if (!is_panning() && !is_undefined(_anchor))
 		{
-			// calculate position
-			var _screen_ratio_w	= (_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);
-			var _screen_ratio_h	= (_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
-			
-			var _view_width		= width/zoom;
-			var _view_height	= height/zoom;
-			
-			var _adjusted_x		= _anchor.x - (_view_width * _screen_ratio_w) + (_view_width/2);
-			var _adjusted_y		= _anchor.y - (_view_height * _screen_ratio_h) + (_view_height/2);
-			
-			// update position - without move_to() so that x,y can be set conditionally, for panning.
-			var _diff_x		= _adjusted_x-target.x;
-			var _diff_y		= _adjusted_y-target.y;
-			
-			target.x		+= _diff_x;
-			target.y		+= _diff_y;
-			
-			if (!is_panning())
-			{
-				x		+= _diff_x;
-				y		+= _diff_y;
-			}
+			move_to(_anchor.x, _anchor.y);
 		}
 	};
 	
@@ -268,14 +247,35 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function							__enforce_position_anchor(_anchor)
-	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting position.
-	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.position]	The position anchor. Must contain an x and y value if not undefined.
+	/// @function							__enforce_zoom_anchor(_anchor)
+	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting zoom.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
-	static __enforce_position_anchor = function(_anchor=anchors.position) {
-		if (!is_panning() && !is_undefined(_anchor))
+	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
+		if (zoom != previous.zoom && !is_undefined(_anchor))
 		{
-			move_to(_anchor.x, _anchor.y);
+			// calculate position
+			var _screen_ratio_w	= (_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);
+			var _screen_ratio_h	= (_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
+			
+			var _view_width		= width/zoom;
+			var _view_height	= height/zoom;
+			
+			var _adjusted_x		= _anchor.x - (_view_width * _screen_ratio_w) + (_view_width/2);
+			var _adjusted_y		= _anchor.y - (_view_height * _screen_ratio_h) + (_view_height/2);
+			
+			// update position - without move_to() so that x,y can be set conditionally, for panning.
+			var _diff_x		= _adjusted_x-target.x;
+			var _diff_y		= _adjusted_y-target.y;
+			
+			target.x		+= _diff_x;
+			target.y		+= _diff_y;
+			
+			if (!is_panning())
+			{
+				x		+= _diff_x;
+				y		+= _diff_y;
+			}
 		}
 	};
 	
@@ -592,20 +592,23 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		start.zoom	= _zoomstart;
 	};
 	
-	/// @function		zoom_to(_target_zoom)
-	/// @description	Sets the target.zoom factor for the camera.
-	/// @param {real}	[_target_zoom=target.zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
+	/// @function		move_to(_target_x, _target_y)
+	/// @description	Sets the target.x/.y for the camera.
+	/// @param {real}	[_target_x=target.x]		The new target.x position for the camera.
+	/// @param {real}	[_target_y=target.y]		The new target.y position for the camera.
 	/// @returns		N/A
-	static zoom_to = function(_target_zoom=target.zoom) {
-		target.zoom = clamp(_target_zoom, zoom_min, zoom_max);
+	static move_to = function(_target_x=target.x, _target_y=target.y) {
+		target.x = _target_x;
+		target.y = _target_y;
 	};
 	
-	/// @function		zoom_by(_zoom_factor)
-	/// @description	Sets the target.zoom factor relative to the current target.zoom.
-	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
+	/// @function		move_by(_x, _y)
+	/// @description	Moves the camera target.x/.y by a relative amount.
+	/// @param {real}	[_x=0]				The x value to move target.x by.
+	/// @param {real}	[_y=0]				The y value to move target.y by.
 	/// @returns		N/A
-	static zoom_by = function(_zoom_factor=1) {
-		zoom_to(target.zoom * _zoom_factor);
+	static move_by = function(_x=0, _y=0) {
+		move_to(target.x + _x, target.y + _y);
 	};
 	
 	/// @function		rotate_to(_target_angle)
@@ -644,23 +647,20 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		rotate_to(target.angle + _degrees);
 	};
 	
-	/// @function		move_to(_target_x, _target_y)
-	/// @description	Sets the target.x/.y for the camera.
-	/// @param {real}	[_target_x=target.x]		The new target.x position for the camera.
-	/// @param {real}	[_target_y=target.y]		The new target.y position for the camera.
+	/// @function		zoom_to(_target_zoom)
+	/// @description	Sets the target.zoom factor for the camera.
+	/// @param {real}	[_target_zoom=target.zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
 	/// @returns		N/A
-	static move_to = function(_target_x=target.x, _target_y=target.y) {
-		target.x = _target_x;
-		target.y = _target_y;
+	static zoom_to = function(_target_zoom=target.zoom) {
+		target.zoom = clamp(_target_zoom, zoom_min, zoom_max);
 	};
 	
-	/// @function		move_by(_x, _y)
-	/// @description	Moves the camera target.x/.y by a relative amount.
-	/// @param {real}	[_x=0]				The x value to move target.x by.
-	/// @param {real}	[_y=0]				The y value to move target.y by.
+	/// @function		zoom_by(_zoom_factor)
+	/// @description	Sets the target.zoom factor relative to the current target.zoom.
+	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
 	/// @returns		N/A
-	static move_by = function(_x=0, _y=0) {
-		move_to(target.x + _x, target.y + _y);
+	static zoom_by = function(_zoom_factor=1) {
+		zoom_to(target.zoom * _zoom_factor);
 	};
 	
 	/// @function		translate_to(_target_x, _target_y, _target_angle, _target_zoom)
