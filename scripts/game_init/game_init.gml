@@ -34,12 +34,12 @@ function game_init()
 	global.camera.set_start_values(global.world.width_scaled()/2, global.world.height_scaled()/2);	// sets the camera startx and starty to the center of global.world. Also takes optional parameters for anglestart and zoomstart.
 	global.camera.reset();										// resets the camera to the new start values.
 	
-	var _rotation_anchor = {									// targets and anchors simply need to include an x and y value to work, whether that is an object or a struct (such as a Vector2).
+	var _angle_anchor = {										// targets and anchors simply need to include an x and y value to work, whether that is an object or a struct (such as a Vector2).
 		x : global.world.width_scaled() / 2,
 		y : global.world.height_scaled() / 2,
 	};
 	
-	global.camera.set_rotation_anchor(_rotation_anchor);						// ensure the camera rotates around the center of the level.
+	global.camera.set_angle_anchor(_angle_anchor);							// ensure the camera rotates around the center of the level.
 	global.camera.set_zoom_anchor(objMouseControl);							// ensure camera zooms towards and away from objMouseControl.
 	
 	var _border	= 1024;

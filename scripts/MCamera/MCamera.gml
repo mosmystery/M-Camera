@@ -483,28 +483,29 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @function							set_position_anchor(_position_anchor)
 	/// @description						Sets the position anchor (target object or struct) for the camera to follow.
-	/// @param {struct, id.Instance, asset.GMObject, undefined}	[_position_anchor=anchors.position]	The position anchor to follow. If not undefined, must contain an x and y value.
-	/// @returns							N/A
-	static set_position_anchor = function(_target=target) {
-		anchors.position = _target;
-	};
-	
-	/// @function							set_rotation_anchor(_rotation_anchor_or_undefined)
-	/// @description						Sets the rotation anchor for the camera to pivot around when rotating. Useful for keeping a position at the same place on the screen, such as the player position, the mouse position, the center of the level or a Vector2.
 	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
-	/// @param {struct, id.Instance, asset.GMObject, undefined}	[_rotation_anchor_or_undefined=undefined]	The rotation anchor. Must contain an x and y value if not undefined. If undefined, the MCamera object's position will be used.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_position_anchor=undefined]	The position anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
 	/// @returns							N/A
-	static set_rotation_anchor = function(_rotation_anchor_or_undefined=undefined) {
-		anchors.angle = _rotation_anchor_or_undefined;
+	static set_position_anchor = function(_position_anchor=undefined) {
+		anchors.position = _position_anchor;
 	};
 	
-	/// @function							set_zoom_anchor(set_zoom_anchor_or_undefined)
+	/// @function							set_angle_anchor(_angle_anchor)
+	/// @description						Sets the angle anchor for the camera to pivot around when rotating. Useful for keeping a position at the same place on the screen, such as the player position, the mouse position, the center of the level or a Vector2.
+	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=undefined]	The angle anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
+	/// @returns							N/A
+	static set_angle_anchor = function(_angle_anchor=undefined) {
+		anchors.angle = _angle_anchor;
+	};
+	
+	/// @function							set_zoom_anchor(_zoom_anchor)
 	/// @description						Sets the zoom anchor for the camera to zoom towards or away from. Useful for zooming towards or away from a point of interest, such as in cutscenes, or the mouse in an editor or strategy game.
 	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
-	/// @param {struct, id.Instance, asset.GMObject, undefined}	[_zoom_anchor_or_undefined=undefined]		The zoom anchor. Must contain an x and y value if not undefined. If undefined, the MCamera object's position will be used.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=undefined]	The zoom anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
 	/// @returns							N/A
-	static set_zoom_anchor = function(_zoom_anchor_or_undefined=undefined) {
-		anchors.zoom = _zoom_anchor_or_undefined;
+	static set_zoom_anchor = function(_zoom_anchor=undefined) {
+		anchors.zoom = _zoom_anchor;
 	};
 	
 	/// @function		set_boundary(_x1, _y1, _x2, _y2)
