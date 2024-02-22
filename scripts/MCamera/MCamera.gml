@@ -254,28 +254,17 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
 		if (zoom != previous.zoom && !is_undefined(_anchor))
 		{
-			// calculate position
-			var _screen_ratio_w	= (_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);
-			var _screen_ratio_h	= (_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
-			
 			var _view_width		= width/zoom;
 			var _view_height	= height/zoom;
 			
-			var _adjusted_x		= _anchor.x - (_view_width * _screen_ratio_w) + (_view_width/2);
-			var _adjusted_y		= _anchor.y - (_view_height * _screen_ratio_h) + (_view_height/2);
+			var _screen_ratio_w	= (_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);	// camera_get[...]() functions get values previously set with camera_set[...]()
+			var _screen_ratio_h	= (_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
 			
-			// update position - without move_to() so that x,y can be set conditionally, for panning.
-			var _diff_x		= _adjusted_x-target.x;
-			var _diff_y		= _adjusted_y-target.y;
+			target.x		= (_anchor.x - (_view_width * _screen_ratio_w)) + (_view_width/2);
+			target.y		= (_anchor.y - (_view_height * _screen_ratio_h)) + (_view_height/2);
 			
-			target.x		+= _diff_x;
-			target.y		+= _diff_y;
-			
-			if (!is_panning())
-			{
-				x		+= _diff_x;
-				y		+= _diff_y;
-			}
+			x			= target.x;
+			y			= target.y;
 		}
 	};
 	
