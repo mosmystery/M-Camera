@@ -70,8 +70,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	boundary	= undefined;		// See .set_boundary()
 	
-	zoom_min	= 1/16;			// See .set_zoom_limits()
-	zoom_max	= 4;			// See .set_zoom_limits()
+	zoom_min	= 1/power(2, 16);	// See .set_zoom_limits()
+	zoom_max	= power(2, 16);		// See .set_zoom_limits()
 	
 	// panning
 	
@@ -468,8 +468,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_zoom_max=zoom_max]	The maximum camera zoom. Limited to 2^16, or 16 doublings of the base zoom amount at most, and _zoom_min at least.
 	/// @returns		N/A
 	static set_zoom_limits = function(_zoom_min = zoom_min, _zoom_max = zoom_max) {
+		var _min = 1/power(2, 16);
 		var _max = power(2, 16);
-		var _min = 1/_max;
 		
 		zoom_min = clamp(_zoom_min, _min, _max);
 		zoom_max = clamp(_zoom_max, max(_min, _zoom_min), _max);

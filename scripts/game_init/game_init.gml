@@ -41,6 +41,7 @@ function game_init()
 	
 	global.camera.set_angle_anchor(_angle_anchor);							// ensure the camera rotates around the center of the level.
 	global.camera.set_zoom_anchor(objMouseControl);							// ensure camera zooms towards and away from objMouseControl.
+	global.camera.set_zoom_limits(1/16, 4);								// Sets max and min zoom limits to a reasonable expectation for level editing. Try other values or removing this line for wider default range.
 	
 	var _border	= 1024;
 	
