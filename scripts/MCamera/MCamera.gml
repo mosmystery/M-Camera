@@ -176,12 +176,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		__clamp_to_boundary(boundary);
 		
 		// update view
-		var _new_width = width/zoom;
-		var _new_height = height/zoom;
-		
-		camera_set_view_size(id, _new_width, _new_height);
+		camera_set_view_size(id, view_width(), view_height());
 		camera_set_view_angle(id, angle);
-		camera_set_view_pos(id, x - (_new_width/2), y - (_new_height/2));
+		camera_set_view_pos(id, x - (view_width()/2), y - (view_height()/2));
 	};
 	
 	/// @function		draw_end()
@@ -247,14 +244,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
 		if (zoom != previous.zoom && _anchor != undefined)
 		{
-			var _view_width		= width/zoom;
-			var _view_height	= height/zoom;
-			
 			var _screen_ratio_w	= (_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);	// camera_get[...]() functions get values previously set with camera_set[...]()
 			var _screen_ratio_h	= (_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
 			
-			target.x		= (_anchor.x - (_view_width * _screen_ratio_w)) + (_view_width/2);
-			target.y		= (_anchor.y - (_view_height * _screen_ratio_h)) + (_view_height/2);
+			target.x		= (_anchor.x - (view_width() * _screen_ratio_w)) + (view_width()/2);
+			target.y		= (_anchor.y - (view_height() * _screen_ratio_h)) + (view_height()/2);
 			
 			x			= target.x;
 			y			= target.y;
@@ -268,23 +262,17 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __clamp_to_boundary = function(_rect = boundary) {
 		if (_rect != undefined)
 		{
-			var _view_width		= width/zoom;
-			var _view_height	= height/zoom;		
 			var _width_ratio	= abs( lengthdir_x(1, angle) );
 			var _height_ratio	= abs( lengthdir_y(1, angle) );
 			
-			var _rotated_width	= (_width_ratio * _view_width) + (_height_ratio * _view_height);
-			var _rotated_height	= (_width_ratio * _view_height) + (_height_ratio * _view_width);
+			var _rotated_width	= (_width_ratio * view_width()) + (_height_ratio * view_height());
+			var _rotated_height	= (_width_ratio * view_height()) + (_height_ratio * view_width());
 			
 			var _boundary_width	= _rect.x2 - _rect.x1;
 			var _boundary_height	= _rect.y2 - _rect.y1;
 			
-			var _clamped_x		= (_rotated_width > _boundary_width)	? (_rect.x1 + _boundary_width/2)	: clamp(x, _rect.x1 + (_rotated_width/2), _rect.x2 - (_rotated_width/2));
-			var _clamped_y		= (_rotated_height > _boundary_height)	? (_rect.y1 + _boundary_height/2)	: clamp(y, _rect.y1 + (_rotated_height/2), _rect.y2 - (_rotated_height/2));
-			
-			// update position - without move_to() to avoid springing while panning.
-			target.x		= _clamped_x;
-			target.y		= _clamped_y;
+			target.x		= (_rotated_width > _boundary_width)	? (_rect.x1 + _boundary_width/2)	: clamp(x, _rect.x1 + (_rotated_width/2), _rect.x2 - (_rotated_width/2));
+			target.y		= (_rotated_height > _boundary_height)	? (_rect.y1 + _boundary_height/2)	: clamp(y, _rect.y1 + (_rotated_height/2), _rect.y2 - (_rotated_height/2));
 			
 			x			= target.x;
 			y			= target.y;
@@ -782,6 +770,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	/// @function		set_view(_view)
+	/// @description	Sets the view and id for this camera.
 	/// @param {real}	[_view=0]	View number [0..7].
 	/// @returns		N/A
 	static set_view = function(_view=0)
@@ -789,6 +778,22 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		view	= _view;
 		id	= view_camera[view];
 	}
+	
+	/// @function		view_width();
+	/// @description	Returns this camera's width scaled by zoom.
+	/// @returns {real}	width scaled by zoom.
+	static view_width = function()
+	{
+		return width/zoom;
+	};
+	
+	/// @function		view_height();
+	/// @description	Returns this camera's height scaled by zoom.
+	/// @returns {real}	height scaled by zoom.
+	static view_height = function()
+	{
+		return height/zoom;
+	};
 	
 	/// @function		is_debugging()
 	/// @description	Returns if debug mode is active (true) or not (false).
