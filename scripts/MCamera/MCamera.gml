@@ -218,7 +218,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __enforce_angle_anchor = function(_anchor=anchors.angle) {
 		if (angle != previous.angle && _anchor != undefined)
 		{
-			if (is_debugging() && abs(previous.angle-angle) >= 0.5)
+			if (is_debugging() && abs(previous.angle - angle) >= 0.5)
 			{
 				array_push(debug.rotation.points, {
 					x : x,
@@ -226,25 +226,17 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 				});
 			}
 			
-			// calculate position
 			var _distance	= point_distance(_anchor.x, _anchor.y, x, y);
-			var _direction	= point_direction(_anchor.x, _anchor.y, x, y) + (previous.angle-angle);
+			var _direction	= point_direction(_anchor.x, _anchor.y, x, y) + (previous.angle - angle);
 			
 			var _relative_x	= lengthdir_x(_distance, _direction);
 			var _relative_y	= lengthdir_y(_distance, _direction);
 			
-			var _adjusted_x = _anchor.x + _relative_x;
-			var _adjusted_y = _anchor.y + _relative_y;
+			target.x	= _anchor.x + _relative_x;
+			target.y	= _anchor.y + _relative_y;
 			
-			// update position - without move_to() so that x,y can be relative to previous x,y, to not override panning.
-			var _diff_x	= _adjusted_x-target.x;
-			var _diff_y	= _adjusted_y-target.y;
-			
-			target.x	+= _diff_x;
-			target.y	+= _diff_y;
-			
-			x		+= _diff_x;
-			y		+= _diff_y;
+			x		= target.x;
+			y		= target.y;
 		}
 	};
 	
