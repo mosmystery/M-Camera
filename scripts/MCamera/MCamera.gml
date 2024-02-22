@@ -133,7 +133,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	
 		// set target position
-		if (!is_undefined(anchors.position))
+		if (anchors.position != undefined)
 		{
 			target.x	= anchors.position.x;
 			target.y	= anchors.position.y;
@@ -204,7 +204,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.position]	The position anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
 	static __enforce_position_anchor = function(_anchor=anchors.position) {
-		if (!is_panning() && !is_undefined(_anchor))
+		if (!is_panning() && _anchor != undefined)
 		{
 			move_to(_anchor.x, _anchor.y);
 		}
@@ -215,7 +215,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
 	static __enforce_angle_anchor = function(_anchor=anchors.angle) {
-		if (angle != previous.angle && !is_undefined(_anchor))
+		if (angle != previous.angle && _anchor != undefined)
 		{
 			if (is_debugging() && abs(previous.angle-angle) >= 0.5)
 			{
@@ -252,7 +252,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
 	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
-		if (zoom != previous.zoom && !is_undefined(_anchor))
+		if (zoom != previous.zoom && _anchor != undefined)
 		{
 			var _view_width		= width/zoom;
 			var _view_height	= height/zoom;
@@ -268,12 +268,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function			__clamp_to_boundary(_rect_or_undefined)
-	/// @description		For internal use. Clamps the camera position to be within boundary.
-	/// @param {struct,undefined}	[_rect_or_undefined=boundary]	The struct defining the boundary rectangle, or undefined for no clamping. Must contain x1, y1, x2, y2 values. Example: { x1=0, y1=0, x2=width, y2=height }
+	/// @function			__clamp_to_boundary(_rect)
+	/// @description		For internal use. Clamps the camera position to be within boundary _rect.
+	/// @param {struct,undefined}	[_rect=boundary]	The struct defining the boundary rectangle, or undefined for no clamping. Must contain x1, y1, x2, y2 values. Example: { x1=0, y1=0, x2=width, y2=height }
 	/// @returns			N/A
-	static __clamp_to_boundary = function(_rect_or_undefined = boundary) {
-		if (!is_undefined(_rect_or_undefined))
+	static __clamp_to_boundary = function(_rect = boundary) {
+		if (_rect != undefined)
 		{
 			var _view_width		= width/zoom;
 			var _view_height	= height/zoom;		
@@ -282,12 +282,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			
 			var _rotated_width	= (_width_ratio * _view_width) + (_height_ratio * _view_height);
 			var _rotated_height	= (_width_ratio * _view_height) + (_height_ratio * _view_width);
-		
-			var _boundary_width	= _rect_or_undefined.x2 - _rect_or_undefined.x1;
-			var _boundary_height	= _rect_or_undefined.y2 - _rect_or_undefined.y1;
 			
-			var _clamped_x		= (_rotated_width > _boundary_width)	? (_rect_or_undefined.x1 + _boundary_width/2)	: clamp(x, _rect_or_undefined.x1 + (_rotated_width/2), _rect_or_undefined.x2 - (_rotated_width/2));
-			var _clamped_y		= (_rotated_height > _boundary_height)	? (_rect_or_undefined.y1 + _boundary_height/2)	: clamp(y, _rect_or_undefined.y1 + (_rotated_height/2), _rect_or_undefined.y2 - (_rotated_height/2));
+			var _boundary_width	= _rect.x2 - _rect.x1;
+			var _boundary_height	= _rect.y2 - _rect.y1;
+			
+			var _clamped_x		= (_rotated_width > _boundary_width)	? (_rect.x1 + _boundary_width/2)	: clamp(x, _rect.x1 + (_rotated_width/2), _rect.x2 - (_rotated_width/2));
+			var _clamped_y		= (_rotated_height > _boundary_height)	? (_rect.y1 + _boundary_height/2)	: clamp(y, _rect.y1 + (_rotated_height/2), _rect.y2 - (_rotated_height/2));
 			
 			// update position - without move_to() to avoid springing while panning.
 			target.x		= _clamped_x;
@@ -325,7 +325,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		var _po			= 1; // pixel offset
 			
 		// boundary
-		if (!is_undefined(boundary))
+		if (boundary != undefined)
 		{
 			draw_rectangle_colour(boundary.x1+0.5, boundary.y1+0.5, boundary.x2-1.5, boundary.y2-1.5, _col_boundary, _col_boundary, _col_boundary, _col_boundary, true);
 		}
@@ -343,7 +343,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 			
 		// rotation anchor
-		if (!is_undefined(anchors.angle))
+		if (anchors.angle != undefined)
 		{
 			draw_circle_color(anchors.angle.x-_po, anchors.angle.y-_po, _dot_radius, _col_rot_anchor, _col_rot_anchor, false);
 		}
@@ -362,7 +362,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 			
 		// zoom anchor
-		if (!is_undefined(anchors.zoom))
+		if (anchors.zoom != undefined)
 		{
 			draw_circle_color(anchors.zoom.x-_po, anchors.zoom.y-_po, _dot_radius, _col_zoom_anchor, _col_zoom_anchor, false);
 		}
@@ -374,7 +374,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		draw_circle_color(_view_x-_po, _view_y-_po, _dot_radius, _col_view, _col_view, false);
 			
 		// position target dot
-		if (!is_undefined(anchors.position))
+		if (anchors.position != undefined)
 		{
 			draw_circle_color(anchors.position.x-_po, anchors.position.y-_po, _dot_radius, _col_target, _col_target, false);
 		}
