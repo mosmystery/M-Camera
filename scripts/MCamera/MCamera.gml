@@ -204,9 +204,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.position]	The position anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
 	static __enforce_position_anchor = function(_anchor=anchors.position) {
-		if (!is_panning() && _anchor != undefined)
+		if (_anchor != undefined)
 		{
-			move_to(_anchor.x, _anchor.y);
+			target.x = _anchor.x;
+			target.y = _anchor.y;
 		}
 	};
 	
