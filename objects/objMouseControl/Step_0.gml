@@ -62,7 +62,7 @@ if (_input.reset)
 if (_input.toggle_debug)
 {
 	
-	global.camera.set_debug_mode();		// toggle camera debug display
+	global.camera.set_debugging();		// toggle camera debug display
 }
 
 // place and erase blocks

@@ -158,8 +158,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	The End Step event. Updates the camera tranform.
 	/// @returns		N/A
 	static end_step = function() {
-		__apply_panning();	// to be moved next commit. here for equivalency to previous commit.
-		
 		// update transform
 		previous.x	= x;
 		previous.y	= y;
@@ -175,6 +173,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		__enforce_zoom_anchor(anchors.zoom);
 		__enforce_angle_anchor(anchors.angle);
 		__enforce_position_anchor(anchors.position);
+		__apply_panning(anchors.angle);
 		__clamp_to_boundary(boundary);
 		
 		// update view
@@ -257,34 +256,45 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function		__apply_panning()
-	/// @description	Updates the camera position based on the panning start and target values, and anchors.
-	/// @returns		N/A
-	static __apply_panning = function() {
-		if (is_panning())
+	/// @function							__apply_panning(_angle_anchor)
+	/// @description						Updates the camera position based on the panning start and target values, and angle angle.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
+	/// @returns							N/A
+	static __apply_panning = function(_angle_anchor=anchors.angle) {
+		if (!is_panning())
 		{
-			var _angle_diff			= angle - panning.start.angle;
-		
-			var _rotation_adjustment_len	= point_distance(anchors.angle.x, anchors.angle.y, panning.start.x, panning.start.y);
-			var _rotation_adjustment_dir	= point_direction(anchors.angle.x, anchors.angle.y, panning.start.x, panning.start.y) - _angle_diff;
-		
-			var _rotated_pan_start_x	= anchors.angle.x + lengthdir_x(_rotation_adjustment_len, _rotation_adjustment_dir);
-			var _rotated_pan_start_y	= anchors.angle.y + lengthdir_y(_rotation_adjustment_len, _rotation_adjustment_dir);
-		
-			var _relative_to_x		= panning.target.x - _rotated_pan_start_x;
-			var _relative_to_y		= panning.target.y - _rotated_pan_start_y;
-		
-			var _angle_diff_is_cardinal	= (_angle_diff+360) mod 90 <= math_get_epsilon() || (_angle_diff+360) mod 90 >= 90 - math_get_epsilon();
-		
-			_relative_to_x			= _angle_diff_is_cardinal ? _relative_to_x : round(_relative_to_x);	// round co-ordinates at odd relative angles to avoid jitteriness
-			_relative_to_y			= _angle_diff_is_cardinal ? _relative_to_y : round(_relative_to_y);	// round co-ordinates at odd relative angles to avoid jitteriness
-		
-			target.x			-= _relative_to_x;
-			target.y			-= _relative_to_y;
-		
-			x				-= _relative_to_x;
-			y				-= _relative_to_y;
+			return;
 		}
+		
+		if (_angle_anchor == undefined)
+		{
+			target.x	-= panning.target.x - panning.start.x;
+			target.y	-= panning.target.y - panning.start.y;
+			
+			x		= target.x;
+			y		= target.y;
+			
+			return;
+		}
+		
+		var _angle_diff		= panning.start.angle - previous.angle;
+		
+		var _pan_distance	= point_distance(_angle_anchor.x, _angle_anchor.y, panning.start.x, panning.start.y);
+		var _pan_direction	= point_direction(_angle_anchor.x, _angle_anchor.y, panning.start.x, panning.start.y) + _angle_diff;
+		
+		var _rotated_pan_x	= _angle_anchor.x + lengthdir_x(_pan_distance, _pan_direction);
+		var _rotated_pan_y	= _angle_anchor.y + lengthdir_y(_pan_distance, _pan_direction);
+		
+		var _relative_target_x	= panning.target.x - _rotated_pan_x;
+		var _relative_target_y	= panning.target.y - _rotated_pan_y;
+		
+		var _angle_is_cardinal	= (_angle_diff+360) mod 90 <= math_get_epsilon() || (_angle_diff+360) mod 90 >= 90 - math_get_epsilon();
+		
+		target.x		-= _angle_is_cardinal ? _relative_target_x : round(_relative_target_x);		// round co-ordinates at odd relative angles to avoid jitteriness
+		target.y		-= _angle_is_cardinal ? _relative_target_y : round(_relative_target_y);		// round co-ordinates at odd relative angles to avoid jitteriness
+		
+		x			= target.x;
+		y			= target.y;
 	};
 	
 	/// @function			__clamp_to_boundary(_rect)
