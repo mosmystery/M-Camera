@@ -158,6 +158,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	The End Step event. Updates the camera tranform.
 	/// @returns		N/A
 	static end_step = function() {
+		__apply_panning();	// to be moved next commit. here for equivalency to previous commit.
+		
 		// update transform
 		previous.x	= x;
 		previous.y	= y;
@@ -252,6 +254,36 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			
 			x			= target.x;
 			y			= target.y;
+		}
+	};
+	
+	/// @function		__apply_panning()
+	/// @description	Updates the camera position based on the panning start and target values, and anchors.
+	/// @returns		N/A
+	static __apply_panning = function() {
+		if (is_panning())
+		{
+			var _angle_diff			= angle - panning.start.angle;
+		
+			var _rotation_adjustment_len	= point_distance(anchors.angle.x, anchors.angle.y, panning.start.x, panning.start.y);
+			var _rotation_adjustment_dir	= point_direction(anchors.angle.x, anchors.angle.y, panning.start.x, panning.start.y) - _angle_diff;
+		
+			var _rotated_pan_start_x	= anchors.angle.x + lengthdir_x(_rotation_adjustment_len, _rotation_adjustment_dir);
+			var _rotated_pan_start_y	= anchors.angle.y + lengthdir_y(_rotation_adjustment_len, _rotation_adjustment_dir);
+		
+			var _relative_to_x		= panning.target.x - _rotated_pan_start_x;
+			var _relative_to_y		= panning.target.y - _rotated_pan_start_y;
+		
+			var _angle_diff_is_cardinal	= (_angle_diff+360) mod 90 <= math_get_epsilon() || (_angle_diff+360) mod 90 >= 90 - math_get_epsilon();
+		
+			_relative_to_x			= _angle_diff_is_cardinal ? _relative_to_x : round(_relative_to_x);	// round co-ordinates at odd relative angles to avoid jitteriness
+			_relative_to_y			= _angle_diff_is_cardinal ? _relative_to_y : round(_relative_to_y);	// round co-ordinates at odd relative angles to avoid jitteriness
+		
+			target.x			-= _relative_to_x;
+			target.y			-= _relative_to_y;
+		
+			x				-= _relative_to_x;
+			y				-= _relative_to_y;
 		}
 	};
 	
@@ -715,6 +747,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		panning.start.y		= _from_y;
 		panning.start.angle	= angle;
 		panning.start.zoom	= zoom;
+		panning.target.x	= _from_x;
+		panning.target.y	= _from_y;
+		panning.target.angle	= angle;
+		panning.target.zoom	= zoom;
 		
 		debug.panning.camera_start_x	= x;
 		debug.panning.camera_start_y	= y;
@@ -728,7 +764,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @function		pan_to(_to_x, _to_y)
-	/// @description	Pans the camera to _to_x, _to_y from panning.start.x and panning.start.y. Only call this function when in panning mode - See .start_panning(), .stop_panning() and .is_panning().
+	/// @description	Sets target panning co-ordinates. Only call this function when in panning mode. See .start_panning(), .stop_panning() and .is_panning().
 	/// @param {real}	[_to_x=panning.start.x]	The x co-ordinate to which to pan.
 	/// @param {real}	[_to_y=panning.start.y]	The y co-ordinate to which to pan.
 	/// @returns		N/A
@@ -738,27 +774,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			throw ("Error: MCamera() attempting to use .pan_to() outside of panning mode. Check panning mode with .is_panning(), start panning mode with .start_panning(), and stop panning mode with .stop_panning()");
 		}
 		
-		var _angle_diff			= angle - panning.start.angle;
-		
-		var _rotation_adjustment_len	= point_distance(anchors.angle.x, anchors.angle.y, panning.start.x, panning.start.y);
-		var _rotation_adjustment_dir	= point_direction(anchors.angle.x, anchors.angle.y, panning.start.x, panning.start.y) - _angle_diff;
-		
-		var _rotated_pan_start_x	= anchors.angle.x + lengthdir_x(_rotation_adjustment_len, _rotation_adjustment_dir);
-		var _rotated_pan_start_y	= anchors.angle.y + lengthdir_y(_rotation_adjustment_len, _rotation_adjustment_dir);
-		
-		var _relative_to_x		= _to_x - _rotated_pan_start_x;
-		var _relative_to_y		= _to_y - _rotated_pan_start_y;
-		
-		var _angle_diff_is_cardinal	= (_angle_diff+360) mod 90 <= math_get_epsilon() || (_angle_diff+360) mod 90 >= 90 - math_get_epsilon();
-		
-		_relative_to_x			= _angle_diff_is_cardinal ? _relative_to_x : round(_relative_to_x);	// round co-ordinates at odd relative angles to avoid jitteriness
-		_relative_to_y			= _angle_diff_is_cardinal ? _relative_to_y : round(_relative_to_y);	// round co-ordinates at odd relative angles to avoid jitteriness
-		
-		target.x			-= _relative_to_x;
-		target.y			-= _relative_to_y;
-		
-		x				-= _relative_to_x;
-		y				-= _relative_to_y;
+		panning.target.x	= _to_x;
+		panning.target.y	= _to_y;
 	};
 	
 	
