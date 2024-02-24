@@ -65,16 +65,13 @@ global.camera.unset_boundary();
 
 ## Credits
 
-Created by [`@mos_mystery`](https://twitter.com/mos_mystery)
+- Created by [mos_mystery](https://twitter.com/mos_mystery).
+- Originally submitted to [TabularElf](https://twitter.com/TabularElf)'s [GameMaker Kitchen Cookbook Jam #1](https://itch.io/jam/cookbook-jam-1).
+- Special thanks to [Pixelated Pope](https://www.youtube.com/@PixelatedPope) and [Shaun Spalding](https://www.youtube.com/@ShaunJS) for their camera tutorials.
+- Thank *you*!
 
-Originally submitted to [`@TabularElf`](https://twitter.com/TabularElf)'s [GameMaker Kitchen Cookbook Jam #1](https://itch.io/jam/cookbook-jam-1).
+## Help, Feature Requests, Bug Reports
 
-Special thanks to [Pixelated Pope](https://www.youtube.com/@PixelatedPope) and [Shaun Spalding](https://www.youtube.com/@ShaunJS) for their camera tutorials.
-
-Thank *you*!
-
-## Feature requests, Bug reports, Help
-
-- [Open an issue on GitHub](https://github.com/mosmystery/M-Camera/issues)
-- Ping `@__mos` in the [GameMaker Kitchen Discord](https://discord.gg/8krYCqr) or [GameMaker Discord](https://discord.com/invite/gamemaker)
-- Ping [`@mos_mystery` on Twitter](https://twitter.com/mos_mystery)
+- Ping `@__mos` in the [GameMaker Kitchen](https://discord.gg/8krYCqr) or [GameMaker](https://discord.com/invite/gamemaker) Discords.
+- Ping or DM [mos_mystery](https://twitter.com/mos_mystery) on Twitter.
+- [Open an issue](https://github.com/mosmystery/M-Camera/issues) on GitHub.
