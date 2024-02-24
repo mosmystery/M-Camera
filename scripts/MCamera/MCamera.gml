@@ -91,6 +91,30 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}				// The user-defined target transform values for the pan. See .start_panning()
 	};					// See .is_panning(), .start_panning(), .stop_panning(), .pan_to()
 	
+	// shake
+	
+	shake = {
+		limits : {
+			radius		: 4,
+			angle		: 22.5,
+			zoom		: 0.1
+		},				// The maximum range for shake transform values. See .set_shake_limits()
+		raw	: {
+			distance	: 0,
+			direction	: 0,
+			angle		: 0,
+			zoom		: 0
+		},				// The raw internal tranform values.
+		x			: 0,	// The shake x position offset.
+		y			: 0,	// The shake y position offset.
+		angle			: 0,	// The shake angle offset.
+		zoom			: 1,	// The shake zoom offset.
+		coarseness		: 0.25,	// How course the raw transform values should change each step. 1 = white noise. >0 <1 = brown noise. See .set_shake_limits()
+		intensity		: 0,	// The intensity of the shake. Is a multiplier for the limits. 0 = No shake. 1 = match transform to limits. See .shake_to()
+		intensity_falloff_rate	: 0.05,	// The falloff rate of intensity each step. See .set_shake_interpolation()
+		fn_intensity		: lerp	// Custom interpolation function for the intensity falloff. See .set_shake_interpolation()
+	};					// See .set_shake_limits(), .set_shake_interpolation() .shake_to()
+	
 	// debug
 	
 	debug		= {
@@ -175,11 +199,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		__enforce_position_anchor(anchors.position);
 		__apply_panning(anchors.angle);
 		__clamp_to_boundary(boundary);
+		__update_shake();
 		
 		// update view
-		camera_set_view_size(id, view_width(), view_height());
-		camera_set_view_angle(id, angle);
-		camera_set_view_pos(id, x - (view_width()/2), y - (view_height()/2));
+		camera_set_view_size(id, view_width() / shake.zoom, view_height() / shake.zoom);
+		camera_set_view_angle(id, angle + shake.angle);
+		camera_set_view_pos(id, (x - (view_width()/2)) + shake.x, (y - (view_height()/2)) + shake.y);
 	};
 	
 	/// @function		draw_end()
@@ -257,7 +282,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @function							__apply_panning(_angle_anchor)
-	/// @description						Updates the camera position based on the panning start and target values, and angle angle.
+	/// @description						For internal use. Updates the camera position based on the panning start and target values, and angle angle.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
 	static __apply_panning = function(_angle_anchor=anchors.angle) {
@@ -318,6 +343,49 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			
 			x			= target.x;
 			y			= target.y;
+		}
+	};
+	
+	/// @function		__update_shake()
+	/// @description	For internal use. Updates the shake transform.
+	/// @returns		N/A
+	static __update_shake = function() {
+		if (shake.intensity == 0)
+		{
+			return;
+		}
+		
+		with (shake)
+		{
+			// set raw values
+			raw.distance	+= coarseness * random_range(-limits.radius, limits.radius);
+			raw.direction	+= coarseness * random_range(-180, 180);
+			raw.angle	+= coarseness * random_range(-limits.angle, limits.angle);
+			raw.zoom	+= coarseness * random_range(-limits.zoom, limits.zoom);
+			
+			raw.distance	= (raw.distance > limits.radius)	? limits.radius - (raw.distance-limits.radius)	: abs(raw.distance);
+			raw.direction	= (raw.direction + 360) % 360;	// wrap instead of reflect direction at boundaries
+			raw.angle	= (raw.angle > limits.angle)		? limits.angle - (raw.angle-limits.angle)	: abs(raw.angle);
+			raw.zoom	= (raw.zoom > limits.zoom)		? limits.zoom - (raw.zoom-limits.zoom)		: abs(raw.zoom);
+			
+			// set output values
+			x		= lengthdir_x(intensity * raw.distance, raw.direction);
+			y		= lengthdir_y(intensity * raw.distance, raw.direction);
+			angle		= (intensity * raw.angle) - (intensity * (limits.angle/2));
+			zoom		= 1 + (intensity * raw.zoom) - (intensity * (limits.zoom/2)); // to be updated to make negative numbers approach 0
+			
+			// intensity falloff
+			intensity	= fn_intensity(intensity, 0, intensity_falloff_rate);
+			
+			// reset transform when intensity has 
+			if (abs(intensity) <= math_get_epsilon())
+			{
+				intensity	= 0;
+				raw.distance	= 0;
+				raw.direction	= random(360);
+				raw.angle	= limits.angle/2;
+				raw.zoom	= 0;
+			}
 		}
 	};
 	
@@ -786,6 +854,47 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		panning.target.x	= _to_x;
 		panning.target.y	= _to_y;
+	};
+	
+	
+	
+		  ////////////////////////////
+		 // transfomration - shake //
+		////////////////////////////
+	
+	
+	
+	/// @function		set_shake_limits(_radius, _angle, _zoom, _coarseness)
+	/// @description	Sets the maximum radius, angle, and zoom for camera shake transformation. Additionally sets the courseness for transform value change. If you don't want shake to transform a particular way, set that transform limit to 0.
+	/// @param {real}	_radius				The maximum distance from 0,0 the camera x,y can be transformed.
+	/// @param {real}	_angle				The maximum angle range the camera can be rotated. Output angle is added to negative half of the range. For example, 20 will transform the camera between -10 to 10 degrees.
+	/// @param {real}	_zoom				The maximum range the zoom factor can fluctuate in.
+	/// @param {coarseness)	[_coarseness=shake.coarseness]	The coarseness of the brownian step function for changing each transform value each frame. 0 = +-no change (not recommended), 1 = +-whole range (white noise).
+	///							For intended results, input a value >0 and <=1. For white noise, input 1. For typical brown noise, try something between 0.1 and 0.5.
+	/// @returns		N/A
+	static set_shake_limits = function(_radius, _angle, _zoom, _coarseness=shake.coarseness) {
+		shake.limits.radius	= _radius;
+		shake.limits.angle	= _angle;
+		shake.limits.zoom	= _zoom;
+		shake.coarseness	= _coarseness;
+	};
+	
+	/// @function		set_shake_interpolation(_value, _fn_interpolate)
+	/// @description	Sets the interpolation factor and function for reducing the intensity of the shake. Essentially how fast intensity should approach 0.
+	/// @param {real}	[_value=shake.intensity_falloff_rate]		The interpolation factor, as a fraction between 0 and 1. 1 = instantly turn off intensity. 0 = maintain intensity.
+	/// @param {function}	[_fn_interpolate=shake.fn_intensity]		Optional custom interpolation function for fading intensity. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
+	/// @returns		N/A
+	static set_shake_interpolation = function(_value=shake.intensity_falloff_rate, _fn_interpolate=shake.fn_intensity) {
+		shake.intensity_falloff_rate	= _value;
+		shake.fn_intensity		= _fn_interpolate;
+	};
+	
+	/// @function		shake_to(_intensity)
+	/// @description	Sets the intensity for the shake.
+	/// @param {real}	_intensity	The intensity level of the shake; a multiplier for the shake limits (See .set_shake_limits()). 0 = turn off. 1 = set to shake limits. Intended to be a value between 0 and 1, but go wild.
+	/// @returns		N/A
+	static shake_to = function(_intensity) {
+		shake.intensity	= _intensity;
 	};
 	
 	

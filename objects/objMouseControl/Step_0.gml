@@ -15,6 +15,7 @@ var _input = {
 	pan_end		: mouse_check_button_released(mb_middle),
 	reset		: keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("R")),
 	toggle_debug	: keyboard_check_pressed(vk_tab) || keyboard_check_pressed(ord("D")),
+	shake		: keyboard_check_pressed(vk_space),
 	
 	// editor controls
 	place_block	: mouse_check_button(mb_left),
@@ -61,8 +62,12 @@ if (_input.reset)
 
 if (_input.toggle_debug)
 {
-	
 	global.camera.set_debugging();		// toggle camera debug display
+}
+
+if (_input.shake)
+{
+	global.camera.shake_to(0.5);		// set the intensity of the shake. Try a value between 0 and 1. Or, hell, try 1000, why not. See .shake_to(), .set_shake_limits() and .set_shake_interpolation().
 }
 
 // place and erase blocks
