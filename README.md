@@ -29,7 +29,7 @@ A flexible camera system for GameMaker, focused on quick setup and ease of use.
 global.camera = new MCamera(320, 180, 4, 1);
 
 // optionally define other camera settings here
-global.camera.set_target(objPlayer);
+global.camera.set_position_anchor(objPlayer);
 global.camera.set_interpolation_values(1/8, 1/4, 1);
 ```
 
@@ -39,7 +39,7 @@ global.camera.set_interpolation_values(1/8, 1/4, 1);
 // example settings
 global.camera.set_start_values(room_width/2, room_height/2, 0, 1);
 global.camera.set_interpolation_values(1/8, 1/4, 1);
-global.camera.set_debug_mode(true);
+global.camera.set_debugging(true);
 
 // example translation
 global.camera.move_to(x, y);
@@ -48,11 +48,11 @@ global.camera.zoom_by(2);
 global.camera.reset();
 
 // example anchoring
-global.camera.set_target(objPlayer);
-global.camera.set_rotation_anchor({x: room_width/2, y: room_height/2});
+global.camera.set_position_anchor(objPlayer);
+global.camera.set_angle_anchor({x: room_width/2, y: room_height/2});
 global.camera.set_zoom_anchor(objMouse);
-global.camera.set_position_boundary(0, 0, room_width, room_height);
-global.camera.unset_position_boundary();
+global.camera.set_boundary(0, 0, room_width, room_height);
+global.camera.unset_boundary();
 
 // see the full list of methods and their documentation in MCamera.gml
 ```
@@ -63,14 +63,18 @@ global.camera.unset_position_boundary();
 2. Unzip the source code file and open `m_camera.yyp` in GameMaker.
 3. Run the build.
 
-## Closing Notes
+## Credits
 
-Thank you for your interest in this project. I hope it serves you well.
+Created by [`@mos_mystery`](https://twitter.com/mos_mystery)
 
-Special thanks to [Pixelated Pope](https://www.youtube.com/@PixelatedPope) and [Shaun Spalding](https://www.youtube.com/@ShaunJS) for their camera tutorials which made this possible.
+Originally submitted to [`@TabularElf`](https://twitter.com/TabularElf)'s [GameMaker Kitchen Cookbook Jam #1](https://itch.io/jam/cookbook-jam-1).
 
-### Feature requests, bug reports, help
+Special thanks to [Pixelated Pope](https://www.youtube.com/@PixelatedPope) and [Shaun Spalding](https://www.youtube.com/@ShaunJS) for their camera tutorials.
+
+Thank *you*!
+
+## Feature requests, Bug reports, Help
 
 - [Open an issue on GitHub](https://github.com/mosmystery/M-Camera/issues)
-- [ping `@__mos` in the GameMaker Discord](https://discord.com/invite/gamemaker)
-- [ping `@mos_mystery` on Twitter](https://twitter.com/mos_mystery)
+- Ping `@__mos` in the [GameMaker Kitchen Discord](https://discord.gg/8krYCqr) or [GameMaker Discord](https://discord.com/invite/gamemaker)
+- Ping [`@mos_mystery` on Twitter](https://twitter.com/mos_mystery)
