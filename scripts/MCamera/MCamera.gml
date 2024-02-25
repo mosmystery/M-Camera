@@ -897,6 +897,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		shake.intensity	= _intensity;
 	};
 	
+	/// @function		shake_by(_intensity)
+	/// @description	Adds _intensity on to the intensity for the shake. Useful for increasing the shake with consecutive hits.
+	/// @param {real}	_intensity	The intensity to add on to the intensity level of the shake; a multiplier for the shake limits. See .set_shake_limits(), .shake_to()
+	/// @returns		N/A
+	static shake_by = function(_intensity) {
+		shake.intensity	+= _intensity;
+	};
+	
 	
 	
 		  /////////////

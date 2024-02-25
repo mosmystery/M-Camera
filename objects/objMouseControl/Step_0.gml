@@ -67,7 +67,7 @@ if (_input.toggle_debug)
 
 if (_input.shake)
 {
-	global.camera.shake_to(0.5);		// set the intensity of the shake. Try a value between 0 and 1. Or, hell, try 1000, why not. See .shake_to(), .set_shake_limits() and .set_shake_interpolation().
+	global.camera.shake_to(0.5);		// set the intensity of the shake. Try a value between 0 and 1. Or, hell, try 1000, why not. See .shake_to(), .shake_by(), .set_shake_limits() and .set_shake_interpolation().
 }
 
 // place and erase blocks
