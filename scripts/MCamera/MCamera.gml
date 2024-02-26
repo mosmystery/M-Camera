@@ -376,16 +376,25 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			
 			// intensity falloff
 			intensity	= fn_intensity(intensity, 0, intensity_falloff_rate);
-			
-			if (abs(intensity) <= math_get_epsilon())
-			{
-				intensity	= 0;
-				raw.distance	= 0;
-				raw.direction	= random(360)-180;
-				raw.angle	= limits.angle/2;
-				raw.zoom	= 0;
-			}
 		}
+		
+		// reset transform
+		if (abs(shake.intensity) <= math_get_epsilon())
+		{
+			shake.intensity	= 0;
+				
+			__shake_reset_transform();
+		}
+	};
+	
+	/// @function		__shake_reset_transform()
+	/// @description	For internal use. Resets the shake transform to initial values.
+	/// @returns		N/A
+	static __shake_reset_transform = function() {
+		shake.raw.distance	= 0;
+		shake.raw.direction	= random(360)-180;
+		shake.raw.angle		= shake.limits.angle/2;
+		shake.raw.zoom		= 0;
 	};
 	
 	/// @function		__debug_draw()
@@ -868,7 +877,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	_radius				The maximum distance from 0,0 the camera x,y can be transformed.
 	/// @param {real}	_angle				The maximum angle range the camera can be rotated. Output angle is added to negative half of the range. For example, 20 will transform the camera between -10 to 10 degrees.
 	/// @param {real}	_zoom				The maximum range the zoom factor can fluctuate in.
-	/// @param {coarseness)	[_coarseness=shake.coarseness]	The coarseness of the brownian step function for changing each transform value each frame. 0 = +-no change (not recommended), 1 = +-whole range (white noise).
+	/// @param {real}	[_coarseness=shake.coarseness]	The coarseness of the brownian step function for changing each transform value each frame. 0 = +-no change (not recommended), 1 = +-whole range (white noise).
 	///							For intended results, input a value >0 and <=1. For white noise, input 1. For typical brown noise, try something between 0.1 and 0.5.
 	/// @returns		N/A
 	static set_shake_limits = function(_radius, _angle, _zoom, _coarseness=shake.coarseness) {
@@ -888,20 +897,27 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		shake.fn_intensity		= _fn_interpolate;
 	};
 	
-	/// @function		shake_to(_intensity)
+	/// @function		shake_to(_intensity, _reset_transform)
 	/// @description	Sets the intensity for the shake.
-	/// @param {real}	_intensity	The intensity level of the shake; a multiplier for the shake limits (See .set_shake_limits()). 0 = turn off. 1 = set to shake limits. Intended to be a value between 0 and 1, but go wild.
+	/// @param {real}	_intensity		The intensity level of the shake; a multiplier for the shake limits (See .set_shake_limits()). 0 = turn off. 1 = set to shake limits. Intended to be a value between 0 and 1, but go wild.
+	/// @param {bool}	[_reset_transform=true]	Whether to reset the initial transform values before the shake (true) or not (false).
 	/// @returns		N/A
-	static shake_to = function(_intensity) {
+	static shake_to = function(_intensity, _reset_transform=true) {
+		if (_reset_transform)
+		{
+			__shake_reset_transform();
+		}
+		
 		shake.intensity	= _intensity;
 	};
 	
-	/// @function		shake_by(_intensity)
+	/// @function		shake_by(_intensity, _reset_transform)
 	/// @description	Adds _intensity on to the intensity for the shake. Useful for increasing the shake with consecutive hits.
-	/// @param {real}	_intensity	The intensity to add on to the intensity level of the shake; a multiplier for the shake limits. See .set_shake_limits(), .shake_to()
+	/// @param {real}	_intensity			The intensity to add on to the intensity level of the shake; a multiplier for the shake limits. See .set_shake_limits(), .shake_to()
+	/// @param {bool}	[_reset_transform=false]	Whether to reset the initial transform values before the shake (true) or not (false).
 	/// @returns		N/A
-	static shake_by = function(_intensity) {
-		shake.intensity	+= _intensity;
+	static shake_by = function(_intensity, _reset_transform=false) {
+		shake_to(shake.intensity+_intensity, _reset_transform);
 	};
 	
 	
