@@ -97,7 +97,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		limits : {
 			radius		: 4,
 			angle		: 22.5,
-			zoom		: 0.1
+			zoom		: 1
 		},				// The maximum range for shake transform values. See .set_shake_limits()
 		raw	: {
 			distance	: 0,
@@ -347,7 +347,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @function		__update_shake()
-	/// @description	For internal use. Updates the shake transform.
+	/// @description	For internal use. Updates the shake transform and intensity.
 	/// @returns		N/A
 	static __update_shake = function() {
 		if (shake.intensity == 0)
@@ -363,26 +363,25 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			raw.angle	+= coarseness * random_range(-limits.angle, limits.angle);
 			raw.zoom	+= coarseness * random_range(-limits.zoom, limits.zoom);
 			
-			raw.distance	= (raw.distance > limits.radius)	? limits.radius - (raw.distance-limits.radius)	: abs(raw.distance);
-			raw.direction	= (raw.direction + 360) % 360;	// wrap instead of reflect direction at boundaries
-			raw.angle	= (raw.angle > limits.angle)		? limits.angle - (raw.angle-limits.angle)	: abs(raw.angle);
-			raw.zoom	= (raw.zoom > limits.zoom)		? limits.zoom - (raw.zoom-limits.zoom)		: abs(raw.zoom);
+			raw.distance	= reflect(raw.distance, -limits.radius, limits.radius);
+			raw.direction	= wrap(raw.direction, -180, 180);
+			raw.angle	= reflect(raw.angle, 0, limits.angle);
+			raw.zoom	= reflect(raw.zoom, -(limits.zoom/2), limits.zoom/2);
 			
 			// set output values
 			x		= lengthdir_x(intensity * raw.distance, raw.direction);
 			y		= lengthdir_y(intensity * raw.distance, raw.direction);
 			angle		= (intensity * raw.angle) - (intensity * (limits.angle/2));
-			zoom		= 1 + (intensity * raw.zoom) - (intensity * (limits.zoom/2)); // to be updated to make negative numbers approach 0
+			zoom		= power(sqrt(2), intensity * raw.zoom);
 			
 			// intensity falloff
 			intensity	= fn_intensity(intensity, 0, intensity_falloff_rate);
 			
-			// reset transform when intensity has 
 			if (abs(intensity) <= math_get_epsilon())
 			{
 				intensity	= 0;
 				raw.distance	= 0;
-				raw.direction	= random(360);
+				raw.direction	= random(360)-180;
 				raw.angle	= limits.angle/2;
 				raw.zoom	= 0;
 			}
