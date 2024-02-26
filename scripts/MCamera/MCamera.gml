@@ -169,6 +169,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		display_set_gui_size(width, height);
 		window_set_size(width * window_scale, height * window_scale);
 		window_center();
+		
+		// initialise shake
+		__shake_reset_transform();
 	};
 	
 	/// @function		room_start()
