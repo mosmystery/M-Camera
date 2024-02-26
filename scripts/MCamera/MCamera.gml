@@ -94,25 +94,26 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	// shake
 	
 	shake = {
-		limits : {
-			radius		: 4,
-			angle		: 22.5,
-			zoom		: 1
-		},				// The maximum range for shake transform values. See .set_shake_limits()
+		x			: 0,	// The shake x position offset.
+		y			: 0,	// The shake y position offset.
+		angle			: 0,	// The shake angle offset.
+		zoom			: 1,	// The shake zoom offset.
+		intensity		: 0,	// The intensity of the shake. Is a multiplier for the transform values. 0 = No shake. 1 = match transform to limits. See .shake_to()
+		intensity_falloff_rate	: 0.05,	// The falloff rate of intensity each step. See .set_shake_interpolation()
+		fn_intensity		: lerp,	// Custom interpolation function for the intensity falloff. See .set_shake_interpolation()
+		coarseness		: 0.25,	// How coarse the raw transform values should change each step. 1 = white noise. >0 <1 = brown noise. See .set_shake_limits()
 		raw	: {
 			distance	: 0,
 			direction	: 0,
 			angle		: 0,
 			zoom		: 0
-		},				// The raw internal tranform values.
-		x			: 0,	// The shake x position offset.
-		y			: 0,	// The shake y position offset.
-		angle			: 0,	// The shake angle offset.
-		zoom			: 1,	// The shake zoom offset.
-		coarseness		: 0.25,	// How course the raw transform values should change each step. 1 = white noise. >0 <1 = brown noise. See .set_shake_limits()
-		intensity		: 0,	// The intensity of the shake. Is a multiplier for the limits. 0 = No shake. 1 = match transform to limits. See .shake_to()
-		intensity_falloff_rate	: 0.05,	// The falloff rate of intensity each step. See .set_shake_interpolation()
-		fn_intensity		: lerp	// Custom interpolation function for the intensity falloff. See .set_shake_interpolation()
+		},				// The raw internal tranform values. These are used to calculate shake.x .y .angle .zoom
+		limits : {
+			radius		: 4,
+			angle		: 22.5,
+			zoom		: 1,
+			intensity	: infinity
+		}				// The maximum range for shake transform values. See .set_shake_limits()
 	};					// See .set_shake_limits(), .set_shake_interpolation() .shake_to()
 	
 	// debug
@@ -872,19 +873,21 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		set_shake_limits(_radius, _angle, _zoom, _coarseness)
+	/// @function		set_shake_limits(_radius, _angle, _zoom, _coarseness, _intensity)
 	/// @description	Sets the maximum radius, angle, and zoom for camera shake transformation. Additionally sets the courseness for transform value change. If you don't want shake to transform a particular way, set that transform limit to 0.
-	/// @param {real}	_radius				The maximum distance from 0,0 the camera x,y can be transformed.
-	/// @param {real}	_angle				The maximum angle range the camera can be rotated. Output angle is added to negative half of the range. For example, 20 will transform the camera between -10 to 10 degrees.
-	/// @param {real}	_zoom				The maximum range the zoom factor can fluctuate in.
-	/// @param {real}	[_coarseness=shake.coarseness]	The coarseness of the brownian step function for changing each transform value each frame. 0 = +-no change (not recommended), 1 = +-whole range (white noise).
-	///							For intended results, input a value >0 and <=1. For white noise, input 1. For typical brown noise, try something between 0.1 and 0.5.
+	/// @param {real}	_radius					The maximum distance from 0,0 the camera x,y can be transformed.
+	/// @param {real}	_angle					The maximum angle range the camera can be rotated. Output angle is added to negative half of the range. For example, 20 will transform the camera between -10 to 10 degrees.
+	/// @param {real}	_zoom					The maximum range the zoom factor can fluctuate in.
+	/// @param {real}	[_coarseness=shake.coarseness]		The coarseness of the brownian step function for changing each transform value each frame. 0 = +-no change (not recommended), 1 = +-whole range (white noise).
+	///								For intended results, input a value >0 and <=1. For white noise, input 1. For typical brown noise, try something between 0.1 and 0.5.
+	/// @param {real}	[_intensity=shake.limits.intensity]	The maximum intensity of the shake. See .shake_to() and .shake_by()
 	/// @returns		N/A
-	static set_shake_limits = function(_radius, _angle, _zoom, _coarseness=shake.coarseness) {
+	static set_shake_limits = function(_radius, _angle, _zoom, _coarseness=shake.coarseness, _intensity=shake.limits.intensity) {
 		shake.limits.radius	= _radius;
 		shake.limits.angle	= _angle;
 		shake.limits.zoom	= _zoom;
 		shake.coarseness	= _coarseness;
+		shake.limits.intensity	= _intensity;
 	};
 	
 	/// @function		set_shake_interpolation(_value, _fn_interpolate)
@@ -908,7 +911,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			__shake_reset_transform();
 		}
 		
-		shake.intensity	= _intensity;
+		shake.intensity	= clamp(_intensity, -shake.limits.intensity, shake.limits.intensity);
 	};
 	
 	/// @function		shake_by(_intensity, _reset_transform)
