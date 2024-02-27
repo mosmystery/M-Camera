@@ -48,6 +48,8 @@ function game_init()
 	global.camera.set_boundary(-_border, -_border, global.world.width_scaled()+_border, global.world.height_scaled()+_border);	// sets a boundary for the camera. Try .set_debug_mode(true) to see it, or try removing this line or calling .unset_boundary() to remove it.
 	
 	global.camera.set_debugging(true);								// Turn debug mode on. Try setting to false or removing line.
+	
+	//global.camera.set_shake_limits(128, 64, 16);							// Define the shake limits. Try different settings! Try 0 to turn off a parameter.
 }
 
 

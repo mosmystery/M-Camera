@@ -203,12 +203,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		__enforce_position_anchor(anchors.position);
 		__apply_panning(anchors.angle);
 		__clamp_to_boundary(boundary);
-		__update_shake();
+		__update_shake(undefined);
 		
 		// update view
 		camera_set_view_size(id, view_width() / shake.zoom, view_height() / shake.zoom);
 		camera_set_view_angle(id, angle + shake.angle);
-		camera_set_view_pos(id, (x - (view_width()/2)) + shake.x, (y - (view_height()/2)) + shake.y);
+		camera_set_view_pos(id, view_x() + shake.x, view_y() + shake.y);
 	};
 	
 	/// @function		draw_end()
@@ -350,10 +350,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function		__update_shake()
-	/// @description	For internal use. Updates the shake transform and intensity.
+	/// @function							__update_shake(_zoom_anchor)
+	/// @description						For internal use. Updates the shake transform and intensity. Accounts for _zoom_anchor.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=undefined]	The zoom anchor. Must contain an x and y value if not undefined.
 	/// @returns		N/A
-	static __update_shake = function() {
+	static __update_shake = function(_zoom_anchor=undefined) {
 		if (shake.intensity == 0)
 		{
 			return;
@@ -378,6 +379,25 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			angle		= (intensity * raw.angle) - (intensity * (limits.angle/2));
 			zoom		= power(sqrt(2), intensity * raw.zoom);
 			
+			// enforce zoom anchor
+			_zoom_anchor		??= other;
+			
+			var _next_anchor_x	= _zoom_anchor.x + x;		// next values are used so that shake is applied to the the camera transform calculated this frame
+			var _next_anchor_y	= _zoom_anchor.y + y;
+			var _next_view_x	= other.view_x() + x;
+			var _next_view_y	= other.view_y() + y;
+			var _next_view_width	= other.view_width() / zoom;
+			var _next_view_height	= other.view_height() / zoom;
+			
+			var _screen_ratio_w	= (_next_anchor_x - _next_view_x) / _next_view_width;
+			var _screen_ratio_h	= (_next_anchor_y - _next_view_y) / _next_view_height;
+			
+			var _x_in_world		= (_next_anchor_x - (_next_view_width * _screen_ratio_w)) + (_next_view_width/2);
+			var _y_in_world		= (_next_anchor_y - (_next_view_height * _screen_ratio_h)) + (_next_view_height/2);
+			
+			x			= _zoom_anchor.x - _x_in_world;
+			y			= _zoom_anchor.y - _y_in_world;
+			
 			// intensity falloff
 			intensity	= fn_intensity(intensity, 0, intensity_falloff_rate);
 		}
@@ -386,7 +406,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		if (abs(shake.intensity) <= math_get_epsilon())
 		{
 			shake.intensity	= 0;
-				
+			
 			__shake_reset_transform();
 		}
 	};
@@ -943,6 +963,22 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		view	= _view;
 		id	= view_camera[view];
 	}
+	
+	/// @function		view_x();
+	/// @description	Returns this camera's x position in the world.
+	/// @returns {real}	camera x.
+	static view_x = function()
+	{
+		return x - (view_width()/2);
+	};
+	
+	/// @function		view_y();
+	/// @description	Returns this camera's y position in the world.
+	/// @returns {real}	camera y.
+	static view_y = function()
+	{
+		return y - (view_height()/2);
+	};
 	
 	/// @function		view_width();
 	/// @description	Returns this camera's width scaled by zoom.
