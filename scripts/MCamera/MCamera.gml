@@ -198,12 +198,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom		= interpolation.fn_zoom(zoom, target.zoom, interpolation.zoom);
 		
 		// apply constraints
-		__enforce_zoom_anchor(anchors.zoom);
-		__enforce_angle_anchor(anchors.angle);
-		__enforce_position_anchor(anchors.position);
-		__apply_panning(anchors.angle);
-		__clamp_to_boundary(boundary);
-		__update_shake(undefined);
+		//__enforce_zoom_anchor(anchors.zoom);
+		//__enforce_angle_anchor(anchors.angle);
+		//__enforce_position_anchor(anchors.position);
+		//__apply_panning(anchors.angle);
+		//__clamp_to_boundary(boundary);
+		__update_shake({x:64, y:64}); //anchors.zoom. +uncomment above rows.
 		
 		// update view
 		camera_set_view_size(id, view_width() / shake.zoom, view_height() / shake.zoom);
@@ -380,23 +380,37 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			zoom		= power(sqrt(2), intensity * raw.zoom);
 			
 			// enforce zoom anchor
+				// center camera
 			_zoom_anchor		??= other;
 			
-			var _next_anchor_x	= _zoom_anchor.x + x;		// next values are used so that shake is applied to the the camera transform calculated this frame
-			var _next_anchor_y	= _zoom_anchor.y + y;
-			var _next_view_x	= other.view_x() + x;
-			var _next_view_y	= other.view_y() + y;
+			var _next_anchor_x	= _zoom_anchor.x;		// next values are used so that shake is applied to the the camera transform calculated this frame
+			var _next_anchor_y	= _zoom_anchor.y;
+			var _next_view_x	= other.view_x();
+			var _next_view_y	= other.view_y();
 			var _next_view_width	= other.view_width() / zoom;
 			var _next_view_height	= other.view_height() / zoom;
 			
+			var _screen_ratio_w	= (other.x - _next_view_x) / _next_view_width;
+			var _screen_ratio_h	= (other.y - _next_view_y) / _next_view_height;
+			
+			var _x_in_world		= (other.x - (_screen_ratio_w * _next_view_width)) + (_next_view_width/2);
+			var _y_in_world		= (other.y - (_screen_ratio_h * _next_view_height)) + (_next_view_height/2);
+						
+			x			-= _x_in_world - other.x;
+			y			-= _y_in_world - other.y;
+			
+				// offset camera by anchor ratio of screen size difference (wip)
 			var _screen_ratio_w	= (_next_anchor_x - _next_view_x) / _next_view_width;
 			var _screen_ratio_h	= (_next_anchor_y - _next_view_y) / _next_view_height;
 			
-			var _x_in_world		= (_next_anchor_x - (_next_view_width * _screen_ratio_w)) + (_next_view_width/2);
-			var _y_in_world		= (_next_anchor_y - (_next_view_height * _screen_ratio_h)) + (_next_view_height/2);
+			var _diff_width		= (_next_view_width - other.view_width());
+			var _diff_height	= (_next_view_height - other.view_height());
 			
-			x			= _zoom_anchor.x - _x_in_world;
-			y			= _zoom_anchor.y - _y_in_world;
+			var _x_relative		= (_diff_width * _screen_ratio_w) - (_diff_width/2);
+			var _y_relative		= (_diff_height * _screen_ratio_h) - (_diff_height/2);
+			
+			x			-= _x_relative;
+			y			-= _y_relative;
 			
 			// intensity falloff
 			intensity	= fn_intensity(intensity, 0, intensity_falloff_rate);
