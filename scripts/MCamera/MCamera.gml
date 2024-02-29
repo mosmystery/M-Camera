@@ -277,8 +277,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			var _screen_ratio_w	= (_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);	// camera_get[...]() functions get values previously set with camera_set[...]()
 			var _screen_ratio_h	= (_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
 			
-			target.x		= (_anchor.x - (view_width() * _screen_ratio_w)) + (view_width()/2);
-			target.y		= (_anchor.y - (view_height() * _screen_ratio_h)) + (view_height()/2);
+			target.x		= (_anchor.x - (_screen_ratio_w * view_width())) + (view_width()/2);
+			target.y		= (_anchor.y - (_screen_ratio_h * view_height())) + (view_height()/2);
 			
 			x			= target.x;
 			y			= target.y;
@@ -383,30 +383,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			// enforce zoom anchor
 			if (_zoom_anchor != undefined)
 			{
-				// center camera
-				var _next_view_width	= other.view_width() / zoom;	// next values are used so that shake is applied to the the camera transform calculated this frame
-				var _next_view_height	= other.view_height() / zoom;
-				var _diff_width		= _next_view_width - other.view_width();
-				var _diff_height	= _next_view_height - other.view_height();
+				var _diff_width		= (other.view_width()/zoom) - other.view_width();
+				var _diff_height	= (other.view_height()/zoom) - other.view_height();
 				
-				var _screen_ratio_w	= (other.x - other.view_x()) / _next_view_width;
-				var _screen_ratio_h	= (other.y - other.view_y()) / _next_view_height;
+				var _screen_ratio_w	= (_zoom_anchor.x-other.view_x()) / other.view_width();
+				var _screen_ratio_h	= (_zoom_anchor.y-other.view_y()) / other.view_height();
 				
-				var _x_in_world		= (other.x - (_screen_ratio_w * _next_view_width)) + (_next_view_width/2);
-				var _y_in_world		= (other.y - (_screen_ratio_h * _next_view_height)) + (_next_view_height/2);
-				
-				x			-= _x_in_world - other.x;	// try to simplify the zoom code by removing this line and reworking the final xy
-				y			-= _y_in_world - other.y;	// ''
-				
-				// offset camera by anchor ratio of screen size difference (wip)
-				var _screen_ratio_w	= (_zoom_anchor.x - other.view_x()) / other.view_width();
-				var _screen_ratio_h	= (_zoom_anchor.y - other.view_y()) / other.view_height();
-			
-				var _x_relative		= (_diff_width * _screen_ratio_w) - (_diff_width/2);
-				var _y_relative		= (_diff_height * _screen_ratio_h) - (_diff_height/2);
-				
-				x			-= _x_relative;
-				y			-= _y_relative;
+				x			-= _screen_ratio_w * _diff_width;
+				y			-= _screen_ratio_h * _diff_height;
 			}
 			
 			// intensity falloff
