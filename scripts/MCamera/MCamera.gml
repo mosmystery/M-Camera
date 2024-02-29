@@ -388,27 +388,27 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 				var _next_view_height	= other.view_height() / zoom;
 				var _diff_width		= _next_view_width - other.view_width();
 				var _diff_height	= _next_view_height - other.view_height();
-			
+				
 				var _screen_ratio_w	= (other.x - other.view_x()) / _next_view_width;
 				var _screen_ratio_h	= (other.y - other.view_y()) / _next_view_height;
-			
+				
 				var _x_in_world		= (other.x - (_screen_ratio_w * _next_view_width)) + (_next_view_width/2);
 				var _y_in_world		= (other.y - (_screen_ratio_h * _next_view_height)) + (_next_view_height/2);
-						
+				
 				x			-= _x_in_world - other.x;	// try to simplify the zoom code by removing this line and reworking the final xy
 				y			-= _y_in_world - other.y;	// ''
-			
+				
 				// offset camera by anchor ratio of screen size difference (wip)
 				var _screen_ratio_w	= (_zoom_anchor.x - other.view_x()) / other.view_width();
 				var _screen_ratio_h	= (_zoom_anchor.y - other.view_y()) / other.view_height();
 			
 				var _x_relative		= (_diff_width * _screen_ratio_w) - (_diff_width/2);
 				var _y_relative		= (_diff_height * _screen_ratio_h) - (_diff_height/2);
-			
+				
 				x			-= _x_relative;
 				y			-= _y_relative;
 			}
-		
+			
 			// intensity falloff
 			intensity	= fn_intensity(intensity, 0, intensity_falloff_rate);
 		}
@@ -973,7 +973,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	{
 		view	= _view;
 		id	= view_camera[view];
-	}
+	};
 	
 	/// @function		view_x();
 	/// @description	Returns this camera's x position in the world.
@@ -1046,7 +1046,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return window_mouse_get_y() / window_scale;
 	};
 	
-	/// @function		find_gui_position()
+	/// @function		find_gui_position(_x, _y)
 	/// @description	Converts an x,y position in the world to co-ordinates on the GUI and returns it in a struct. Useful for drawing tracking icons on the GUI.
 	/// @param {real}	[_x=0]		The x co-ordinate in the world.
 	/// @param {real}	[_y=0]		The y co-ordinate in the world.
