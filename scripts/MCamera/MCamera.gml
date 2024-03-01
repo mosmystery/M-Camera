@@ -203,7 +203,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		__enforce_position_anchor(anchors.position);
 		__apply_panning(anchors.angle);
 		__clamp_to_boundary(boundary);
-		__update_shake(anchors.zoom);
+		__update_shake(anchors.angle, anchors.zoom);
 		
 		// update view
 		camera_set_view_size(id, view_width() / shake.zoom, view_height() / shake.zoom);
@@ -350,12 +350,13 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function							__update_shake(_zoom_anchor)
+	/// @function							__update_shake(_angle_anchor, _zoom_anchor,)
 	/// @description						For internal use. Updates the shake transform and intensity based on anchors and shake members.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle.anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
 	///								Warning: if _zoom_anchor does not equal that of .__enforce_zoom_anchor(), the camera will drift when simultaneously zooming and shaking.
 	/// @returns		N/A
-	static __update_shake = function(_zoom_anchor=anchors.zoom) {
+	static __update_shake = function(_angle_anchor=anchors.angle, _zoom_anchor=anchors.zoom) {
 		if (shake.intensity == 0)
 		{
 			return;
@@ -391,6 +392,19 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 				
 				x			-= _screen_ratio_w * _diff_width;
 				y			-= _screen_ratio_h * _diff_height;
+			}
+			
+			// enforce angle anchor
+			if (_angle_anchor != undefined)
+			{
+				var _distance	= point_distance(_angle_anchor.x, _angle_anchor.y, other.x, other.y);
+				var _direction	= point_direction(_angle_anchor.x, _angle_anchor.y, other.x, other.y) - angle;
+				
+				var _relative_x	= lengthdir_x(_distance, _direction);
+				var _relative_y	= lengthdir_y(_distance, _direction);
+				
+				x		+= (_angle_anchor.x + _relative_x) - other.x;
+				y		+= (_angle_anchor.y + _relative_y) - other.y;
 			}
 			
 			// intensity falloff
@@ -560,7 +574,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __debug_draw_nav_anchor_dot = function(_anchor, _nav_dots_radius, _nav_dotring_radius, _col) {
 		if (is_struct(_anchor) || instance_exists(_anchor))
 		{
-			__debug_draw_nav_dot(_anchor.x, _anchor.y, _nav_dots_radius, _nav_dotring_radius, _col)
+			__debug_draw_nav_dot(_anchor.x, _anchor.y, _nav_dots_radius, _nav_dotring_radius, _col);
 		}
 	};
 	

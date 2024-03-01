@@ -50,7 +50,7 @@ function game_init()
 	global.camera.set_debugging(true);								// Turn debug mode on. Try setting to false or removing line.
 	
 	//global.camera.set_shake_limits(128, 64, 16);							// Define the shake limits. Try different settings! Try 0 to turn off a parameter.
-	global.camera.set_shake_limits(0, 0, 4); //testing. remove after use.
+	global.camera.set_shake_limits(0, 45, 4); //testing. remove after use.
 }
 
 
