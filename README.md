@@ -6,16 +6,14 @@ A flexible camera system for GameMaker, focused on quick setup and ease of use.
 
 - Optionally self-managed host object, to streamline setup.
 - Define window scale and pixel scale, for pixel-perfect pixel art or visible subpixels.
-- Camera movement, panning, rotation and zoom.
-- Set interpolation values for smooth translation.
-- Set a target object to follow.
-- Set rotation and zoom anchor points.
-- Set a boundary rectangle to clamp the camera within a room or rectangle.
+- Camera movement, panning, rotation and zoom, with custom interpolation values and functions for smooth translation.
+- Follow a position anchor, rotate around an angle anchor, or zoom towards a zoom anchor.
+- Set a boundary rectangle to clamp the camera within a rectangle, such as the current room.
+- Shake the camera by position, angle, and/or zoom, around/towards anchor points, with arcade-style jitter or realistic brownian motion.
 
 ### Limitations
 
-- Designed with single-view pixel art games in mind.
-- No screenshake currently, however there are plans to implement it.
+- Designed with single-view games in mind.
 
 ## Quickstart Guide
 
@@ -40,12 +38,14 @@ global.camera.set_interpolation_values(1/8, 1/4, 1);
 global.camera.set_start_values(room_width/2, room_height/2, 0, 1);
 global.camera.set_interpolation_values(1/8, 1/4, 1);
 global.camera.set_debugging(true);
+global.camera.set_shake_limits(4, 22.5, 2);
 
 // example translation
 global.camera.move_to(x, y);
 global.camera.rotate_by(90);
 global.camera.zoom_by(2);
 global.camera.reset();
+global.camera.shake_to(0.5);
 
 // example anchoring
 global.camera.set_position_anchor(objPlayer);
