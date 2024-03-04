@@ -209,12 +209,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		camera_set_view_size(id, view_width() / shake.zoom, view_height() / shake.zoom);
 		camera_set_view_angle(id, angle + shake.angle);
 		camera_set_view_pos(id, view_x() + shake.x, view_y() + shake.y);
-		
-		//testing
-		global.x = view_x();
-		global.y = view_y();
-		global.w = view_width();
-		global.h = view_height();
 	};
 	
 	/// @function		draw_end()
@@ -280,8 +274,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
 		if (zoom != previous.zoom && _anchor != undefined)
 		{
-			var _screen_ratio_w	= (_anchor.x - global.x) / global.w;
-			var _screen_ratio_h	= (_anchor.y - global.y) / global.h;
+			var _screen_ratio_w	= (_anchor.x - view_x_previous()) / view_width_previous();
+			var _screen_ratio_h	= (_anchor.y - view_y_previous()) / view_height_previous();
 			
 			target.x		= (_anchor.x - (_screen_ratio_w * view_width())) + (view_width()/2);
 			target.y		= (_anchor.y - (_screen_ratio_h * view_height())) + (view_height()/2);
@@ -979,7 +973,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		id	= view_camera[view];
 	};
 	
-	/// @function		view_x();
+	/// @function		view_x()
 	/// @description	Returns this camera's x position in the world.
 	/// @returns {real}	camera x.
 	static view_x = function()
@@ -987,7 +981,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return x - (view_width()/2);
 	};
 	
-	/// @function		view_y();
+	/// @function		view_y()
 	/// @description	Returns this camera's y position in the world.
 	/// @returns {real}	camera y.
 	static view_y = function()
@@ -995,7 +989,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return y - (view_height()/2);
 	};
 	
-	/// @function		view_width();
+	/// @function		view_width()
 	/// @description	Returns this camera's width scaled by zoom.
 	/// @returns {real}	width scaled by zoom.
 	static view_width = function()
@@ -1003,12 +997,44 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return width/zoom;
 	};
 	
-	/// @function		view_height();
+	/// @function		view_height()
 	/// @description	Returns this camera's height scaled by zoom.
 	/// @returns {real}	height scaled by zoom.
 	static view_height = function()
 	{
 		return height/zoom;
+	};
+	
+	/// @function		view_x_previous()
+	/// @description	Returns this camera's previous x position in the world.
+	/// @returns {real}	camera x previous.
+	static view_x_previous = function()
+	{
+		return previous.x - (view_width_previous()/2);
+	};
+	
+	/// @function		view_y_previous()
+	/// @description	Returns this camera's previous y position in the world.
+	/// @returns {real}	camera y previous.
+	static view_y_previous = function()
+	{
+		return previous.y - (view_height_previous()/2);
+	};
+	
+	/// @function		view_width_previous()
+	/// @description	Returns this camera's width scaled by previous zoom.
+	/// @returns {real}	width scaled by previous zoom.
+	static view_width_previous = function()
+	{
+		return width / previous.zoom;
+	};
+	
+	/// @function		view_height_previous()
+	/// @description	Returns this camera's height scaled by previous zoom.
+	/// @returns {real}	height scaled by previous zoom.
+	static view_height_previous = function()
+	{
+		return height / previous.zoom;
 	};
 	
 	/// @function		is_debugging()
