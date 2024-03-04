@@ -209,6 +209,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		camera_set_view_size(id, view_width() / shake.zoom, view_height() / shake.zoom);
 		camera_set_view_angle(id, angle + shake.angle);
 		camera_set_view_pos(id, view_x() + shake.x, view_y() + shake.y);
+		
+		//testing
+		global.x = view_x();
+		global.y = view_y();
+		global.w = view_width();
+		global.h = view_height();
 	};
 	
 	/// @function		draw_end()
@@ -274,8 +280,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
 		if (zoom != previous.zoom && _anchor != undefined)
 		{
-			var _screen_ratio_w	= (_anchor.x - camera_get_view_x(id)) / camera_get_view_width(id);	// camera_get[...]() functions get values previously set with camera_set[...]()
-			var _screen_ratio_h	= (_anchor.y - camera_get_view_y(id)) / camera_get_view_height(id);
+			var _screen_ratio_w	= (_anchor.x - global.x) / global.w;
+			var _screen_ratio_h	= (_anchor.y - global.y) / global.h;
 			
 			target.x		= (_anchor.x - (_screen_ratio_w * view_width())) + (view_width()/2);
 			target.y		= (_anchor.y - (_screen_ratio_h * view_height())) + (view_height()/2);
