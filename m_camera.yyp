@@ -34,6 +34,7 @@
     {"id":{"name":"pointarray","path":"scripts/pointarray/pointarray.yy",},},
     {"id":{"name":"array2d","path":"scripts/array2d/array2d.yy",},},
     {"id":{"name":"MCamera","path":"scripts/MCamera/MCamera.yy",},},
+    {"id":{"name":"example_editor","path":"scripts/example_editor/example_editor.yy",},},
     {"id":{"name":"rmExample","path":"rooms/rmExample/rmExample.yy",},},
   ],
   "RoomOrderNodes": [

@@ -12,6 +12,7 @@
     {"name":"game_init","order":3,"path":"scripts/game_init/game_init.yy",},
     {"name":"pointarray","order":3,"path":"scripts/pointarray/pointarray.yy",},
     {"name":"MCamera","order":2,"path":"scripts/MCamera/MCamera.yy",},
+    {"name":"example_editor","order":3,"path":"scripts/example_editor/example_editor.yy",},
     {"name":"rmExample","order":2,"path":"rooms/rmExample/rmExample.yy",},
   ],
 }
