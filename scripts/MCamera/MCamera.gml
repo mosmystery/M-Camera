@@ -143,7 +143,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		create(_create_host_object_for_me)
 	/// @description	The Create event. Initialises the camera.
 	/// @param {bool}	[_create_host_object_for_me=true]	Whether to create a permanent host object that runs the event methods automatically (true) or not (false). Useful if you want to run the event methods in a different event or manage the hose object yourself.
 	///								If false:	You will need to run this camera's .room_start(), .end_step(), and optionally .draw_end() events in a permanent object for intended results.
@@ -174,7 +173,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		__shake_reset_transform();
 	};
 	
-	/// @function		room_start()
 	/// @description	The Room Start event. Enables the view for this room.
 	/// @returns		N/A
 	static room_start = function() {
@@ -182,7 +180,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		view_visible[view]	= true;
 	};
 	
-	/// @function		end_step()
 	/// @description	The End Step event. Updates the camera tranform.
 	/// @returns		N/A
 	static end_step = function() {
@@ -211,7 +208,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		camera_set_view_pos(id, view_x() + shake.x, view_y() + shake.y);
 	};
 	
-	/// @function		draw_end()
 	/// @description	The Draw End event, for drawing the camera debug overlay.
 	/// @returns		N/A
 	static draw_end = function() {
@@ -226,7 +222,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function							__enforce_position_anchor(_anchor)
 	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting position.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.position]	The position anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
@@ -238,7 +233,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function							__enforce_angle_anchor(_anchor)
 	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting angle.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
@@ -267,7 +261,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function							__enforce_zoom_anchor(_anchor)
 	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting zoom.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
@@ -285,7 +278,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function							__apply_panning(_angle_anchor)
 	/// @description						For internal use. Updates the camera position based on the panning start and target values, and angle angle.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
@@ -326,7 +318,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		y			= target.y;
 	};
 	
-	/// @function			__clamp_to_boundary(_rect)
 	/// @description		For internal use. Clamps the camera position to be within boundary _rect.
 	/// @param {struct,undefined}	[_rect=boundary]	The struct defining the boundary rectangle, or undefined for no clamping. Must contain x1, y1, x2, y2 values. Example: { x1=0, y1=0, x2=width, y2=height }
 	/// @returns			N/A
@@ -350,7 +341,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function							__update_shake(_angle_anchor, _zoom_anchor,)
 	/// @description						For internal use. Updates the shake transform and intensity based on anchors and shake members.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle.anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
@@ -420,7 +410,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function		__shake_reset_transform()
 	/// @description	For internal use. Resets the shake transform to initial values.
 	/// @returns		N/A
 	static __shake_reset_transform = function() {
@@ -430,7 +419,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		shake.raw.zoom		= 0;
 	};
 	
-	/// @function		__debug_draw()
 	/// @description	For internal use. Draws the debug display.
 	/// @returns		N/A
 	static __debug_draw = function() {
@@ -544,7 +532,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		draw_line_color(x-_po, y-_po, x+_nav_ring_radius-_po, y-_po, _col_pos, _col_pos);
 	};
 	
-	/// @function			__debug_draw_nav_dot(_x, _y, _nav_dots_radius, _nav_dotring_radius, _col)
 	/// @description		For internal use. Draws a dot on the outer edge of the navigation ring of the debug display.
 	/// @param {real}		_x			The x position to draw the dot.
 	/// @param {real}		_x			The y position to draw the dot.
@@ -564,7 +551,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function							__debug_draw_nav_anchor_dot(_x, _y, _nav_dots_radius, _nav_dotring_radius, _col)
 	/// @description						For internal use. Draws a dot on the outer edge of the navigation ring of the debug display, to represent an anchor object.
 	/// @param {struct, id.Instance, Asset.GMObject, undefined}	_anchor			The anchor struct/object to derive x,y co-ordinates from, for where to draw the dot.
 	/// @param {real}						_nav_dots_radius	The radius of the dot.
@@ -586,7 +572,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function							set_position_anchor(_position_anchor)
 	/// @description						Sets the position anchor (target object or struct) for the camera to follow.
 	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_position_anchor=undefined]	The position anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
@@ -595,7 +580,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		anchors.position = _position_anchor;
 	};
 	
-	/// @function							set_angle_anchor(_angle_anchor)
 	/// @description						Sets the angle anchor for the camera to pivot around when rotating. Useful for keeping a position at the same place on the screen, such as the player position, the mouse position, the center of the level or a Vector2.
 	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=undefined]	The angle anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
@@ -604,7 +588,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		anchors.angle = _angle_anchor;
 	};
 	
-	/// @function							set_zoom_anchor(_zoom_anchor)
 	/// @description						Sets the zoom anchor for the camera to zoom towards or away from. Useful for zooming towards or away from a point of interest, such as in cutscenes, or the mouse in an editor or strategy game.
 	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=undefined]	The zoom anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
@@ -613,7 +596,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		anchors.zoom = _zoom_anchor;
 	};
 	
-	/// @function		set_zoom_limits(_zoom_min, _zoom_max)
 	/// @description	Sets the minimum and maximum limits for the camera zoom.
 	/// @param {real}	[_zoom_min=zoom_min]	The minimum camera zoom. Limited to 1/(2^16), or 16 halvings of the base zoom amount.
 	/// @param {real}	[_zoom_max=zoom_max]	The maximum camera zoom. Limited to 2^16, or 16 doublings of the base zoom amount at most, and _zoom_min at least.
@@ -626,7 +608,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_max = clamp(_zoom_max, max(_min, _zoom_min), _max);
 	};
 	
-	/// @function		set_boundary(_x1, _y1, _x2, _y2)
 	/// @description	Defines the boundary for the camera to clamp to. Useful for keeping the camera within the bounds of a level or area. Unset with .unset_boundary(). Note: The outer bounds may be visible while the camera is rotating or zoomed out.
 	/// @param {real}	[_x1=0]			The left edge of the boundary.
 	/// @param {real}	[_y1=0]			The top edge of the boundary.
@@ -642,7 +623,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		};
 	};
 	
-	/// @function		unset_boundary()
 	/// @description	Unsets the position boundary for the camera, ensuring the camera's position is not limited. Set with .set_boundary()
 	/// @returns		N/A
 	static unset_boundary = function() {
@@ -657,7 +637,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		set_start_values(_xstart, _ystart, _anglestart, _zoomstart)
 	/// @description	Sets the start values for the camera. These values are used by .reset(), so they are useful if you want to, for example, change where the camera should reset to.
 	/// @param {real}	[_xstart=start.x]		The starting x position.
 	/// @param {real}	[_ystart=start.y]		The starting y position.
@@ -671,7 +650,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		start.zoom	= _zoomstart;
 	};
 	
-	/// @function		set_position_interpolation(_value, _fn_interpolate)
 	/// @description	Sets the interpolation factor and function for transforming the x, y position towards target.x/.y. Essentially how fast x/y should approach target.x/.y.
 	/// @param {real}	[_value=interpolation.position]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @param {function}	[_fn_interpolate=interpolation.fn_position]	Optional custom interpolation function for updating the camera's x and y values. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
@@ -681,7 +659,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		interpolation.fn_position	= _fn_interpolate;
 	};
 	
-	/// @function		set_angle_interpolation(_value, _fn_interpolate)
 	/// @description	Sets the interpolation factor and function for transforming the angle towards target.angle. Essentially how fast angle should approach target.angle.
 	/// @param {real}	[_value=interpolation.angle]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @param {function}	[_fn_interpolate=interpolation.fn_angle]	Optional custom interpolation function for updating the camera's angle. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
@@ -691,7 +668,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		interpolation.fn_angle	= _fn_interpolate;
 	};
 	
-	/// @function		set_zoom_interpolation(_value, _fn_interpolate)
 	/// @description	Sets the interpolation factor and function for transforming the zoom towards target.zoom. Essentially how fast zoom should approach target.zoom.
 	/// @param {real}	[_value=interpolation.zoom]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @param {function}	[_fn_interpolate=interpolation.fn_zoom]	Optional custom interpolation function for updating the camera's zoom. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
@@ -701,7 +677,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		interpolation.fn_zoom	= _fn_interpolate;
 	};
 	
-	/// @function		set_interpolation_values(_position_interpolation, _angle_interpolation, _zoom_interpolation)
 	/// @description	Sets the interpolation factors for moving, rotating and zooming the camera. Essentially how fast x, y, angle and zoom should approach their respective target values.
 	/// @param {real}	[_position_interpolation=interpolation.position]	The position interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
 	/// @param {real}	[_angle_interpolation=interpolation.angle]		The angle interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
@@ -721,7 +696,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		move_to(_target_x, _target_y)
 	/// @description	Sets the target.x/.y for the camera.
 	/// @param {real}	[_target_x=target.x]		The new target.x position for the camera.
 	/// @param {real}	[_target_y=target.y]		The new target.y position for the camera.
@@ -731,7 +705,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		target.y = _target_y;
 	};
 	
-	/// @function		move_by(_x, _y)
 	/// @description	Moves the camera target.x/.y by a relative amount.
 	/// @param {real}	[_x=0]				The x value to move target.x by.
 	/// @param {real}	[_y=0]				The y value to move target.y by.
@@ -740,7 +713,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		move_to(target.x + _x, target.y + _y);
 	};
 	
-	/// @function		rotate_to(_target_angle)
 	/// @description	Sets the target.angle for the camera.
 	/// @param {real}	[_target_angle=target.angle]	The new target angle for the camera, in degrees.
 	/// @returns		N/A
@@ -768,7 +740,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 	};
 	
-	/// @function		rotate_by(_degrees)
 	/// @description	Increments camera's target.angle by _degrees.
 	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
 	/// @returns		N/A
@@ -776,7 +747,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		rotate_to(target.angle + _degrees);
 	};
 	
-	/// @function		zoom_to(_target_zoom)
 	/// @description	Sets the target.zoom factor for the camera.
 	/// @param {real}	[_target_zoom=target.zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
 	/// @returns		N/A
@@ -784,7 +754,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		target.zoom = clamp(_target_zoom, zoom_min, zoom_max);
 	};
 	
-	/// @function		zoom_by(_zoom_factor)
 	/// @description	Sets the target.zoom factor relative to the current target.zoom.
 	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
 	/// @returns		N/A
@@ -792,7 +761,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_to(target.zoom * _zoom_factor);
 	};
 	
-	/// @function		transform_to(_target_x, _target_y, _target_angle, _target_zoom)
 	/// @description	Sets the target values for the camera.
 	/// @param {real}	[_target_x=target.x]		The new target.x position for the camera.
 	/// @param {real}	[_target_y=target.y]		The new target.y position for the camera.
@@ -805,7 +773,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_to(_target_zoom);
 	};
 	
-	/// @function		transform_by(_x, _y, _degrees, _zoom_factor)
 	/// @description	Sets the camera target by a relative amount.
 	/// @param {real}	[_x=0]			The x value to move target.x by.
 	/// @param {real}	[_y=0]			The y value to move target.y by.
@@ -818,7 +785,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_by(_zoom_factor);
 	};
 	
-	/// @function		reset()
 	/// @description	Resets the camera back to the start values and stops panning. See .set_start_values() and .stop_panning()
 	/// @returns		N/A
 	static reset = function() {
@@ -848,14 +814,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		is_panning()
 	/// @description	Checks if camera is in panning mode. Useful to check before using .pan_to(). Start panning mode with .start_panning(), stop panning mode with .stop_panning().
 	/// @returns {bool}	Returns panning (true) or not (false).
 	static is_panning = function() {
 		return panning.active;
 	};
 	
-	/// @function		start_panning(_from_x, _from_y)
 	/// @description	Starts camera panning mode and sets start values. Start panning mode before using .pan_to()
 	/// @param {real}	_from_x		The x co-ordinate from which you wish to pan from. Is used for calculations in .pan_to()
 	/// @param {real}	_from_y		The y co-ordinate from which you wish to pan from. Is used for calculations in .pan_to()
@@ -875,14 +839,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		debug.panning.camera_start_y	= y;
 	};
 	
-	/// @function		stop_panning()
 	/// @description	Stops camera panning mode. Call this method when you have finished panning with .pan_to()
 	/// @returns		N/A
 	static stop_panning = function() {
 		panning.active		= false;
 	};
 	
-	/// @function		pan_to(_to_x, _to_y)
 	/// @description	Sets target panning co-ordinates. Only call this function when in panning mode. See .start_panning(), .stop_panning() and .is_panning().
 	/// @param {real}	[_to_x=panning.start.x]	The x co-ordinate to which to pan.
 	/// @param {real}	[_to_y=panning.start.y]	The y co-ordinate to which to pan.
@@ -905,7 +867,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		set_shake_limits(_radius, _angle, _zoom, _coarseness, _intensity)
 	/// @description	Sets the maximum radius, angle, and zoom for camera shake transformation. Additionally sets the courseness for transform value change. If you don't want shake to transform a particular way, set that transform limit to 0.
 	/// @param {real}	_radius					The maximum distance from 0,0 the camera x,y can be transformed.
 	/// @param {real}	_angle					The maximum angle range the camera can be rotated. Output angle is added to negative half of the range. For example, 20 will transform the camera between -10 to 10 degrees.
@@ -922,7 +883,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		shake.limits.intensity	= _intensity;
 	};
 	
-	/// @function		set_shake_interpolation(_value, _fn_interpolate)
 	/// @description	Sets the interpolation factor and function for reducing the intensity of the shake. Essentially how fast intensity should approach 0.
 	/// @param {real}	[_value=shake.intensity_falloff_rate]		The interpolation factor, as a fraction between 0 and 1. 1 = instantly turn off intensity. 0 = maintain intensity.
 	/// @param {function}	[_fn_interpolate=shake.fn_intensity]		Optional custom interpolation function for fading intensity. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
@@ -932,7 +892,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		shake.fn_intensity		= _fn_interpolate;
 	};
 	
-	/// @function		shake_to(_intensity, _reset_transform)
 	/// @description	Sets the intensity for the shake.
 	/// @param {real}	_intensity		The intensity level of the shake; a multiplier for the shake limits (See .set_shake_limits()). 0 = turn off. 1 = set to shake limits. Intended to be a value between 0 and 1, but go wild.
 	/// @param {bool}	[_reset_transform=true]	Whether to reset the initial transform values before the shake (true) or not (false).
@@ -946,7 +905,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		shake.intensity	= clamp(_intensity, -shake.limits.intensity, shake.limits.intensity);
 	};
 	
-	/// @function		shake_by(_intensity, _reset_transform)
 	/// @description	Adds _intensity on to the intensity for the shake. Useful for increasing the shake with consecutive hits.
 	/// @param {real}	_intensity			The intensity to add on to the intensity level of the shake; a multiplier for the shake limits. See .set_shake_limits(), .shake_to()
 	/// @param {bool}	[_reset_transform=false]	Whether to reset the initial transform values before the shake (true) or not (false).
@@ -963,7 +921,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @function		set_view(_view)
 	/// @description	Sets the view and id for this camera.
 	/// @param {real}	[_view=0]	View number [0..7].
 	/// @returns		N/A
@@ -973,7 +930,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		id	= view_camera[view];
 	};
 	
-	/// @function		view_x()
 	/// @description	Returns this camera's x position in the world.
 	/// @returns {real}	camera x.
 	static view_x = function()
@@ -981,7 +937,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return x - (view_width()/2);
 	};
 	
-	/// @function		view_y()
 	/// @description	Returns this camera's y position in the world.
 	/// @returns {real}	camera y.
 	static view_y = function()
@@ -989,7 +944,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return y - (view_height()/2);
 	};
 	
-	/// @function		view_width()
 	/// @description	Returns this camera's width scaled by zoom.
 	/// @returns {real}	width scaled by zoom.
 	static view_width = function()
@@ -997,7 +951,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return width/zoom;
 	};
 	
-	/// @function		view_height()
 	/// @description	Returns this camera's height scaled by zoom.
 	/// @returns {real}	height scaled by zoom.
 	static view_height = function()
@@ -1005,7 +958,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return height/zoom;
 	};
 	
-	/// @function		view_x_previous()
 	/// @description	Returns this camera's previous x position in the world.
 	/// @returns {real}	camera x previous.
 	static view_x_previous = function()
@@ -1013,7 +965,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return previous.x - (view_width_previous()/2);
 	};
 	
-	/// @function		view_y_previous()
 	/// @description	Returns this camera's previous y position in the world.
 	/// @returns {real}	camera y previous.
 	static view_y_previous = function()
@@ -1021,7 +972,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return previous.y - (view_height_previous()/2);
 	};
 	
-	/// @function		view_width_previous()
 	/// @description	Returns this camera's width scaled by previous zoom.
 	/// @returns {real}	width scaled by previous zoom.
 	static view_width_previous = function()
@@ -1029,7 +979,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return width / previous.zoom;
 	};
 	
-	/// @function		view_height_previous()
 	/// @description	Returns this camera's height scaled by previous zoom.
 	/// @returns {real}	height scaled by previous zoom.
 	static view_height_previous = function()
@@ -1037,14 +986,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return height / previous.zoom;
 	};
 	
-	/// @function		is_debugging()
 	/// @description	Returns if debug mode is active (true) or not (false).
 	/// @returns {bool}	Returns if debug mode is active (true) or not (false).
 	static is_debugging = function() {
 		return debug.active;
 	};
 	
-	/// @function		set_debugging(_is_debugging)
 	/// @description	Activates or deactivates debug mode. When debug mode is active, the debug display is drawn to the screen.
 	/// @param {bool}	[_is_debugging]		Whether to turn debug mode on (true) or off (false). Toggles on/off by default.
 	/// @returns		N/A
@@ -1052,7 +999,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		debug.active = _is_debugging;
 	};
 	
-	/// @function		find_gui_mouse_x()
 	/// @description	Finds the x position of the mouse on the GUI. Useful for drawing a mouse cursor to the GUI.
 	/// @returns {real}	Returns an x position relative to the GUI.
 	static find_gui_mouse_x = function() {
@@ -1064,7 +1010,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return window_mouse_get_x() / window_scale;
 	};
 	
-	/// @function		find_gui_mouse_y()
 	/// @description	Finds the y position of the mouse on the GUI. Useful for drawing a mouse cursor to the GUI.
 	/// @returns {real}	Returns an y position relative to the GUI.
 	static find_gui_mouse_y = function() {
@@ -1076,7 +1021,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return window_mouse_get_y() / window_scale;
 	};
 	
-	/// @function		find_gui_position(_x, _y)
 	/// @description	Converts an x,y position in the world to co-ordinates on the GUI and returns it in a struct. Useful for drawing tracking icons on the GUI.
 	/// @param {real}	[_x=0]		The x co-ordinate in the world.
 	/// @param {real}	[_y=0]		The y co-ordinate in the world.
