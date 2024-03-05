@@ -1,29 +1,29 @@
 {
-  "resourceType": "GMProject",
-  "resourceVersion": "1.7",
-  "name": "m_camera",
-  "AudioGroups": [
-    {"resourceType":"GMAudioGroup","resourceVersion":"1.3","name":"audiogroup_default","targets":-1,},
+  "$GMProject":"",
+  "%Name":"m_camera",
+  "AudioGroups":[
+    {"$GMAudioGroup":"","%Name":"audiogroup_default","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
-  "configs": {
-    "children": [],
-    "name": "Default",
+  "configs":{
+    "children":[],
+    "name":"Default",
   },
-  "defaultScriptType": 1,
-  "Folders": [
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Examples","folderPath":"folders/Examples.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"M-Camera v0.4.0","folderPath":"folders/M-Camera v0.4.0.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Utilities","folderPath":"folders/M-Camera v0.4.0/Utilities.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Example Editor","folderPath":"folders/Examples/Example Editor.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Utilities","folderPath":"folders/Examples/Utilities.yy",},
+  "defaultScriptType":1,
+  "Folders":[
+    {"$GMFolder":"","%Name":"Examples","folderPath":"folders/Examples.yy","name":"Examples","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Example Editor","folderPath":"folders/Examples/Example Editor.yy","name":"Example Editor","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Utilities","folderPath":"folders/Examples/Utilities.yy","name":"Utilities","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"M-Camera v0.4.0","folderPath":"folders/M-Camera v0.4.0.yy","name":"M-Camera v0.4.0","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Utilities","folderPath":"folders/M-Camera v0.4.0/Utilities.yy","name":"Utilities","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
-  "IncludedFiles": [],
-  "isEcma": false,
-  "LibraryEmitters": [],
-  "MetaData": {
-    "IDEVersion": "2023.11.1.129",
+  "IncludedFiles":[],
+  "isEcma":false,
+  "LibraryEmitters":[],
+  "MetaData":{
+    "IDEVersion":"2024.2.0.132",
   },
-  "resources": [
+  "name":"m_camera",
+  "resources":[
     {"id":{"name":"range_operations","path":"scripts/range_operations/range_operations.yy",},},
     {"id":{"name":"objMCamera","path":"objects/objMCamera/objMCamera.yy",},},
     {"id":{"name":"sprBlock","path":"sprites/sprBlock/sprBlock.yy",},},
@@ -37,11 +37,13 @@
     {"id":{"name":"example_editor","path":"scripts/example_editor/example_editor.yy",},},
     {"id":{"name":"rmExample","path":"rooms/rmExample/rmExample.yy",},},
   ],
-  "RoomOrderNodes": [
+  "resourceType":"GMProject",
+  "resourceVersion":"2.0",
+  "RoomOrderNodes":[
     {"roomId":{"name":"rmExample","path":"rooms/rmExample/rmExample.yy",},},
   ],
-  "templateType": "game",
-  "TextureGroups": [
-    {"resourceType":"GMTextureGroup","resourceVersion":"1.3","name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"targets":-1,},
+  "templateType":"game",
+  "TextureGroups":[
+    {"$GMTextureGroup":"","%Name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","customOptions":"","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"name":"Default","resourceType":"GMTextureGroup","resourceVersion":"2.0","targets":-1,},
   ],
 }

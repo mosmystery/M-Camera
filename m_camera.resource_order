@@ -1,10 +1,10 @@
 {
-  "FolderOrderSettings": [
+  "FolderOrderSettings":[
+    {"name":"Utilities","order":1,"path":"folders/Examples/Utilities.yy",},
     {"name":"M-Camera v0.4.0","order":1,"path":"folders/M-Camera v0.4.0.yy",},
     {"name":"Utilities","order":1,"path":"folders/M-Camera v0.4.0/Utilities.yy",},
-    {"name":"Utilities","order":1,"path":"folders/Examples/Utilities.yy",},
   ],
-  "ResourceOrderSettings": [
+  "ResourceOrderSettings":[
     {"name":"range_operations","order":1,"path":"scripts/range_operations/range_operations.yy",},
     {"name":"sprMouse","order":1,"path":"sprites/sprMouse/sprMouse.yy",},
     {"name":"objMouseControl","order":2,"path":"objects/objMouseControl/objMouseControl.yy",},

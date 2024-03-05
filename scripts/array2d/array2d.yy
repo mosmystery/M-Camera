@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "array2d",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Utilities",
-    "path": "folders/Examples/Utilities.yy",
+  "$GMScript":"",
+  "%Name":"array2d",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"array2d",
+  "parent":{
+    "name":"Utilities",
+    "path":"folders/Examples/Utilities.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }
