@@ -136,8 +136,8 @@
   "lineHeight": 12,
   "maintainGms1Font": false,
   "parent": {
-    "name": "Fonts",
-    "path": "folders/Example/Fonts.yy",
+    "name": "Utilities",
+    "path": "folders/Examples/Utilities.yy",
   },
   "pointRounding": 0,
   "ranges": [

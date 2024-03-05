@@ -10,8 +10,8 @@
   "managed": true,
   "overriddenProperties": [],
   "parent": {
-    "name": "Objects",
-    "path": "folders/Example/Objects.yy",
+    "name": "Example Editor",
+    "path": "folders/Examples/Example Editor.yy",
   },
   "parentObjectId": null,
   "persistent": false,

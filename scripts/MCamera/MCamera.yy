@@ -5,7 +5,7 @@
   "isCompatibility": false,
   "isDnD": false,
   "parent": {
-    "name": "M-Camera",
-    "path": "folders/M-Camera.yy",
+    "name": "M-Camera v0.4.0",
+    "path": "folders/M-Camera v0.4.0.yy",
   },
 }

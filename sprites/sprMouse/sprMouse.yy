@@ -27,8 +27,8 @@
   "nineSlice": null,
   "origin": 0,
   "parent": {
-    "name": "Sprites",
-    "path": "folders/Example/Sprites.yy",
+    "name": "Example Editor",
+    "path": "folders/Examples/Example Editor.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

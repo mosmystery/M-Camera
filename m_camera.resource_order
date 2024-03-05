@@ -1,17 +1,17 @@
 {
   "FolderOrderSettings": [
-    {"name":"Fonts","order":7,"path":"folders/Example/Fonts.yy",},
-    {"name":"Objects","order":2,"path":"folders/Example/Objects.yy",},
-    {"name":"Scripts","order":1,"path":"folders/Example/Scripts.yy",},
-    {"name":"Sprites","order":5,"path":"folders/Example/Sprites.yy",},
-    {"name":"M-Camera","order":1,"path":"folders/M-Camera.yy",},
-    {"name":"utilities","order":1,"path":"folders/M-Camera/utilities.yy",},
+    {"name":"M-Camera v0.4.0","order":1,"path":"folders/M-Camera v0.4.0.yy",},
+    {"name":"Utilities","order":1,"path":"folders/M-Camera v0.4.0/Utilities.yy",},
+    {"name":"Utilities","order":1,"path":"folders/Examples/Utilities.yy",},
   ],
   "ResourceOrderSettings": [
     {"name":"range_operations","order":1,"path":"scripts/range_operations/range_operations.yy",},
-    {"name":"sprBlock","order":1,"path":"sprites/sprBlock/sprBlock.yy",},
+    {"name":"sprMouse","order":1,"path":"sprites/sprMouse/sprMouse.yy",},
+    {"name":"objMouseControl","order":2,"path":"objects/objMouseControl/objMouseControl.yy",},
+    {"name":"fntSystem","order":1,"path":"fonts/fntSystem/fntSystem.yy",},
+    {"name":"game_init","order":3,"path":"scripts/game_init/game_init.yy",},
     {"name":"pointarray","order":3,"path":"scripts/pointarray/pointarray.yy",},
-    {"name":"array2d","order":1,"path":"scripts/array2d/array2d.yy",},
     {"name":"MCamera","order":2,"path":"scripts/MCamera/MCamera.yy",},
+    {"name":"rmExample","order":2,"path":"rooms/rmExample/rmExample.yy",},
   ],
 }
