@@ -21,6 +21,8 @@ function ExampleLoader() constructor
 	index		= -1;		// index of currently installed example
 	num_examples	= 0;		// number of installed examples. Increments when an example is installed
 	
+	show_help_text	= true;		// Whether to display help text on gui (true) or not (false)
+	
 	
 	
 	  /////////////
@@ -69,10 +71,24 @@ function ExampleLoader() constructor
 	/// @description	The step event. Steps through the currently loaded example and loads the next example on vk_enter keypress.
 	/// @returns		N/A
 	static step = function() {
+		// controls
+		
 		if (keyboard_check_pressed(vk_enter))
 		{
-			load_next();
+			load_next();				// load next example
 		}
+		
+		if (keyboard_check_pressed(vk_tab))
+		{
+			global.camera.set_debugging();		// toggle camera debugging
+		}
+		
+		if (keyboard_check_pressed(vk_f1))
+		{
+			show_help_text = !show_help_text;	// toggle help text
+		}
+		
+		// example
 		
 		if (example == undefined)
 		{
@@ -97,7 +113,7 @@ function ExampleLoader() constructor
 	/// @returns		N/A
 	static draw_gui = function() {
 		// draw gui text
-		if (global.camera.is_debugging())
+		if (show_help_text)
 		{
 			draw_set_font(fntSystem);
 			
@@ -114,9 +130,23 @@ function ExampleLoader() constructor
 				_next_name	= (examples[_next_index] == undefined) ? "N/A. No installed examples." : examples[_next_index].name;
 			}
 			
-			draw_set_alpha(0.25);
-			draw_text(8, 8, _name + "\nEnter: load " + _next_name + "\n\n" + _ui_text);
-			draw_set_alpha(1);
+			var _margin	= 8;
+			
+			// draw help text
+			draw_set_colour(c_dkgrey);
+			
+			draw_set_valign(fa_bottom);
+			draw_text(_margin, global.camera.height-_margin, "F1: toggle help\nTab: toggle debug\nEnter: load " + _next_name);
+			
+			draw_set_valign(fa_top);
+			draw_text(_margin, _margin, "\n\n" + _ui_text);
+			
+			// draw name text
+			draw_set_colour(c_black);
+			draw_text(_margin-1, _margin+1, _name);
+			
+			draw_set_colour(c_white);
+			draw_text_color(_margin, _margin, _name, c_purple, c_maroon, c_yellow, c_orange, 1);
 		}
 		
 		// draw example gui

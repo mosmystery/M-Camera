@@ -10,7 +10,7 @@ function ExampleEditor() : Example() constructor
 	// config
 	
 	name	= "Editor Example";
-	ui_text	= "mouse:\n- L/R: place/erase\n- Middle: pan\n- Scroll: zoom\nZ/X: rotate\nR: reset\nD: toggle debug\nSpace: shake";
+	ui_text	= "Mouse:\n- L / R: place / erase\n- Middle: pan\n- Scroll: zoom\nZ / X: rotate\nR: reset\nSpace: shake";
 	
 	x	= mouse_x;
 	y	= mouse_y;
@@ -99,7 +99,6 @@ function ExampleEditor() : Example() constructor
 			pan_start	: mouse_check_button_pressed(mb_middle),
 			pan_end		: mouse_check_button_released(mb_middle),
 			reset		: keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("R")),
-			toggle_debug	: keyboard_check_pressed(vk_tab) || keyboard_check_pressed(ord("D")),
 			shake		: keyboard_check_pressed(vk_space),
 			
 			// editor controls
@@ -144,12 +143,7 @@ function ExampleEditor() : Example() constructor
 			
 			if (_input.reset)
 			{
-				reset();		// reset the camera to start values. Try manually resetting the camera with .zoom_to(), .rotate_to() and .move_to() 
-			}
-			
-			if (_input.toggle_debug)
-			{
-				set_debugging();	// toggle camera debug display
+				reset(true, false);	// reset the camera to start values. Try manually resetting the camera with .zoom_to(), .rotate_to() and .move_to() 
 			}
 			
 			if (_input.shake)
