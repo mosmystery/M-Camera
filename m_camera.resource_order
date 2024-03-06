@@ -1,19 +1,19 @@
 {
   "FolderOrderSettings":[
     {"name":"Utilities","order":1,"path":"folders/Examples/Utilities.yy",},
-    {"name":"M-Camera v0.4.0","order":1,"path":"folders/M-Camera v0.4.0.yy",},
-    {"name":"Utilities","order":1,"path":"folders/M-Camera v0.4.0/Utilities.yy",},
+    {"name":"M-Camera v0.4.0 *","order":1,"path":"folders/M-Camera v0.4.0 *.yy",},
+    {"name":"Utilities","order":1,"path":"folders/M-Camera v0.4.0 */Utilities.yy",},
   ],
   "ResourceOrderSettings":[
     {"name":"fntSystem","order":1,"path":"fonts/fntSystem/fntSystem.yy",},
-    {"name":"objExampleLoader","order":4,"path":"objects/objExampleLoader/objExampleLoader.yy",},
-    {"name":"rmExample","order":2,"path":"rooms/rmExample/rmExample.yy",},
+    {"name":"objExampleLoader","order":2,"path":"objects/objExampleLoader/objExampleLoader.yy",},
+    {"name":"objMCamera","order":2,"path":"objects/objMCamera/objMCamera.yy",},
+    {"name":"rmExamples","order":2,"path":"rooms/rmExamples/rmExamples.yy",},
     {"name":"ExampleEditor","order":3,"path":"scripts/ExampleEditor/ExampleEditor.yy",},
-    {"name":"game_init","order":3,"path":"scripts/game_init/game_init.yy",},
+    {"name":"examples_init","order":3,"path":"scripts/examples_init/examples_init.yy",},
     {"name":"MCamera","order":2,"path":"scripts/MCamera/MCamera.yy",},
-    {"name":"pointarray","order":3,"path":"scripts/pointarray/pointarray.yy",},
-    {"name":"range_operations","order":1,"path":"scripts/range_operations/range_operations.yy",},
-    {"name":"ExampleLoader","order":5,"path":"scripts/ExampleLoader/ExampleLoader.yy",},
+    {"name":"pointarray","order":1,"path":"scripts/pointarray/pointarray.yy",},
+    {"name":"ExampleLoader","order":3,"path":"scripts/ExampleLoader/ExampleLoader.yy",},
     {"name":"sprMouse","order":1,"path":"sprites/sprMouse/sprMouse.yy",},
   ],
 }

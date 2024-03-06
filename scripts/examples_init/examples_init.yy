@@ -1,9 +1,9 @@
 {
   "$GMScript":"",
-  "%Name":"game_init",
+  "%Name":"examples_init",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"game_init",
+  "name":"examples_init",
   "parent":{
     "name":"Examples",
     "path":"folders/Examples.yy",

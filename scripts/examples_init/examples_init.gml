@@ -2,10 +2,10 @@
 
 
 
-/// @function		game_init()
-/// @description	This function initialises the game. It is ran in the creation code of rmExample
+/// @function		examples_init()
+/// @description	This function initialises the game. It is ran in the creation code of rmExamples
 /// @returns		N/A
-function game_init()
+function examples_init()
 {
 	// camera init
 	

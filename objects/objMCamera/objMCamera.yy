@@ -11,8 +11,8 @@
   "name":"objMCamera",
   "overriddenProperties":[],
   "parent":{
-    "name":"M-Camera v0.4.0",
-    "path":"folders/M-Camera v0.4.0.yy",
+    "name":"Utilities",
+    "path":"folders/M-Camera v0.4.0 */Utilities.yy",
   },
   "parentObjectId":null,
   "persistent":true,

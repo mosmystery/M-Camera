@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"ExampleLoader",
   "parent":{
-    "name":"Examples",
-    "path":"folders/Examples.yy",
+    "name":"Utilities",
+    "path":"folders/Examples/Utilities.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -11,8 +11,8 @@
   "name":"objExampleLoader",
   "overriddenProperties":[],
   "parent":{
-    "name":"Examples",
-    "path":"folders/Examples.yy",
+    "name":"Utilities",
+    "path":"folders/Examples/Utilities.yy",
   },
   "parentObjectId":null,
   "persistent":true,
