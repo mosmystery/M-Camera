@@ -121,7 +121,7 @@ function ExampleLoader() constructor
 		
 		draw_set_font(fntSystem);
 		
-		var _name	= "Welcome to M-Camera.";
+		var _name	= "Welcome to M-Camera";
 		var _ui_text	= "";
 		
 		if (num_examples >= 1)
@@ -136,7 +136,7 @@ function ExampleLoader() constructor
 		
 		if (show_help_text)
 		{
-			var _global_text	= "F1: help\nTab: debug\nEsc: reload\nEnter: load next";
+			var _global_text	= "F1: help\nTab: debug\nEsc: reload\nEnter: load next" + (num_examples >= 1 ? "" : " -- no examples installed");
 			var _local_text		= "\n\n" + _ui_text;
 			
 			draw_set_colour(c_black);
@@ -153,8 +153,6 @@ function ExampleLoader() constructor
 			draw_set_valign(fa_top);
 			draw_text(_margin, _margin, _local_text);
 		}
-		
-		// draw name text
 		
 		draw_set_colour(c_black);
 		draw_text(_margin-1, _margin+1, _name);
@@ -198,9 +196,16 @@ function ExampleLoader() constructor
 			return;
 		}
 		
-		index = (index+1) % num_examples;
+		index += 1;
 		
-		load(examples[index]);
+		if (index >= num_examples)
+		{
+			index = -1;
+		}
+		
+		var _example = (index >= 0) ? examples[index] : undefined;
+		
+		load(_example);
 	};
 	
 	/// @description		Load an example. (Automatically unloads the current example beforehand.)
