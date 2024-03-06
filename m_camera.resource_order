@@ -7,7 +7,6 @@
   "ResourceOrderSettings":[
     {"name":"fntSystem","order":1,"path":"fonts/fntSystem/fntSystem.yy",},
     {"name":"objExampleLoader","order":4,"path":"objects/objExampleLoader/objExampleLoader.yy",},
-    {"name":"objMouseControl","order":2,"path":"objects/objMouseControl/objMouseControl.yy",},
     {"name":"rmExample","order":2,"path":"rooms/rmExample/rmExample.yy",},
     {"name":"ExampleEditor","order":3,"path":"scripts/ExampleEditor/ExampleEditor.yy",},
     {"name":"game_init","order":3,"path":"scripts/game_init/game_init.yy",},

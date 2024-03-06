@@ -27,7 +27,6 @@
     {"id":{"name":"fntSystem","path":"fonts/fntSystem/fntSystem.yy",},},
     {"id":{"name":"objExampleLoader","path":"objects/objExampleLoader/objExampleLoader.yy",},},
     {"id":{"name":"objMCamera","path":"objects/objMCamera/objMCamera.yy",},},
-    {"id":{"name":"objMouseControl","path":"objects/objMouseControl/objMouseControl.yy",},},
     {"id":{"name":"rmExample","path":"rooms/rmExample/rmExample.yy",},},
     {"id":{"name":"array2d","path":"scripts/array2d/array2d.yy",},},
     {"id":{"name":"ExampleEditor","path":"scripts/ExampleEditor/ExampleEditor.yy",},},
