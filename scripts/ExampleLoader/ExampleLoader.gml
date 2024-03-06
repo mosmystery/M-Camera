@@ -18,7 +18,7 @@ function ExampleLoader() constructor
 	example		= undefined;	// currently loaded example
 	
 	examples	= [];		// installed examples
-	index		= 0;		// index of currently installed example
+	index		= -1;		// index of currently installed example
 	num_examples	= 0;		// number of installed examples. Increments when an example is installed
 	
 	

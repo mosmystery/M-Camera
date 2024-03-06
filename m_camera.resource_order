@@ -1,5 +1,6 @@
 {
   "FolderOrderSettings":[
+    {"name":"Example Racer","order":4,"path":"folders/Examples/Example Racer.yy",},
     {"name":"Utilities","order":1,"path":"folders/Examples/Utilities.yy",},
     {"name":"M-Camera v0.4.0 *","order":1,"path":"folders/M-Camera v0.4.0 *.yy",},
     {"name":"Utilities","order":1,"path":"folders/M-Camera v0.4.0 */Utilities.yy",},
@@ -10,10 +11,10 @@
     {"name":"objMCamera","order":2,"path":"objects/objMCamera/objMCamera.yy",},
     {"name":"rmExamples","order":2,"path":"rooms/rmExamples/rmExamples.yy",},
     {"name":"ExampleEditor","order":3,"path":"scripts/ExampleEditor/ExampleEditor.yy",},
+    {"name":"ExampleLoader","order":3,"path":"scripts/ExampleLoader/ExampleLoader.yy",},
     {"name":"examples_init","order":3,"path":"scripts/examples_init/examples_init.yy",},
     {"name":"MCamera","order":2,"path":"scripts/MCamera/MCamera.yy",},
     {"name":"pointarray","order":1,"path":"scripts/pointarray/pointarray.yy",},
-    {"name":"ExampleLoader","order":3,"path":"scripts/ExampleLoader/ExampleLoader.yy",},
     {"name":"sprMouse","order":1,"path":"sprites/sprMouse/sprMouse.yy",},
   ],
 }

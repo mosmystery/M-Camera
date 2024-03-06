@@ -2,8 +2,8 @@
 
 
 
-/// @function			ExampleEditor() constructor
-/// @description		A camera example for a basic level or graphics editor, showcasing pan and zoom with the mouse.
+/// @function			ExampleEditor() : Example() constructor
+/// @description		A racer example for a basic top-down racing game, showcasing camera rotation and shake.
 /// @returns {struct.Example}
 function ExampleEditor() : Example() constructor
 {
