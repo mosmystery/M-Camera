@@ -1,3 +1,7 @@
+// feather ignore all
+
+
+
 /// @function		game_init()
 /// @description	This function initialises the game. It is ran in the creation code of rmExample
 /// @returns		N/A

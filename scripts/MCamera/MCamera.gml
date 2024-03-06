@@ -1,3 +1,7 @@
+// feather ignore all
+
+
+
 /// @function		MCamera(_width, _height, _window_scale, _pixel_scale, _create_host_object_for_me);
 /// @description	A system designed to manage the view's scale, resolution, movement, rotation, etc.
 /// @param {real}	[_width=320]				The width of the display in pixels. Recomended to be a division of the width of your desired resolution, such as 1920/6=320, to suit 1920x1080 monitor resolution.

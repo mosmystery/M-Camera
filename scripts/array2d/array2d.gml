@@ -1,3 +1,7 @@
+// feather ignore all
+
+
+
 /// @function				array2d_create(width, height, value);
 /// @description			Returns a array2d of defined width and height and initialises each cell with a value.
 /// @param {real}			_width			The width of the array.

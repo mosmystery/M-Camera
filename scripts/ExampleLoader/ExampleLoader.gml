@@ -1,3 +1,7 @@
+// feather ignore all
+
+
+
 /// @function				ExampleLoader() constructor
 /// @description			A loader to manage loading and unloading of examples. Automatically creates a host object for running of event code. Useage:
 ///					1. Create an instance of this loader, such as with `global.loader = new ExampleLoader();`. (game_init() already does this.)

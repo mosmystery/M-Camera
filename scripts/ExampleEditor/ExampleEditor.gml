@@ -1,3 +1,7 @@
+// feather ignore all
+
+
+
 /// @function			ExampleEditor() constructor
 /// @description		A camera example for a basic level or graphics editor, showcasing pan and zoom with the mouse.
 /// @returns {struct.Example}

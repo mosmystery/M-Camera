@@ -1,3 +1,7 @@
+// feather ignore all
+
+
+
 /// @function		wrap(_number, _range_start, _range_end)
 /// @description	Given a value and a range, constricts the value to the range by looping it around the edges of the range. Example use: constrict an angle to the range 0->360.
 /// @param {real}	_number		The number to keep within range

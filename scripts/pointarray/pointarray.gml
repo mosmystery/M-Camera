@@ -1,3 +1,7 @@
+// feather ignore all
+
+
+
 /// @function				draw_pointarray(_x, _y, _pointarray, _connect_end_points, _primitive_type, _colour)
 /// @description			Draws a pointarray (array of vector2 structs containing x, y)
 /// @param {real}			_x				The x co-ordinate to draw the pointarray at.
