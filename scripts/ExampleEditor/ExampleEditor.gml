@@ -3,7 +3,7 @@
 
 
 /// @function			ExampleEditor() : Example() constructor
-/// @description		A racer example for a basic top-down racing game, showcasing camera rotation and shake.
+/// @description		A camera example for a basic level or graphics editor, showcasing pan and zoom with the mouse.
 /// @returns {struct.Example}
 function ExampleEditor() : Example() constructor
 {
@@ -58,12 +58,12 @@ function ExampleEditor() : Example() constructor
 		
 		var _border	= 1024;						// A border margin for the camera boundary.
 		
-		global.camera.set_position_anchor(undefined);			// unset the position anchor in case a previously loaded example had it set. Normally this would be redundant in your own usage.
 		global.camera.set_angle_anchor(_angle_anchor);			// ensure the camera rotates around the center of the level.
 		global.camera.set_zoom_anchor(self);				// ensure camera zooms towards and away from objMouseControl.
+		
 		global.camera.set_zoom_limits(1/16, 4);				// Sets max and min zoom limits to a reasonable expectation for level editing. Try other values or removing this line for wider default range.
-		global.camera.set_shake_limits(4, 22.5, 2);			// Define the shake limits. Try different settings! Try 0 to turn off a parameter.
-		global.camera.set_interpolation_values(1/4, 1/4, 1/4);		// Try setting interpolation values to different interpolation values, such as other fractions or 1 for instant change.
+		global.camera.set_shake_limits(4, 22.5, 1);			// Define the shake limits. Try different settings! Try 0 to turn off a parameter.
+		global.camera.set_interpolation(1, 1/4, 1/4);			// Try setting interpolation values to different interpolation values, such as other fractions or 1 for instant change.
 		
 		global.camera.set_boundary(-_border, -_border, world.width_scaled()+_border, world.height_scaled()+_border);	// sets a boundary for the camera. Try .set_debug_mode(true) to see it, or try removing this line or calling .unset_boundary() to remove it.
 		global.camera.set_start_values(world.width_scaled()/2, world.height_scaled()/2);				// sets the camera startx and starty to the center of global.world. Also takes optional parameters for anglestart and zoomstart.

@@ -7,6 +7,7 @@
   ],
   "ResourceOrderSettings":[
     {"name":"fntSystem","order":1,"path":"fonts/fntSystem/fntSystem.yy",},
+    {"name":"objCar","order":1,"path":"objects/objCar/objCar.yy",},
     {"name":"objExampleLoader","order":2,"path":"objects/objExampleLoader/objExampleLoader.yy",},
     {"name":"objMCamera","order":2,"path":"objects/objMCamera/objMCamera.yy",},
     {"name":"rmExamples","order":2,"path":"rooms/rmExamples/rmExamples.yy",},

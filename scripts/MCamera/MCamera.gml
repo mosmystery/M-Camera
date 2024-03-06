@@ -56,9 +56,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};					// See .transform_to(),	.transform_by()
 	
 	interpolation	= {
-		position	: 1/8,		// See .set_position_interpolation()
-		angle		: 1/4,		// See .set_angle_interpolation()
-		zoom		: 1/16,		// See .set_zoom_interpolation()
+		position	: 1,		// See .set_position_interpolation()
+		angle		: 1,		// See .set_angle_interpolation()
+		zoom		: 1,		// See .set_zoom_interpolation()
 		fn_position	: lerp,		// Custom interpolation function. See .set_position_interpolation()
 		fn_angle	: lerp,		// Custom interpolation function. See .set_angle_interpolation()
 		fn_zoom		: lerp		// Custom interpolation function. See .set_zoom_interpolation()
@@ -116,7 +116,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 			radius		: 4,
 			angle		: 22.5,
 			zoom		: 1,
-			intensity	: infinity
+			intensity	: 1
 		}				// The maximum range for shake transform values. See .set_shake_limits()
 	};					// See .set_shake_limits(), .set_shake_interpolation() .shake_to()
 	
@@ -421,6 +421,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		shake.raw.direction	= random(360)-180;
 		shake.raw.angle		= shake.limits.angle/2;
 		shake.raw.zoom		= 0;
+		
+		shake.x			= 0;
+		shake.y			= 0;
+		shake.angle		= 0;
+		shake.zoom		= 1;
 	};
 	
 	/// @description	For internal use. Draws the debug display.
@@ -578,7 +583,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @description						Sets the position anchor (target object or struct) for the camera to follow.
 	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
-	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_position_anchor=undefined]	The position anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_position_anchor=undefined]	The position anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
 	/// @returns							N/A
 	static set_position_anchor = function(_position_anchor=undefined) {
 		anchors.position = _position_anchor;
@@ -586,7 +591,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @description						Sets the angle anchor for the camera to pivot around when rotating. Useful for keeping a position at the same place on the screen, such as the player position, the mouse position, the center of the level or a Vector2.
 	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
-	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=undefined]	The angle anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=undefined]	The angle anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
 	/// @returns							N/A
 	static set_angle_anchor = function(_angle_anchor=undefined) {
 		anchors.angle = _angle_anchor;
@@ -594,17 +599,17 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	/// @description						Sets the zoom anchor for the camera to zoom towards or away from. Useful for zooming towards or away from a point of interest, such as in cutscenes, or the mouse in an editor or strategy game.
 	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if its position is not static.
-	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=undefined]	The zoom anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=undefined]	The zoom anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
 	/// @returns							N/A
 	static set_zoom_anchor = function(_zoom_anchor=undefined) {
 		anchors.zoom = _zoom_anchor;
 	};
 	
 	/// @description	Sets the minimum and maximum limits for the camera zoom.
-	/// @param {real}	[_zoom_min=zoom_min]	The minimum camera zoom. Limited to 1/(2^16), or 16 halvings of the base zoom amount.
-	/// @param {real}	[_zoom_max=zoom_max]	The maximum camera zoom. Limited to 2^16, or 16 doublings of the base zoom amount at most, and _zoom_min at least.
+	/// @param {real}	[_zoom_min]	The minimum camera zoom. Limited to 1/(2^16), or 16 halvings of the base zoom amount. Defaults to min limit.
+	/// @param {real}	[_zoom_max]	The maximum camera zoom. Limited to 2^16, or 16 doublings of the base zoom amount at most, and _zoom_min at least. Defaults to max limit.
 	/// @returns		N/A
-	static set_zoom_limits = function(_zoom_min = zoom_min, _zoom_max = zoom_max) {
+	static set_zoom_limits = function(_zoom_min = 1/power(2, 16), _zoom_max = power(2, 16)) {
 		var _min = 1/power(2, 16);
 		var _max = power(2, 16);
 		
@@ -642,12 +647,12 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	/// @description	Sets the start values for the camera. These values are used by .reset(), so they are useful if you want to, for example, change where the camera should reset to.
-	/// @param {real}	[_xstart=start.x]		The starting x position.
-	/// @param {real}	[_ystart=start.y]		The starting y position.
-	/// @param {real}	[_anglestart=start.angle]	The starting angle.
-	/// @param {real}	[_zoomstart=start.zoom]		The starting zoom.
+	/// @param {real}	[_xstart=width/2]	The starting x position.
+	/// @param {real}	[_ystart=height/2]	The starting y position.
+	/// @param {real}	[_anglestart=0]		The starting angle.
+	/// @param {real}	[_zoomstart=1]		The starting zoom.
 	/// @returns		N/A
-	static set_start_values = function(_xstart = start.x, _ystart = start.y, _anglestart = start.angle, _zoomstart = start.zoom) {
+	static set_start_values = function(_xstart = width/2, _ystart = height/2, _anglestart = 0, _zoomstart = 1) {
 		start.x		= _xstart;
 		start.y		= _ystart;
 		start.angle	= _anglestart;
@@ -655,41 +660,41 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @description	Sets the interpolation factor and function for transforming the x, y position towards target.x/.y. Essentially how fast x/y should approach target.x/.y.
-	/// @param {real}	[_value=interpolation.position]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {function}	[_fn_interpolate=interpolation.fn_position]	Optional custom interpolation function for updating the camera's x and y values. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
+	/// @param {real}	[_value=1]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no change.
+	/// @param {function}	[_fn_interpolate=lerp]	Optional custom interpolation function for updating the camera's x and y values. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
-	static set_position_interpolation = function(_value=interpolation.position, _fn_interpolate=interpolation.fn_position) {
+	static set_position_interpolation = function(_value=1, _fn_interpolate=lerp) {
 		interpolation.position		= _value;
 		interpolation.fn_position	= _fn_interpolate;
 	};
 	
 	/// @description	Sets the interpolation factor and function for transforming the angle towards target.angle. Essentially how fast angle should approach target.angle.
-	/// @param {real}	[_value=interpolation.angle]			The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {function}	[_fn_interpolate=interpolation.fn_angle]	Optional custom interpolation function for updating the camera's angle. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
+	/// @param {real}	[_value=1]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no change.
+	/// @param {function}	[_fn_interpolate=lerp]	Optional custom interpolation function for updating the camera's angle. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
-	static set_angle_interpolation = function(_value=interpolation.angle, _fn_interpolate=interpolation.fn_angle) {
+	static set_angle_interpolation = function(_value=1, _fn_interpolate=lerp) {
 		interpolation.angle	= _value;
 		interpolation.fn_angle	= _fn_interpolate;
 	};
 	
 	/// @description	Sets the interpolation factor and function for transforming the zoom towards target.zoom. Essentially how fast zoom should approach target.zoom.
-	/// @param {real}	[_value=interpolation.zoom]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {function}	[_fn_interpolate=interpolation.fn_zoom]	Optional custom interpolation function for updating the camera's zoom. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
+	/// @param {real}	[_value=1]		The interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no change.
+	/// @param {function}	[_fn_interpolate=lerp]	Optional custom interpolation function for updating the camera's zoom. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
-	static set_zoom_interpolation = function(_value=interpolation.zoom, _fn_interpolate=interpolation.fn_angle) {
+	static set_zoom_interpolation = function(_value=1, _fn_interpolate=lerp) {
 		interpolation.zoom	= _value;
 		interpolation.fn_zoom	= _fn_interpolate;
 	};
 	
-	/// @description	Sets the interpolation factors for moving, rotating and zooming the camera. Essentially how fast x, y, angle and zoom should approach their respective target values.
-	/// @param {real}	[_position_interpolation=interpolation.position]	The position interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {real}	[_angle_interpolation=interpolation.angle]		The angle interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
-	/// @param {real}	[_zoom_interpolation=interpolation.zoom]		The zoom interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no interpolation.
+	/// @description	Sets the interpolation factors for moving, rotating and zooming the camera. Does not change the interpolation functions. Essentially how fast x, y, angle and zoom should approach their respective target values.
+	/// @param {real}	[_position_interpolation=1]	The position interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no change.
+	/// @param {real}	[_angle_interpolation=1]	The angle interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no change.
+	/// @param {real}	[_zoom_interpolation=1]		The zoom interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no change.
 	/// @returns		N/A
-	static set_interpolation_values = function(_position_interpolation=interpolation.position, _angle_interpolation=interpolation.angle, _zoom_interpolation=interpolation.zoom) {
-		set_position_interpolation(_position_interpolation);
-		set_angle_interpolation(_angle_interpolation);
-		set_zoom_interpolation(_zoom_interpolation);
+	static set_interpolation = function(_position_interpolation=1, _angle_interpolation=1, _zoom_interpolation=1) {
+		set_position_interpolation(_position_interpolation, interpolation.fn_position);
+		set_angle_interpolation(_angle_interpolation, interpolation.fn_angle);
+		set_zoom_interpolation(_zoom_interpolation, interpolation.fn_zoom);
 	};
 	
 	
@@ -789,15 +794,40 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		zoom_by(_zoom_factor);
 	};
 	
-	/// @description	Resets the camera back to the start values and stops panning. See .set_start_values() and .stop_panning()
+	/// @description	Resets the camera back to the start values and stops panning. See .set_start_values() and .stop_panning().
+	///			Optionally resets shake and settings.
+	/// @param {bool}	[_reset_shake=false]		Whether to reset the shake transform (true) or not (false).
+	/// @param {bool}	[_reset_settings=false]		Whether to unset shake settings, anchors, limits, boundary, interpolation, and start values (true) or not (false).
 	/// @returns		N/A
-	static reset = function() {
+	static reset = function(_reset_shake=false, _reset_settings=false) {
 		if (is_debugging())
 		{
 			debug.rotation.points = [];
 		}
 		
 		stop_panning();
+		
+		if (_reset_shake)
+		{
+			shake_to(0, true);
+		}
+		
+		if (_reset_settings)
+		{
+			set_position_anchor();		// unset position anchor
+			set_angle_anchor();		// unset angle anchor
+			set_zoom_anchor();		// unset zoom anchor
+			set_zoom_limits();		// unset zoom limits
+			unset_boundary();		// unset boundary
+			
+			set_start_values();		// unset custom start values
+			set_position_interpolation();	// unset custom position interpolation value and function
+			set_angle_interpolation();	// unset custom angle interpolation value and function
+			set_zoom_interpolation();	// unset custom zoom interpolation value and function
+			
+			set_shake_limits();		// unset custom shake limits
+			set_shake_interpolation();	// unset custom shake interpolation value and function
+		}
 		
 		target.x	= start.x;
 		target.y	= start.y;
@@ -872,14 +902,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	/// @description	Sets the maximum radius, angle, and zoom for camera shake transformation. Additionally sets the courseness for transform value change. If you don't want shake to transform a particular way, set that transform limit to 0.
-	/// @param {real}	_radius					The maximum distance from 0,0 the camera x,y can be transformed.
-	/// @param {real}	_angle					The maximum angle range the camera can be rotated. Output angle is added to negative half of the range. For example, 20 will transform the camera between -10 to 10 degrees.
-	/// @param {real}	_zoom					The maximum range the zoom factor can fluctuate in.
-	/// @param {real}	[_coarseness=shake.coarseness]		The coarseness of the brownian step function for changing each transform value each frame. 0 = +-no change (not recommended), 1 = +-whole range (white noise).
-	///								For intended results, input a value >0 and <=1. For white noise, input 1. For typical brown noise, try something between 0.1 and 0.5.
-	/// @param {real}	[_intensity=shake.limits.intensity]	The maximum intensity of the shake. See .shake_to() and .shake_by()
+	/// @param {real}	[_radius=4]		The maximum distance from 0,0 the camera x,y can be transformed.
+	/// @param {real}	[_angle=22.5]		The maximum angle range the camera can be rotated. Output angle is added to negative half of the range. For example, 20 will transform the camera between -10 to 10 degrees.
+	/// @param {real}	[_zoom=1]		The maximum range the zoom factor can fluctuate in.
+	/// @param {real}	[_coarseness=0.25]	The coarseness of the brownian step function for changing each transform value each frame. 0 = +-no change (not recommended), 1 = +-whole range (white noise).
+	///						For intended results, input a value >0 and <=1. For white noise, input 1. For typical brown noise, try something between 0.1 and 0.5.
+	/// @param {real}	[_intensity=1]		The maximum intensity of the shake. Supports any number below infinity. See .shake_to() and .shake_by()
 	/// @returns		N/A
-	static set_shake_limits = function(_radius, _angle, _zoom, _coarseness=shake.coarseness, _intensity=shake.limits.intensity) {
+	static set_shake_limits = function(_radius=4, _angle=22.5, _zoom=0.25, _coarseness=0.25, _intensity=1) {
 		shake.limits.radius	= _radius;
 		shake.limits.angle	= _angle;
 		shake.limits.zoom	= _zoom;
@@ -888,10 +918,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @description	Sets the interpolation factor and function for reducing the intensity of the shake. Essentially how fast intensity should approach 0.
-	/// @param {real}	[_value=shake.intensity_falloff_rate]		The interpolation factor, as a fraction between 0 and 1. 1 = instantly turn off intensity. 0 = maintain intensity.
-	/// @param {function}	[_fn_interpolate=shake.fn_intensity]		Optional custom interpolation function for fading intensity. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
+	/// @param {real}	[_value=0.05]		The interpolation factor, as a fraction between 0 and 1. 1 = instantly turn off intensity. 0 = maintain intensity.
+	/// @param {function}	[_fn_interpolate=lerp]	Optional custom interpolation function for fading intensity. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
-	static set_shake_interpolation = function(_value=shake.intensity_falloff_rate, _fn_interpolate=shake.fn_intensity) {
+	static set_shake_interpolation = function(_value=0.05, _fn_interpolate=lerp) {
 		shake.intensity_falloff_rate	= _value;
 		shake.fn_intensity		= _fn_interpolate;
 	};

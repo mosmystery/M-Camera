@@ -3,7 +3,7 @@
 
 
 /// @function			ExampleRacer() : Example() constructor
-/// @description		A camera example for a basic level or graphics editor, showcasing pan and zoom with the mouse.
+/// @description		A racer example for a basic top-down racing game, showcasing camera rotation and shake.
 /// @returns {struct.Example}
 function ExampleRacer() : Example() constructor
 {
@@ -11,6 +11,8 @@ function ExampleRacer() : Example() constructor
 	
 	name	= "Racer Example";
 	ui_text	= "W / up: Accelerate\nS / down: Decelerate\nA / left: turn left\nD / right: turn right";
+	
+	racer	= undefined;		// racer object. See .create()
 	
 	
 	
@@ -29,24 +31,30 @@ function ExampleRacer() : Example() constructor
 	/// @description	The create event, for setting up the camera and example.
 	/// @returns		N/A
 	create	= function() {
+		racer ??= instance_create_depth(0, 0, 0, objCar);
+		
 		// camera init
 		
-		global.camera.set_position_anchor(undefined);		// unset the position anchor in case a previously loaded example had it set. Normally this would be redundant in your own usage.
-		global.camera.set_angle_anchor(undefined);		// ensure the camera rotates around the center of the level.
-		global.camera.set_zoom_anchor(undefined);		// ensure camera zooms towards and away from objMouseControl.
-		global.camera.set_zoom_limits(1/16, 4);			// Sets max and min zoom limits to a reasonable expectation for level editing. Try other values or removing this line for wider default range.
-		global.camera.set_shake_limits(4, 22.5, 2);		// Define the shake limits. Try different settings! Try 0 to turn off a parameter.
-		global.camera.set_interpolation_values(1/4, 1/4, 1/4);	// Try setting interpolation values to different interpolation values, such as other fractions or 1 for instant change.
-		
-		global.camera.unset_boundary();				// Remove the camera boundary in case it was set by a previous example. Normally this would be redundant in your own usage.
-		global.camera.set_start_values(0, 0);			// sets the camera startx and starty to 0,0 in case it was set by a previous example. Normally this would be redundant in your own usage.
-		global.camera.reset();					// resets the camera to the new start values.
+		global.camera.set_position_anchor(racer);
+		global.camera.set_angle_anchor(racer);
+		global.camera.set_zoom_anchor(racer);
 	};
 	
 	/// @description	The destroy event, for cleaning up the example.
 	/// @returns		N/A
 	destroy	= function() {
+		if (racer = undefined)
+		{
+			return;
+		}
 		
+		instance_destroy(racer, true);
+		
+		racer = undefined;
+		
+		global.camera.set_position_anchor();	// unset position anchor, as racer no longer exists
+		global.camera.set_angle_anchor();	// unset angle anchor, as racer no longer exists
+		global.camera.set_zoom_anchor();	// unset zoom anchor, as rocer no longer exists
 	};
 	
 	/// @description	The step event, for code that needs to run every frame.

@@ -172,6 +172,8 @@ function ExampleLoader() constructor
 	/// @description	Unload an example.
 	/// @returns		N/A
 	static unload = function() {
+		global.camera.reset(true, true);
+		
 		if (example == undefined)
 		{
 			return;
