@@ -1,6 +1,6 @@
 // draw level
 
-level_draw(global.world.level, global.world.cell_width, global.world.cell_height, 1);
+_level_draw(global.world.level, global.world.cell_width, global.world.cell_height, 1);
 
 // draw cell outline of cell at mouse position
 

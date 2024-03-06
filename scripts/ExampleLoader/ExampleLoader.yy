@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"ExampleLoader",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ExampleLoader",
+  "parent":{
+    "name":"Examples",
+    "path":"folders/Examples.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

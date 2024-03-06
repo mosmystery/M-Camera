@@ -1,9 +1,9 @@
 {
   "$GMScript":"",
-  "%Name":"example_editor",
+  "%Name":"ExampleEditor",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"example_editor",
+  "name":"ExampleEditor",
   "parent":{
     "name":"Example Editor",
     "path":"folders/Examples/Example Editor.yy",
