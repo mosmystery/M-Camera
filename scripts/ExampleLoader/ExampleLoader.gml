@@ -88,6 +88,11 @@ function ExampleLoader() constructor
 			show_help_text = !show_help_text;	// toggle help text
 		}
 		
+		if (keyboard_check_pressed(vk_escape))
+		{
+			load(example);				// reload current example
+		}
+		
 		// example
 		
 		if (example == undefined)
@@ -113,43 +118,53 @@ function ExampleLoader() constructor
 	/// @returns		N/A
 	static draw_gui = function() {
 		// draw gui text
-		if (show_help_text)
+		
+		draw_set_font(fntSystem);
+		
+		var _name	= "Welcome to M-Camera.";
+		var _ui_text	= "";
+		
+		if (num_examples >= 1)
 		{
-			draw_set_font(fntSystem);
+			var _next_index = (index+1) % num_examples;
 			
-			var _name	= "Welcome to M-Camera.";
-			var _ui_text	= "";
-			var _next_name	= "... N/A. No installed examples.";
-			
-			if (num_examples >= 1)
-			{
-				var _next_index = (index+1) % num_examples;
-				
-				_name		= (example == undefined) ? _name	: example.name;
-				_ui_text	= (example == undefined) ? _ui_text	: example.ui_text;
-				_next_name	= (examples[_next_index] == undefined) ? "N/A. No installed examples." : examples[_next_index].name;
-			}
-			
-			var _margin	= 8;
-			
-			// draw help text
-			draw_set_colour(c_dkgrey);
-			
-			draw_set_valign(fa_bottom);
-			draw_text(_margin, global.camera.height-_margin, "F1: toggle help\nTab: toggle debug\nEnter: load " + _next_name);
-			
-			draw_set_valign(fa_top);
-			draw_text(_margin, _margin, "\n\n" + _ui_text);
-			
-			// draw name text
-			draw_set_colour(c_black);
-			draw_text(_margin-1, _margin+1, _name);
-			
-			draw_set_colour(c_white);
-			draw_text_color(_margin, _margin, _name, c_purple, c_maroon, c_yellow, c_orange, 1);
+			_name		= (example == undefined) ? _name	: example.name;
+			_ui_text	= (example == undefined) ? _ui_text	: example.ui_text;
 		}
 		
+		var _margin	= 8;
+		
+		if (show_help_text)
+		{
+			var _global_text	= "F1: help\nTab: debug\nEsc: reload\nEnter: load next";
+			var _local_text		= "\n\n" + _ui_text;
+			
+			draw_set_colour(c_black);
+			draw_set_valign(fa_bottom);
+			draw_text(_margin-1, global.camera.height-_margin+1, _global_text);
+			draw_text(_margin, global.camera.height-_margin+1, _global_text);
+			draw_set_valign(fa_top);
+			draw_text(_margin-1, _margin+1, _local_text);
+			draw_text(_margin, _margin+1, _local_text);
+			
+			draw_set_colour(c_dkgrey);
+			draw_set_valign(fa_bottom);
+			draw_text(_margin, global.camera.height-_margin, _global_text);
+			draw_set_valign(fa_top);
+			draw_text(_margin, _margin, _local_text);
+		}
+		
+		// draw name text
+		
+		draw_set_colour(c_black);
+		draw_text(_margin-1, _margin+1, _name);
+		draw_text(_margin, _margin+1, _name);
+		
+		draw_set_colour(c_white);
+		draw_text_color(_margin, _margin, _name, c_purple, c_maroon, c_yellow, c_orange, 1);
+		
 		// draw example gui
+		
 		if (example == undefined)
 		{
 			return;
@@ -195,6 +210,11 @@ function ExampleLoader() constructor
 		unload();
 		
 		example = _example;
+		
+		if (example == undefined)
+		{
+			return;
+		}
 		
 		example.create();
 	};

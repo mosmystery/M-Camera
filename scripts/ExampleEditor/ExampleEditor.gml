@@ -98,7 +98,7 @@ function ExampleEditor() : Example() constructor
 			rotate_cw	: keyboard_check_pressed(ord("X")),
 			pan_start	: mouse_check_button_pressed(mb_middle),
 			pan_end		: mouse_check_button_released(mb_middle),
-			reset		: keyboard_check_pressed(vk_escape) || keyboard_check_pressed(ord("R")),
+			reset		: keyboard_check_pressed(ord("R")),
 			shake		: keyboard_check_pressed(vk_space),
 			
 			// editor controls
@@ -211,7 +211,6 @@ function ExampleEditor() : Example() constructor
 		{
 			_level[0][i]				= 1;
 			_level[_height-1][i]			= 1;
-			_level[max(0, (_height-1)-i)][i]	= 1;
 		}
 		
 		return _level;
