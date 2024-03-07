@@ -17,7 +17,7 @@ car_angle	= 0;
 
 // visual
 
-trail = array_create(240, {
+trail = array_create(512, {
 	x : x,
 	y : y
 });

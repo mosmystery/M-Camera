@@ -34,12 +34,11 @@ function ExampleRacer() : Example() constructor
 		racer ??= instance_create_depth(0, 0, 0, objCar);
 		
 		// camera init
-		global.camera.set_interpolation(1/4, 1/4, 1/16);
+		global.camera.set_interpolation(1/4, 1/8, 1/16);
 		
-		global.camera.set_position_anchor(racer);
 		global.camera.set_angle_anchor(racer);
 		
-		global.camera.set_start_values(racer.x, racer.y);
+		global.camera.set_start_values(racer.x, racer.y-6);
 		global.camera.reset();
 	};
 	
