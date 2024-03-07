@@ -34,10 +34,13 @@ function ExampleRacer() : Example() constructor
 		racer ??= instance_create_depth(0, 0, 0, objCar);
 		
 		// camera init
+		global.camera.set_interpolation(1/4, 1/4, 1/16);
 		
 		global.camera.set_position_anchor(racer);
 		global.camera.set_angle_anchor(racer);
-		global.camera.set_zoom_anchor(racer);
+		
+		global.camera.set_start_values(racer.x, racer.y);
+		global.camera.reset();
 	};
 	
 	/// @description	The destroy event, for cleaning up the example.
@@ -60,15 +63,7 @@ function ExampleRacer() : Example() constructor
 	/// @description	The step event, for code that needs to run every frame.
 	/// @returns		N/A
 	step	= function() {
-		// get inputs
 		
-		var _input = {
-			// controls
-			accelerate	: keyboard_check_pressed(ord("W")) || keyboard_check_pressed(vk_up),
-			decelerate	: keyboard_check_pressed(ord("S")) || keyboard_check_pressed(vk_down),
-			turn_left	: keyboard_check_pressed(ord("A")) || keyboard_check_pressed(vk_left),
-			turn_right	: keyboard_check_pressed(ord("D")) || keyboard_check_pressed(vk_right)
-		};
 	};
 	
 	/// @description	The draw event, for drawing the example.

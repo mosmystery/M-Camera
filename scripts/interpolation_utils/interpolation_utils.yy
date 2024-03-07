@@ -1,0 +1,13 @@
+{
+  "$GMScript":"",
+  "%Name":"interpolation_utils",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"interpolation_utils",
+  "parent":{
+    "name":"Utilities",
+    "path":"folders/Examples/Utilities.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
