@@ -22,6 +22,14 @@ function ExampleRacer() : Example() constructor
 	
 	road_width	= 128;
 	
+	checkpoint	= {
+		x		: 0,
+		y		: 0,
+		angle		: 0,
+		points		: undefined,
+		radius		: road_width * 0.75
+	};
+	
 	
 	
 	  /////////////
@@ -49,21 +57,39 @@ function ExampleRacer() : Example() constructor
 		// place racer on track
 		var _p1		= track[0];
 		var _p2		= track[1];
-		var _dir	= point_direction(_p1.x, _p1.y, _p2.x, _p2.y)
+		var _racer_dir	= point_direction(_p1.x, _p1.y, _p2.x, _p2.y)
 		
 		racer ??= instance_create_depth(_p1.x, _p1.y, -1, objCar);
-		racer.velocity.dir	= _dir;
-		racer.car_angle		= _dir-90;
+		racer.velocity.dir	= _racer_dir;
+		racer.car_angle		= _racer_dir-90;
+		
+		// create checkpoint
+		
+		var _num_points = 32;
+		
+		checkpoint.x		= _p1.x;
+		checkpoint.y		= _p1.y;
+		checkpoint.points	= [];
+		
+		for (var i = 0; i < _num_points; i++)
+		{
+			var _dir	= (360/_num_points) * i;
+			
+			array_push(checkpoint.points, {
+				x : lengthdir_x(checkpoint.radius, _dir),
+				y : lengthdir_y(checkpoint.radius, _dir)
+			});
+		}
 		
 		// camera init
 		global.camera.set_interpolation(1/4, 1/8, 1/16);
 		
 		global.camera.set_angle_anchor(racer);
 		
-		var _x_offset	= lengthdir_x(6, _dir);
-		var _y_offset	= lengthdir_y(6, _dir);
+		var _x_offset	= lengthdir_x(6, _racer_dir);
+		var _y_offset	= lengthdir_y(6, _racer_dir);
 		
-		global.camera.set_start_values(racer.x+_x_offset, racer.y+_y_offset, -_dir+90, 1);
+		global.camera.set_start_values(racer.x+_x_offset, racer.y+_y_offset, -_racer_dir+90, 1);
 		global.camera.reset();
 	};
 	
@@ -96,18 +122,23 @@ function ExampleRacer() : Example() constructor
 	/// @description	The step event, for code that needs to run every frame.
 	/// @returns		N/A
 	step	= function() {
-		
+		checkpoint.angle += 1;
+		checkpoint.angle %= 360;
 	};
 	
 	/// @description	The draw event, for drawing the example.
 	/// @returns		N/A
 	draw	= function() {
+		// draw track
 		draw_racetrack(road_width+64, $181C20);
 		draw_racetrack(road_width+32, $444448);
 		draw_racetrack(road_width+16, $111118);
 		draw_racetrack(road_width+8, $CCCCCC);
 		draw_racetrack(road_width, $111218);
 		draw_racetrack(4, $222228);
+		
+		// draw checkpoint
+		draw_checkpoint(checkpoint.x, checkpoint.y, checkpoint.angle, $CCCCCC)
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
@@ -130,7 +161,7 @@ function ExampleRacer() : Example() constructor
 		var _points	= [];
 		var _num_points	= ceil(track_radius/(64+irandom_range(-8, 8)));
 		
-		for (i = 0; i < _num_points; i++)
+		for (var i = 0; i < _num_points; i++)
 		{
 			var _length	= track_radius - irandom_range(track_radius/2, 0);
 			var _dir	= (360/_num_points) * i;
@@ -152,7 +183,7 @@ function ExampleRacer() : Example() constructor
 		var _points	= []
 		var _num_points = array_length(_pointarray);
 		
-		for (i=0; i<_num_points; i++)
+		for (var i = 0; i < _num_points; i++)
 		{
 			array_push(_points, {
 				x : _pointarray[i].x * _scale,
@@ -172,7 +203,7 @@ function ExampleRacer() : Example() constructor
 		
 		var _num_points = array_length(track);
 		
-		for(i = 0; i < _num_points; i++)
+		for (var i = 0; i < _num_points; i++)
 		{
 			var _p1 = track[i];
 			var _p2	= track[(i+1) % _num_points];
@@ -205,5 +236,41 @@ function ExampleRacer() : Example() constructor
 		var _minimap_y	= global.camera.height-_size;
 		
 		draw_surface(minimap_surface,_minimap_x-_halfsize, _minimap_y-_halfsize);
+	};
+	
+	/// @description		Draws the checkpoint
+	/// @param {real}		_x		The x coordinate to draw the checkpoint at
+	/// @param {real}		_y		The y coordinate to draw the checkpoint at
+	/// @param {real}		_angle		The angle to draw the checkpoint at
+	/// @param {constant.Colour)	_colour		The colour to draw the checkpoint
+	/// @retuns			N/A
+	static draw_checkpoint = function(_x, _y, _angle, _colour) {
+		var _pointarray = checkpoint.points;
+		var _num_points	= array_length(_pointarray);
+		
+		draw_set_color(_colour);
+		draw_primitive_begin(pr_linelist);
+		
+		for (var i = 0; i < _num_points; i++)
+		{
+			var _p_len	= distance_to_point(_pointarray[i].x, _pointarray[i].y);
+			var _p_dir	= point_direction(0, 0, _pointarray[i].x, _pointarray[i].y);
+			var _x_rotated	= lengthdir_x(_p_len, _p_dir-_angle);
+			var _y_rotated	= lengthdir_y(_p_len, _p_dir-_angle);
+			
+			draw_vertex(_x + _x_rotated, _y + _y_rotated);
+		}
+		
+		if (_num_points > 0)
+		{
+			var _p_len	= distance_to_point(_pointarray[0].x, _pointarray[0].y); //so that last point continues to first point
+			var _p_dir	= point_direction(0, 0, _pointarray[0].x, _pointarray[0].y);
+			var _x_rotated	= lengthdir_x(_p_len, _p_dir-_angle);
+			var _y_rotated	= lengthdir_y(_p_len, _p_dir-_angle);
+			
+			draw_vertex(_x + _x_rotated, _y + _y_rotated);
+		}
+		
+		draw_primitive_end();
 	};
 }
