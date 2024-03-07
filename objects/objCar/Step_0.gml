@@ -58,7 +58,7 @@ array_push(trail, {
 
 // camera update
 
-var _zoom_change = (torque == 0) ? 0 : - ((0.4 / max_torque) * min(abs(torque * 1), max_torque));
+var _zoom_change = (torque == 0) ? 0 : - ((0.4 / max_torque) * min(abs(torque), max_torque));
 
 global.camera.zoom_to(1 + _zoom_change);
 global.camera.rotate_to(-car_angle);

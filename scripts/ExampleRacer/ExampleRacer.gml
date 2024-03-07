@@ -9,15 +9,19 @@ function ExampleRacer() : Example() constructor
 {
 	// config
 	
-	name	= "Racer Example";
-	ui_text	= "W / up: Accelerate\nS / down: Decelerate\nA / left: turn left\nD / right: turn right";
+	name		= "Racer Example";
+	ui_text		= "W / up: Accelerate\nS / down: Decelerate\nA / left: turn left\nD / right: turn right";
 	
-	racer	= undefined;		// racer object. See .create()
-	track	= undefined;
-	minimap	= undefined;
+	racer		= undefined;		// racer object. See .create()
+	track		= undefined;		// pointarray of the track
+	minimap		= undefined;		// pointarray of the minimap
+	minimap_surface	= undefined;
 	
-	track_radius	= 1024;
+	track_radius	= irandom_range(512, 2048);
 	minimap_scale	= 24/track_radius;
+	
+	road_width	= 128;
+	
 	
 	
 	  /////////////
@@ -35,7 +39,7 @@ function ExampleRacer() : Example() constructor
 	/// @description	The create event, for setting up the camera and example.
 	/// @returns		N/A
 	create	= function() {
-		racer ??= instance_create_depth(0, 0, 0, objCar);
+		racer ??= instance_create_depth(0, 0, -1, objCar);
 		
 		// camera init
 		global.camera.set_interpolation(1/4, 1/8, 1/16);
@@ -46,6 +50,9 @@ function ExampleRacer() : Example() constructor
 		global.camera.reset();
 		
 		//generate racetrack
+		track_radius	= irandom_range(512, 2048);
+		minimap_scale	= 24/track_radius;
+		
 		track	= generate_racetrack_points();
 		minimap	= pointarray_scale(track, minimap_scale);
 	};
@@ -67,6 +74,13 @@ function ExampleRacer() : Example() constructor
 		global.camera.set_position_anchor();	// unset position anchor, as racer no longer exists
 		global.camera.set_angle_anchor();	// unset angle anchor, as racer no longer exists
 		global.camera.set_zoom_anchor();	// unset zoom anchor, as rocer no longer exists
+		
+		if (surface_exists(minimap_surface))
+		{
+			surface_free(minimap_surface);
+			
+			minimap_surface = undefined;
+		}
 	};
 	
 	/// @description	The step event, for code that needs to run every frame.
@@ -99,11 +113,11 @@ function ExampleRacer() : Example() constructor
 	/// @returns {array<struct>}	returns array of vector2s.
 	static generate_racetrack_points = function() {
 		var _points	= [];
-		var _num_points = irandom_range(8, 16);
+		var _num_points	= ceil(track_radius/(64+irandom_range(-8, 8)));
 		
-		for (i=0; i<_num_points; i++)
+		for (i = 0; i < _num_points; i++)
 		{
-			var _length	= track_radius + irandom_range(-(track_radius/2), 0);
+			var _length	= track_radius - irandom_range(track_radius/2, 0);
 			var _dir	= (360/_num_points) * i;
 			
 			array_push(_points, {
@@ -137,18 +151,42 @@ function ExampleRacer() : Example() constructor
 	/// @description	Draws the racetrack
 	/// @retuns		N/A
 	static draw_racetrack = function() {
-		draw_pointarray(0, 0, track, true, pr_linestrip, c_grey);
+		draw_set_color(c_dkgrey);
+		
+		var _num_points = array_length(track)
+		
+		for(i = 0; i < _num_points; i++)
+		{
+			var _p1 = track[i];
+			var _p2	= track[(i+1) % _num_points];
+			
+			draw_line_width(_p1.x, _p1.y, _p2.x, _p2.y, road_width);
+			draw_circle(_p1.x, _p1.y, road_width/2, false);
+		}
 	};
 	
 	/// @description	Draws the racetrack
 	/// @retuns		N/A
 	static draw_minimap = function() {
-		var _margin	= (track_radius * minimap_scale) * 2;
-		var _minimap_x	= global.camera.width-_margin;
-		var _minimap_y	= global.camera.height-_margin;
+		var _size	= (track_radius * minimap_scale) * 2;
+		var _halfsize	= _size/2;
 		
-		draw_pointarray(_minimap_x, _minimap_y, minimap, true, pr_linestrip, c_grey);
+		if (!surface_exists(minimap_surface))
+		{
+			minimap_surface = surface_create(_size, _size);
+		}
 		
-		draw_point_color(_minimap_x+(racer.x*minimap_scale), _minimap_y+(racer.y*minimap_scale), c_yellow);
+		surface_set_target(minimap_surface);
+		
+		draw_clear_alpha(c_black, 0);
+		draw_pointarray(_halfsize, _halfsize, minimap, true, pr_linestrip, c_grey);
+		draw_point_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale), c_yellow);
+		
+		surface_reset_target();
+		
+		var _minimap_x	= global.camera.width-_size;
+		var _minimap_y	= global.camera.height-_size;
+		
+		draw_surface(minimap_surface,_minimap_x-_halfsize, _minimap_y-_halfsize);
 	};
 }
