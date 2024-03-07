@@ -92,7 +92,12 @@ function ExampleRacer() : Example() constructor
 	/// @description	The draw event, for drawing the example.
 	/// @returns		N/A
 	draw	= function() {
-		draw_racetrack();
+		draw_racetrack(road_width+64, $181C20);
+		draw_racetrack(road_width+32, $444448);
+		draw_racetrack(road_width+16, $111118);
+		draw_racetrack(road_width+8, $CCCCCC);
+		draw_racetrack(road_width, $111218);
+		draw_racetrack(4, $222228);
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
@@ -148,20 +153,22 @@ function ExampleRacer() : Example() constructor
 		return _points;
 	};
 	
-	/// @description	Draws the racetrack
-	/// @retuns		N/A
-	static draw_racetrack = function() {
-		draw_set_color(c_dkgrey);
+	/// @description		Draws the racetrack
+	/// @param {real}		_width		The width of the road to draw
+	/// @param {constant.Colour)	_colour		The colour to draw the road
+	/// @retuns			N/A
+	static draw_racetrack = function(_width, _colour) {
+		draw_set_color(_colour);
 		
-		var _num_points = array_length(track)
+		var _num_points = array_length(track);
 		
 		for(i = 0; i < _num_points; i++)
 		{
 			var _p1 = track[i];
 			var _p2	= track[(i+1) % _num_points];
 			
-			draw_line_width(_p1.x, _p1.y, _p2.x, _p2.y, road_width);
-			draw_circle(_p1.x, _p1.y, road_width/2, false);
+			draw_line_width(_p1.x, _p1.y, _p2.x, _p2.y, _width);
+			draw_circle(_p1.x, _p1.y, _width/2, false);
 		}
 	};
 	
