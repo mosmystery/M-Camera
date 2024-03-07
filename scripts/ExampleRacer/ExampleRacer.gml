@@ -38,23 +38,33 @@ function ExampleRacer() : Example() constructor
 	
 	/// @description	The create event, for setting up the camera and example.
 	/// @returns		N/A
-	create	= function() {
-		racer ??= instance_create_depth(0, 0, -1, objCar);
+	create	= function() {	
+		// generate racetrack
+		track_radius	= irandom_range(512, 2048);
+		minimap_scale	= 24/track_radius;
+		
+		track	= generate_racetrack_points();
+		minimap	= pointarray_scale(track, minimap_scale);
+		
+		// place racer on track
+		var _p1		= track[0];
+		var _p2		= track[1];
+		var _dir	= point_direction(_p1.x, _p1.y, _p2.x, _p2.y)
+		
+		racer ??= instance_create_depth(_p1.x, _p1.y, -1, objCar);
+		racer.velocity.dir	= _dir;
+		racer.car_angle		= _dir-90;
 		
 		// camera init
 		global.camera.set_interpolation(1/4, 1/8, 1/16);
 		
 		global.camera.set_angle_anchor(racer);
 		
-		global.camera.set_start_values(racer.x, racer.y-6);
+		var _x_offset	= lengthdir_x(6, _dir);
+		var _y_offset	= lengthdir_y(6, _dir);
+		
+		global.camera.set_start_values(racer.x+_x_offset, racer.y+_y_offset, -_dir+90, 1);
 		global.camera.reset();
-		
-		//generate racetrack
-		track_radius	= irandom_range(512, 2048);
-		minimap_scale	= 24/track_radius;
-		
-		track	= generate_racetrack_points();
-		minimap	= pointarray_scale(track, minimap_scale);
 	};
 	
 	/// @description	The destroy event, for cleaning up the example.
@@ -131,7 +141,7 @@ function ExampleRacer() : Example() constructor
 			});
 		}
 		
-		return _points;
+		return choose(_points, array_reverse(_points));
 	};
 	
 	/// @description		Convert a pointarray into a smaller scale version.
@@ -187,7 +197,7 @@ function ExampleRacer() : Example() constructor
 		
 		draw_clear_alpha(c_black, 0);
 		draw_pointarray(_halfsize, _halfsize, minimap, true, pr_linestrip, c_grey);
-		draw_point_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale), c_yellow);
+		draw_circle_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale), 2, c_yellow, c_yellow, false);
 		
 		surface_reset_target();
 		
