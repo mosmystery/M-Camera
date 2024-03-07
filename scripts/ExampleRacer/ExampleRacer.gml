@@ -31,6 +31,12 @@ function ExampleRacer() : Example() constructor
 		radius		: road_width
 	};
 	
+	finish		= {
+		x	: 0,
+		y	: 0,
+		angle	: 0
+	}
+	
 	
 	
 	  /////////////
@@ -58,11 +64,18 @@ function ExampleRacer() : Example() constructor
 		// place racer on track
 		var _p1		= track[0];
 		var _p2		= track[1];
+		
 		var _racer_dir	= point_direction(_p1.x, _p1.y, _p2.x, _p2.y)
 		
 		racer ??= instance_create_depth(_p1.x, _p1.y, -1, objCar);
 		racer.velocity.dir	= _racer_dir;
 		racer.car_angle		= _racer_dir-90;
+		
+		// create finish line
+		
+		finish.x	= _p1.x + ((_p2.x - _p1.x)/2);
+		finish.y	= _p1.y + ((_p2.y - _p1.y)/2);
+		finish.angle	= _racer_dir-90;
 		
 		// create checkpoint
 		
@@ -148,6 +161,9 @@ function ExampleRacer() : Example() constructor
 		draw_racetrack(road_width+8, $CCCCCC);
 		draw_racetrack(road_width, $111218);
 		draw_racetrack(4, $222228);
+		
+		// draw finish line
+		draw_sprite_ext(sprFinishLine, 0, finish.x, finish.y, 8, 8, finish.angle, $CCCCCC, 1);
 		
 		// draw checkpoint
 		draw_checkpoint(checkpoint.x, checkpoint.y, checkpoint.angle, $CCCCCC);
