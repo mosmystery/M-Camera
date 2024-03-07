@@ -23,11 +23,12 @@ function ExampleRacer() : Example() constructor
 	road_width	= 128;
 	
 	checkpoint	= {
+		track_index	: 0,
 		x		: 0,
 		y		: 0,
 		angle		: 0,
 		points		: undefined,
-		radius		: road_width * 0.75
+		radius		: road_width
 	};
 	
 	
@@ -67,6 +68,7 @@ function ExampleRacer() : Example() constructor
 		
 		var _num_points = 32;
 		
+		checkpoint.track_index	= 0;
 		checkpoint.x		= _p1.x;
 		checkpoint.y		= _p1.y;
 		checkpoint.points	= [];
@@ -122,8 +124,18 @@ function ExampleRacer() : Example() constructor
 	/// @description	The step event, for code that needs to run every frame.
 	/// @returns		N/A
 	step	= function() {
-		checkpoint.angle += 1;
+		// checkpoint
+		checkpoint.angle += 0.5;
 		checkpoint.angle %= 360;
+		
+		if (point_distance(track[checkpoint.track_index].x, track[checkpoint.track_index].y, racer.x, racer.y) <= checkpoint.radius+16)
+		{
+			checkpoint.track_index += 1;
+			checkpoint.track_index %= array_length(track);
+		}
+		
+		checkpoint.x = lerp(checkpoint.x, track[checkpoint.track_index].x, 1/16);
+		checkpoint.y = lerp(checkpoint.y, track[checkpoint.track_index].y, 1/16);
 	};
 	
 	/// @description	The draw event, for drawing the example.
@@ -138,7 +150,7 @@ function ExampleRacer() : Example() constructor
 		draw_racetrack(4, $222228);
 		
 		// draw checkpoint
-		draw_checkpoint(checkpoint.x, checkpoint.y, checkpoint.angle, $CCCCCC)
+		draw_checkpoint(checkpoint.x, checkpoint.y, checkpoint.angle, $CCCCCC);
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
