@@ -348,7 +348,7 @@ function ExampleRacer() : Example() constructor
 			var _best		= finish.best_time;
 			
 			var _time_string	= get_timer_string(_time);
-			var _best_time_string	= _best == infinity ? "" : _besget_timer_string(_best);
+			var _best_time_string	= _best == infinity ? "" : get_timer_string(_best);
 			
 			var _prev_halign	= draw_get_halign();
 			var _prev_valign	= draw_get_valign();
