@@ -32,9 +32,12 @@ function ExampleRacer() : Example() constructor
 	};
 	
 	finish		= {
-		x	: 0,
-		y	: 0,
-		angle	: 0
+		x		: 0,
+		y		: 0,
+		angle		: 0,
+		to_be_passed	: true,	// whether the finish line is reset and waiting for the next passing. Used for triggering the timer.
+		timer		: 0,
+		best_time	: infinity
 	}
 	
 	
@@ -72,13 +75,14 @@ function ExampleRacer() : Example() constructor
 		racer.car_angle		= _racer_dir-90;
 		
 		// create finish line
-		
-		finish.x	= _p1.x + ((_p2.x - _p1.x)/2);
-		finish.y	= _p1.y + ((_p2.y - _p1.y)/2);
-		finish.angle	= _racer_dir-90;
+		finish.x		= _p1.x + ((_p2.x - _p1.x)/2);
+		finish.y		= _p1.y + ((_p2.y - _p1.y)/2);
+		finish.angle		= _racer_dir-90;
+		finish.to_be_passed	= true;
+		finish.timer		= 0;
+		finish.best_time	= infinity;
 		
 		// create checkpoint
-		
 		var _num_points = 32;
 		
 		checkpoint.track_index	= 1;
@@ -137,14 +141,41 @@ function ExampleRacer() : Example() constructor
 	/// @description	The step event, for code that needs to run every frame.
 	/// @returns		N/A
 	step	= function() {
-		// checkpoint
+		// finish line & timer
+		if (passed_finish_line() && finish.to_be_passed)
+		{
+			finish.to_be_passed = false;
+			
+			// update best lap time
+			if (finish.timer != 0)	// if this isn't the initial crossing before the first lap
+			{
+				var _lap_time		= get_timer() - finish.timer;
+				
+				finish.best_time	= min(finish.best_time, _lap_time);
+			}
+			
+			// reset timer
+			finish.timer = get_timer();
+		}
+		
+		show_debug_message(finish)
+		
+		// checkpoint (and finish line reset)
 		checkpoint.angle += 0.5;
 		checkpoint.angle %= 360;
 		
 		if (point_distance(track[checkpoint.track_index].x, track[checkpoint.track_index].y, racer.x, racer.y) <= checkpoint.radius+16)
 		{
-			checkpoint.track_index += 1;
-			checkpoint.track_index %= array_length(track);
+			if (checkpoint.track_index != 1 || passed_finish_line()) // require passing of finish line before progressing from checkpoint 1
+			{
+				if (checkpoint.track_index == 1)	// if you are passing the first checkpoint
+				{
+					finish.to_be_passed = true;	// reset the finish line switch
+				}
+				
+				checkpoint.track_index += 1;
+				checkpoint.track_index %= array_length(track);
+			}
 		}
 		
 		checkpoint.x = lerp(checkpoint.x, track[checkpoint.track_index].x, 1/16);
@@ -241,6 +272,28 @@ function ExampleRacer() : Example() constructor
 		}
 	};
 	
+	/// @description	Checks whether the finish line has been passed. Passing is defined as being closer to track[1] than track[0] when checkpoint is at track[1].
+	/// @retuns {bool}	Returns whether the finish line is triggered as having being passed on this frame (true) or (not).
+	static passed_finish_line = function() {
+		if (checkpoint.track_index != 1)
+		{
+			return false;
+		}
+		
+		var _p0 = track[0];
+		var _p1 = track[1];
+		
+		var _p0_dist = point_distance(_p0.x, _p0.y, racer.x, racer.y);
+		var _p1_dist = point_distance(_p1.x, _p1.y, racer.x, racer.y);
+		
+		if (_p1_dist <= _p0_dist)
+		{
+			return true;
+		}
+		
+		return false;
+	};
+	
 	/// @description	Draws the racetrack
 	/// @retuns		N/A
 	static draw_minimap = function() {
@@ -252,8 +305,8 @@ function ExampleRacer() : Example() constructor
 			minimap_surface = surface_create(_size, _size);
 		}
 		
+		// initialise surface
 		surface_set_target(minimap_surface);
-		
 		draw_clear_alpha(c_black, 0);
 		
 		// draw track
@@ -261,8 +314,8 @@ function ExampleRacer() : Example() constructor
 		
 		// draw finish line
 		var _p = {
-			x : _halfsize + (finish.x*minimap_scale),
-			y : _halfsize + (finish.y*minimap_scale)
+			x : _halfsize + (finish.x * minimap_scale),
+			y : _halfsize + (finish.y * minimap_scale)
 		};
 		
 		var _p1 = {
@@ -281,12 +334,31 @@ function ExampleRacer() : Example() constructor
 		// draw racer
 		draw_circle_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale), 2, c_yellow, c_yellow, false);
 		
-		surface_reset_target();
-		
+		// draw surface
 		var _minimap_x	= global.camera.width-_size;
 		var _minimap_y	= global.camera.height-_size;
 		
+		surface_reset_target();
 		draw_surface(minimap_surface,_minimap_x-_halfsize, _minimap_y-_halfsize);
+		
+		// draw times
+		if (finish.timer != 0) // if this isn't prior to the first crossing of the line.
+		{
+			var _time		= (get_timer() - finish.timer);
+			var _best		= finish.best_time;
+			
+			var _prev_halign	= draw_get_halign();
+			var _prev_valign	= draw_get_valign();
+			
+			draw_set_halign(fa_center);
+			draw_set_valign(fa_top);
+			draw_set_color(c_white);
+			
+			draw_text(_minimap_x, _minimap_y+_halfsize, string(_time) + "\n" + string(_best));
+			
+			draw_set_halign(_prev_halign);
+			draw_set_valign(_prev_valign);
+		}
 	};
 	
 	/// @description		Draws the checkpoint
