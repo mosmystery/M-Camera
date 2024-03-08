@@ -307,12 +307,7 @@ function ExampleRacer() : Example() constructor
 		surface_set_target(minimap_surface);
 		draw_clear_alpha(c_black, 0);
 		
-		// draw track
-		draw_pointarray(_halfsize-1, _halfsize+1, minimap, true, pr_linestrip, c_black);
-		draw_pointarray(_halfsize, _halfsize+1, minimap, true, pr_linestrip, c_black);
-		draw_pointarray(_halfsize, _halfsize, minimap, true, pr_linestrip, c_grey);
-		
-		// draw finish line
+		// calculate finish line
 		var _p = {
 			x : _halfsize + (finish.x * minimap_scale),
 			y : _halfsize + (finish.y * minimap_scale)
@@ -328,16 +323,27 @@ function ExampleRacer() : Example() constructor
 			y : _p.y + lengthdir_y(3, finish.angle-180)
 		};
 		
+		// draw shadows - track
+		draw_pointarray(_halfsize-1, _halfsize+1, minimap, true, pr_linestrip, c_black);
+		draw_pointarray(_halfsize, _halfsize+1, minimap, true, pr_linestrip, c_black);
+		
+		// draw shadows - finish line
 		draw_set_color(c_black);
 		draw_line(_p1.x-1, _p1.y+1, _p2.x-1, _p2.y+1);
 		draw_line(_p1.x, _p1.y+1, _p2.x, _p2.y+1);
 		
+		// draw shadows - racer
+		draw_circle_color(_halfsize+(racer.x*minimap_scale)-1, _halfsize+(racer.y*minimap_scale)+1, 2, c_black, c_black, false);
+		draw_circle_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale)+1, 2, c_black, c_black, false);
+		
+		// draw track
+		draw_pointarray(_halfsize, _halfsize, minimap, true, pr_linestrip, c_grey);
+		
+		// draw finish line
 		draw_set_color(c_grey);
 		draw_line(_p1.x, _p1.y, _p2.x, _p2.y);
 		
 		// draw racer
-		draw_circle_color(_halfsize+(racer.x*minimap_scale)-1, _halfsize+(racer.y*minimap_scale)+1, 2, c_black, c_black, false);
-		draw_circle_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale)+1, 2, c_black, c_black, false);
 		draw_circle_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale), 2, c_yellow, c_yellow, false);
 		
 		// draw surface
