@@ -28,7 +28,7 @@ function ExampleRacer() : Example() constructor
 		y		: 0,
 		angle		: 0,
 		points		: undefined,
-		radius		: road_width
+		radius		: road_width * 2
 	};
 	
 	finish		= {
@@ -38,7 +38,7 @@ function ExampleRacer() : Example() constructor
 		to_be_passed	: true,	// whether the finish line is reset and waiting for the next passing. Used for triggering the timer.
 		timer		: 0,
 		best_time	: infinity
-	}
+	};
 	
 	
 	
@@ -162,7 +162,13 @@ function ExampleRacer() : Example() constructor
 		checkpoint.angle += 0.5;
 		checkpoint.angle %= 360;
 		
-		if (point_distance(track[checkpoint.track_index].x, track[checkpoint.track_index].y, racer.x, racer.y) <= checkpoint.radius+16)
+		var _i = checkpoint.track_index;
+		var _backup_i = min(checkpoint.track_index+1, array_length(track)-1);
+		
+		var _checkpoint_met = point_distance(track[_i].x, track[_i].y, racer.x, racer.y) <= checkpoint.radius+16;
+		var _backup_checkpoint_met = point_distance(track[_backup_i].x, track[_backup_i].y, racer.x, racer.y) <= checkpoint.radius+16;
+		
+		if (_checkpoint_met || _backup_checkpoint_met)
 		{
 			if (checkpoint.track_index != 1 || passed_finish_line()) // require passing of finish line before progressing from checkpoint 1
 			{
@@ -176,8 +182,8 @@ function ExampleRacer() : Example() constructor
 			}
 		}
 		
-		checkpoint.x = lerp(checkpoint.x, track[checkpoint.track_index].x, 1/16);
-		checkpoint.y = lerp(checkpoint.y, track[checkpoint.track_index].y, 1/16);
+		checkpoint.x = lerp(checkpoint.x, track[checkpoint.track_index].x, 1/4);
+		checkpoint.y = lerp(checkpoint.y, track[checkpoint.track_index].y, 1/4);
 	};
 	
 	/// @description	The draw event, for drawing the example.
@@ -194,8 +200,14 @@ function ExampleRacer() : Example() constructor
 		// draw finish line
 		draw_sprite_ext(sprFinishLine, 0, finish.x, finish.y, 8, 8, finish.angle, $CCCCCC, 1);
 		
-		// draw checkpoint
-		draw_checkpoint(checkpoint.x, checkpoint.y, checkpoint.angle, $CCCCCC);
+		// draw checkpoint & backup checkpoint
+		if (global.loader.show_help_text) // only show if loader help is on
+		{
+			var _backup_i = min(checkpoint.track_index+1, array_length(track)-1);
+			
+			draw_checkpoint(track[_backup_i].x, track[_backup_i].y, checkpoint.angle, $CCCCCC);
+			draw_checkpoint(checkpoint.x, checkpoint.y, checkpoint.angle, $CCCCCC);
+		}
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
@@ -433,16 +445,6 @@ function ExampleRacer() : Example() constructor
 		{
 			var _p_len	= distance_to_point(_pointarray[i].x, _pointarray[i].y);
 			var _p_dir	= point_direction(0, 0, _pointarray[i].x, _pointarray[i].y);
-			var _x_rotated	= lengthdir_x(_p_len, _p_dir-_angle);
-			var _y_rotated	= lengthdir_y(_p_len, _p_dir-_angle);
-			
-			draw_vertex(_x + _x_rotated, _y + _y_rotated);
-		}
-		
-		if (_num_points > 0)
-		{
-			var _p_len	= distance_to_point(_pointarray[0].x, _pointarray[0].y); //so that last point continues to first point
-			var _p_dir	= point_direction(0, 0, _pointarray[0].x, _pointarray[0].y);
 			var _x_rotated	= lengthdir_x(_p_len, _p_dir-_angle);
 			var _y_rotated	= lengthdir_y(_p_len, _p_dir-_angle);
 			
