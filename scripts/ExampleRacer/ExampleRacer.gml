@@ -37,7 +37,8 @@ function ExampleRacer() : Example() constructor
 		angle		: 0,
 		to_be_passed	: true,	// whether the finish line is reset and waiting for the next passing. Used for triggering the timer.
 		timer		: 0,
-		best_time	: infinity
+		best_time	: infinity,
+		last_lap_time	: infinity
 	};
 	
 	
@@ -149,9 +150,9 @@ function ExampleRacer() : Example() constructor
 			// update best lap time
 			if (finish.timer != 0)	// if this isn't the initial crossing before the first lap
 			{
-				var _lap_time		= get_timer() - finish.timer;
+				finish.last_lap_time	= get_timer() - finish.timer;
 				
-				finish.best_time	= min(finish.best_time, _lap_time);
+				finish.best_time	= min(finish.best_time, finish.last_lap_time);
 			}
 			
 			// reset timer
@@ -370,13 +371,16 @@ function ExampleRacer() : Example() constructor
 		{
 			var _time		= (get_timer() - finish.timer);
 			var _best		= finish.best_time;
+			var _lap		= finish.last_lap_time == _best ? infinity : finish.last_lap_time;	// only get lap time if it is different from best time
 			
 			var _time_string	= get_timer_string(_time);
 			var _best_time_string	= _best == infinity ? "" : get_timer_string(_best);
+			var _lap_time_string	= _lap == infinity ? "" : " \n" + get_timer_string(_lap);
 			
 			var _prev_halign	= draw_get_halign();
 			var _prev_valign	= draw_get_valign();
 			
+			// time
 			draw_set_valign(fa_bottom);
 			draw_set_halign(fa_middle);
 			
@@ -387,6 +391,7 @@ function ExampleRacer() : Example() constructor
 			draw_set_color($CCCCCC);
 			draw_text(_minimap_x, global.camera.height-8, _time_string);
 			
+			// best time
 			draw_set_valign(fa_top);
 			
 			draw_set_color(c_black);
@@ -395,6 +400,14 @@ function ExampleRacer() : Example() constructor
 			
 			draw_text_color(_minimap_x, 10, _best_time_string, $20FFFF, c_yellow, c_green, c_lime, 1);
 			
+			// lap time
+			draw_text(_minimap_x-1, 10+1, _lap_time_string);
+			draw_text(_minimap_x, 10+1, _lap_time_string);
+			
+			draw_set_color($CCCCCC);
+			draw_text(_minimap_x, 10, _lap_time_string);
+			
+			// reset align
 			draw_set_halign(_prev_halign);
 			draw_set_valign(_prev_valign);
 		}
