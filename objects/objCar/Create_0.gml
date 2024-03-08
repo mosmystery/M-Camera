@@ -14,10 +14,3 @@ max_steering_angle	= 60;
 steering_rate		= 1.5;
 
 car_angle	= 0;
-
-// visual
-
-trail = array_create(512, {
-	x : x,
-	y : y
-});

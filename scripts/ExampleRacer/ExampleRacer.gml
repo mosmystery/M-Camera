@@ -205,7 +205,7 @@ function ExampleRacer() : Example() constructor
 		{
 			var _backup_i = min(checkpoint.track_index+1, array_length(track)-1);
 			
-			draw_checkpoint(track[_backup_i].x, track[_backup_i].y, checkpoint.angle, $CCCCCC);
+			draw_checkpoint(track[_backup_i].x, track[_backup_i].y, checkpoint.angle, $444448);
 			draw_checkpoint(checkpoint.x, checkpoint.y, checkpoint.angle, $CCCCCC);
 		}
 	};

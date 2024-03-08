@@ -50,12 +50,6 @@ y += lengthdir_y(velocity.length, velocity.dir);
 
 car_angle	= velocity.dir - 90;
 
-array_delete(trail, 0, 1);
-array_push(trail, {
-	x : x,
-	y : y
-});
-
 // camera update
 
 var _zoom_change = (torque == 0) ? 0 : - ((0.4 / max_torque) * min(abs(torque), max_torque));
