@@ -347,6 +347,9 @@ function ExampleRacer() : Example() constructor
 			var _time		= (get_timer() - finish.timer);
 			var _best		= finish.best_time;
 			
+			var _time_string	= get_timer_string(_time);
+			var _best_time_string	= _best == infinity ? "" : _besget_timer_string(_best);
+			
 			var _prev_halign	= draw_get_halign();
 			var _prev_valign	= draw_get_valign();
 			
@@ -354,11 +357,33 @@ function ExampleRacer() : Example() constructor
 			draw_set_valign(fa_top);
 			draw_set_color(c_white);
 			
-			draw_text(_minimap_x, _minimap_y+_halfsize, string(_time) + "\n" + string(_best));
+			draw_text(_minimap_x, _minimap_y+_halfsize, _time_string + "\n" + _best_time_string);
 			
 			draw_set_halign(_prev_halign);
 			draw_set_valign(_prev_valign);
 		}
+	};
+	
+	/// @description		Converts raw microseconds value to a displayable string.
+	/// @param {real}		_time		The time to convert to a string, in microseconds (there are 1 million microseconds per second)
+	/// @retuns {string}		Return string of timer.
+	static get_timer_string = function(_time)
+	{
+		// get values
+		
+		var _minutes = floor(_time / 60000000);
+		
+		_time %= 60000000;	// remove minutes from time
+		
+		var _seconds = floor(_time / 1000000);
+		
+		_time %= 1000000;	// remove seonds from time
+		
+		var _milliseconds = floor(_time / 1000);
+		
+		// format
+		
+		return (string(_minutes) + ":" + string_format(_seconds, 2, 0) + "." + string_format(_milliseconds, 3, 0));
 	};
 	
 	/// @description		Draws the checkpoint
