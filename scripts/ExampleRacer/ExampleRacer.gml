@@ -158,8 +158,6 @@ function ExampleRacer() : Example() constructor
 			finish.timer = get_timer();
 		}
 		
-		show_debug_message(finish)
-		
 		// checkpoint (and finish line reset)
 		checkpoint.angle += 0.5;
 		checkpoint.angle %= 360;
@@ -310,6 +308,8 @@ function ExampleRacer() : Example() constructor
 		draw_clear_alpha(c_black, 0);
 		
 		// draw track
+		draw_pointarray(_halfsize-1, _halfsize+1, minimap, true, pr_linestrip, c_black);
+		draw_pointarray(_halfsize, _halfsize+1, minimap, true, pr_linestrip, c_black);
 		draw_pointarray(_halfsize, _halfsize, minimap, true, pr_linestrip, c_grey);
 		
 		// draw finish line
@@ -328,10 +328,16 @@ function ExampleRacer() : Example() constructor
 			y : _p.y + lengthdir_y(3, finish.angle-180)
 		};
 		
+		draw_set_color(c_black);
+		draw_line(_p1.x-1, _p1.y+1, _p2.x-1, _p2.y+1);
+		draw_line(_p1.x, _p1.y+1, _p2.x, _p2.y+1);
+		
 		draw_set_color(c_grey);
 		draw_line(_p1.x, _p1.y, _p2.x, _p2.y);
 		
 		// draw racer
+		draw_circle_color(_halfsize+(racer.x*minimap_scale)-1, _halfsize+(racer.y*minimap_scale)+1, 2, c_black, c_black, false);
+		draw_circle_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale)+1, 2, c_black, c_black, false);
 		draw_circle_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale), 2, c_yellow, c_yellow, false);
 		
 		// draw surface
@@ -353,11 +359,23 @@ function ExampleRacer() : Example() constructor
 			var _prev_halign	= draw_get_halign();
 			var _prev_valign	= draw_get_valign();
 			
-			draw_set_halign(fa_center);
-			draw_set_valign(fa_top);
-			draw_set_color(c_white);
+			draw_set_valign(fa_bottom);
+			draw_set_halign(fa_middle);
 			
-			draw_text(_minimap_x, _minimap_y+_halfsize, _time_string + "\n" + _best_time_string);
+			draw_set_color(c_black);
+			draw_text(_minimap_x-1, (global.camera.height-8)+1, _time_string);
+			draw_text(_minimap_x, (global.camera.height-8)+1, _time_string);
+			
+			draw_set_color($CCCCCC);
+			draw_text(_minimap_x, global.camera.height-8, _time_string);
+			
+			draw_set_valign(fa_top);
+			
+			draw_set_color(c_black);
+			draw_text(_minimap_x-1, 10+1, _best_time_string);
+			draw_text(_minimap_x, 10+1, _best_time_string);
+			
+			draw_text_color(_minimap_x, 10, _best_time_string, $20FFFF, c_yellow, c_green, c_lime, 1);
 			
 			draw_set_halign(_prev_halign);
 			draw_set_valign(_prev_valign);
@@ -377,13 +395,19 @@ function ExampleRacer() : Example() constructor
 		
 		var _seconds = floor(_time / 1000000);
 		
-		_time %= 1000000;	// remove seonds from time
+		_time %= 1000000;	// remove seconds from time
 		
-		var _milliseconds = floor(_time / 1000);
+		var _milliseconds	= floor(_time / 1000);
 		
 		// format
 		
-		return (string(_minutes) + ":" + string_format(_seconds, 2, 0) + "." + string_format(_milliseconds, 3, 0));
+		var _str_minutes	= string(_minutes) + ":";
+		var _str_seconds	= string_format(_seconds, 2, 0) + ".";
+		var _str_milliseconds	= string_format(_milliseconds, 3, 0);
+		
+		var _timer_string	= _str_minutes + _str_seconds + _str_milliseconds;
+		
+		return string_replace_all(_timer_string, " ", "0");
 	};
 	
 	/// @description		Draws the checkpoint
