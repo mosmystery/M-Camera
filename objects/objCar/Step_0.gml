@@ -2,21 +2,23 @@
 
 var _input = {
 	accelerate	: keyboard_check(ord("W")) || keyboard_check(vk_up),
-	decelerate	: keyboard_check(ord("S")) || keyboard_check(vk_down),
+	decelerate	: keyboard_check(ord("S")) || keyboard_check(vk_down) || keyboard_check(vk_space),
 	turn_left	: keyboard_check(ord("A")) || keyboard_check(vk_left),
 	turn_right	: keyboard_check(ord("D")) || keyboard_check(vk_right)
 };
 
 // acceleration and breaking
 
+var _accel = accel - ((abs(torque)/max_torque) * accel); // make acceleration slower as max speed is approached
+
 if (_input.decelerate)
 {
-	torque = approach(torque, -max_torque/2, breaking_power * decel);
+	torque = approach(torque, -max_torque/2, (torque > 0) ? breaking_power : _accel); // only break until stopped, then reverse with _accel
 }
 
 if (_input.accelerate)
 {
-	torque = approach(torque, max_torque, accel);
+	torque = approach(torque, max_torque, (torque >= 0) ? _accel : breaking_power); // accelerate with breaking power if reversing
 }
 else if (!_input.decelerate)
 {
@@ -27,7 +29,7 @@ else if (!_input.decelerate)
 
 if (_input.turn_left != _input.turn_right)
 {
-	var _max_steering_angle = max_steering_angle - ((abs(torque)/max_torque) * (max_steering_angle/1.5));	// decrease max steering angle as approaching max torque
+	var _max_steering_angle = max_steering_angle - ((abs(torque)/max_torque) * (max_steering_angle * 0.9));	// decrease max steering angle as approaching max torque
 	
 	_max_steering_angle = _input.turn_left ? -_max_steering_angle : _max_steering_angle;			// negate max steering angle if turning left
 	
@@ -52,12 +54,12 @@ car_angle	= velocity.dir - 90;
 
 // camera update
 
-var _zoom_change = (torque == 0) ? 0 : - ((0.4 / max_torque) * min(abs(torque), max_torque));
+var _zoom_change = (torque == 0) ? 0 : - ((0.5 / max_torque) * min(abs(torque), max_torque));
 
 global.camera.zoom_to(1 + _zoom_change);
 global.camera.rotate_to(-car_angle);
 
 global.camera.set_position_anchor({
-	x : x + lengthdir_x(6 + (velocity.length * (96/max_torque)), velocity.dir + (steering_angle/8)),
-	y : y + lengthdir_y(6 + (velocity.length * (96/max_torque)), velocity.dir + (steering_angle/8))
+	x : x + lengthdir_x(6 + (velocity.length * (128/max_torque)), velocity.dir + (steering_angle/8)),
+	y : y + lengthdir_y(6 + (velocity.length * (128/max_torque)), velocity.dir + (steering_angle/8))
 }); // set anchor to look ahead of racer

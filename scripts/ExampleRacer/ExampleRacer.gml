@@ -10,7 +10,7 @@ function ExampleRacer() : Example() constructor
 	// config
 	
 	name		= "Racer Example";
-	ui_text		= "W / up: Accelerate\nS / down: Decelerate\nA / left: turn left\nD / right: turn right";
+	ui_text		= "W / Up: accelerate\nS / Down / Space: break\nA / Left: turn left\nD / Right: turn right";
 	
 	racer		= undefined;		// racer object. See .create()
 	track		= undefined;		// pointarray of the track
@@ -20,7 +20,7 @@ function ExampleRacer() : Example() constructor
 	track_radius	= irandom_range(512, 2048);
 	minimap_scale	= 24/track_radius;
 	
-	road_width	= 128;
+	road_width	= 96;
 	
 	checkpoint	= {
 		track_index	: 0,
@@ -28,7 +28,7 @@ function ExampleRacer() : Example() constructor
 		y		: 0,
 		angle		: 0,
 		points		: undefined,
-		radius		: road_width * 2
+		radius		: road_width * 3
 	};
 	
 	finish		= {
@@ -101,7 +101,7 @@ function ExampleRacer() : Example() constructor
 		}
 		
 		// camera init
-		global.camera.set_interpolation(1/4, 1/8, 1/16);
+		global.camera.set_interpolation(1/4, 1/8, 1/64);
 		
 		global.camera.set_angle_anchor(racer);
 		
