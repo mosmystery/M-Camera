@@ -82,6 +82,7 @@ function ExampleRacer() : Example() constructor
 		finish.to_be_passed	= true;
 		finish.timer		= 0;
 		finish.best_time	= infinity;
+		finish.last_lap_time	= infinity;
 		
 		// create checkpoint
 		var _num_points = 32;
