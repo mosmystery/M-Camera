@@ -1,10 +1,10 @@
 // get inputs
 
 var _input = {
-	accelerate	: keyboard_check(ord("W")) || keyboard_check(vk_up),
-	decelerate	: keyboard_check(ord("S")) || keyboard_check(vk_down) || keyboard_check(vk_space),
-	turn_left	: keyboard_check(ord("A")) || keyboard_check(vk_left),
-	turn_right	: keyboard_check(ord("D")) || keyboard_check(vk_right)
+	accelerate	: keyboard_check(ord("W")) || keyboard_check(vk_up) || gamepad_button_check(0, gp_face1) || gamepad_button_check(0, gp_shoulderrb),
+	decelerate	: keyboard_check(ord("S")) || keyboard_check(vk_down) || keyboard_check(vk_space) || gamepad_button_check(0, gp_face2) || gamepad_button_check(0, gp_face3) || gamepad_button_check(0, gp_shoulderlb),
+	turn_left	: keyboard_check(ord("A")) || keyboard_check(vk_left) || gamepad_axis_value(0, gp_axislh)<-0.5 || gamepad_button_check(0, gp_padl),
+	turn_right	: keyboard_check(ord("D")) || keyboard_check(vk_right) || gamepad_axis_value(0, gp_axislh)>0.5 || gamepad_button_check(0, gp_padr)
 };
 
 // acceleration and breaking
