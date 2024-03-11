@@ -196,7 +196,7 @@ function ExampleRacer() : Example() constructor
 			var _distance_over_road_edge			= distance_to_track() - (road_width/2);
 			
 			var _ratio_from_edge_to_max_penalty_dist	= _distance_over_road_edge / (road_width/2);
-			var _ratio_max_torque				= abs(racer.torque) / racer.max_torque
+			var _ratio_max_torque				= abs(racer.torque) / racer.max_torque;
 			
 			var _penalty_factor				= _ratio_from_edge_to_max_penalty_dist * _ratio_max_torque;
 			var _max_torque_penalty				= racer.max_torque/4;
@@ -318,29 +318,24 @@ function ExampleRacer() : Example() constructor
 		var _p_left_dir		= point_direction(_p1.x, _p1.y, _p_left.x, _p_left.y);		// compare angles because if p1 is the closest point then the nearest line segment is determined by the smallest angle difference
 		var _p_right_dir	= point_direction(_p1.x, _p1.y, _p_right.x, _p_right.y);
 		
-		var _p_left_diff	= abs(_p1_dir - _p_left_dir);	// potential error: when angles are on either side of 360 or 0. may need to compare the wrapped version of these numbers for the smallest or something...
-		var _p_right_diff	= abs(_p1_dir - _p_right_dir);
+		var _p_left_diff	= abs(_p1_dir - _p_left_dir) % 360;				// calculate angle difference
+		var _p_right_diff	= abs(_p1_dir - _p_right_dir) % 360;
+		
+		_p_left_diff	= _p_left_diff > 180 ? 360 - _p_left_diff : _p_left_diff;		// choose smallest engle of clockwise or counterclockwise te represent the difference
+		_p_right_diff	= _p_right_diff > 180 ? 360 - _p_right_diff : _p_right_diff;
 		
 		if (_p_left_diff >= 90 && _p_right_diff >= 90)
 		{
-			return _nearest_dist;	// if both of the aangles are more than 90 degrees, it means that _p1 is closer than any point on the two line segments, so distance to _p1 represents the shortest point on the track.
+			return _nearest_dist;	// if both of the angle differences are more than 90 degrees, _p1 is closer than any point on the two line segments, so _p1 represents the shortest point on the track.
 		}
 		
 		var _p2			= (_p_left_diff < _p_right_diff) ? _p_left : _p_right;
 		var _p2_dir		= (_p_left_diff < _p_right_diff) ? _p_left_dir : _p_right_dir;
 		
-		show_debug_message("---");
-		show_debug_message([_p1_dir, _p_left_dir, _p_right_dir]);
-		show_debug_message([_p_left_diff, _p_right_diff]);
-		
-		// find the nearest point along the nearest line (p1, p2)
-		
 		var _p2_length		= point_distance(_p1.x, _p1.y, _p2.x, _p2.y);
 		var _frac_of_length	= _nearest_dist / (_nearest_dist + point_distance(_p2.x, _p2.y, racer.x, racer.y));	// the nearest point along the length of the line segment is found by adding the distance of each point to the racer together and finding the ratio of the nearest point's distance to the racer out of the total.
 		
 		var _p3_length		= _p2_length * _frac_of_length; // reduce length to the point along it that is closest to the racer.
-		
-		show_debug_message([_frac_of_length, _p2_length, _nearest_dist, (_nearest_dist + point_distance(_p2.x, _p2.y, racer.x, racer.y))]);
 		
 		var _p3	= {
 			x : _p1.x + lengthdir_x(_p3_length, _p2_dir),
@@ -348,7 +343,7 @@ function ExampleRacer() : Example() constructor
 		}; // nearest point along line segment
 		
 		_nearest_dist		= point_distance(_p3.x, _p3.y, racer.x, racer.y);
-		show_debug_message(_nearest_dist);
+		
 		return _nearest_dist;
 	};
 	
