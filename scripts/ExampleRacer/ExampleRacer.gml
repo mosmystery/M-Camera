@@ -12,15 +12,15 @@ function ExampleRacer() : Example() constructor
 	name		= "Racer Example";
 	ui_text		= "W / Up: accelerate\nS / Down / Space: break\nA / Left: turn left\nD / Right: turn right";
 	
-	racer		= undefined;		// racer object. See .create()
-	track		= undefined;		// pointarray of the track
-	minimap		= undefined;		// pointarray of the minimap
-	minimap_surface	= undefined;
+	racer		= undefined;			// racer object. See .create()
+	track		= undefined;			// pointarray of the track
+	minimap		= undefined;			// pointarray of the minimap
+	minimap_surface	= undefined;			// surface for drawing minimap to gui
 	
-	track_radius	= irandom_range(512, 2048);
-	minimap_scale	= 24/track_radius;
+	track_radius	= irandom_range(512, 2048);	// half-width and half-height for entire racetrack.
+	minimap_scale	= 24/track_radius;		// scale to draw the minimap at.
 	
-	road_width	= 96;
+	road_width	= 96;				// width (or diameter at corners) of the asphalt part of the road
 	
 	checkpoint	= {
 		track_index	: 0,
@@ -103,6 +103,7 @@ function ExampleRacer() : Example() constructor
 		}
 		
 		// camera init
+		global.camera.set_shake_limits(32, 360/32, 0, 0.15, 1);
 		global.camera.set_interpolation(1/4, 1/8, 1/64);
 		
 		global.camera.set_angle_anchor(racer);
@@ -186,6 +187,26 @@ function ExampleRacer() : Example() constructor
 		
 		checkpoint.x = lerp(checkpoint.x, track[checkpoint.track_index].x, 1/4);
 		checkpoint.y = lerp(checkpoint.y, track[checkpoint.track_index].y, 1/4);
+		
+		// rumble and slowdown if offroad
+		
+		if (distance_to_track() > road_width/2)
+		{
+			// penalty
+			var _distance_over_road_edge			= distance_to_track() - (road_width/2);
+			
+			var _ratio_from_edge_to_max_penalty_dist	= _distance_over_road_edge / (road_width/2);
+			var _ratio_max_torque				= abs(racer.torque) / racer.max_torque
+			
+			var _penalty_factor				= _ratio_from_edge_to_max_penalty_dist * _ratio_max_torque;
+			var _max_torque_penalty				= racer.max_torque/4;
+			var _torque_penalty				= _penalty_factor * _max_torque_penalty;
+			
+			racer.torque					= racer.torque >= 0 ? min(racer.torque, racer.max_torque - _torque_penalty) : max(racer.torque, -(racer.max_torque + _torque_penalty));
+			
+			// shake
+			global.camera.shake_to(_penalty_factor);
+		}
 	};
 	
 	/// @description	The draw event, for drawing the example.
@@ -265,23 +286,70 @@ function ExampleRacer() : Example() constructor
 		return _points;
 	};
 	
-	/// @description		Draws the racetrack
-	/// @param {real}		_width		The width of the road to draw
-	/// @param {constant.Colour)	_colour		The colour to draw the road
-	/// @retuns			N/A
-	static draw_racetrack = function(_width, _colour) {
-		draw_set_color(_colour);
+	static distance_to_track = function() {
+		// find nearest point (_p1)
+		
+		var _nearest_point_i	= 0;
+		var _nearest_dist	= infinity;
 		
 		var _num_points = array_length(track);
 		
 		for (var i = 0; i < _num_points; i++)
 		{
-			var _p1 = track[i];
-			var _p2	= track[(i+1) % _num_points];
+			var _p = track[i];
 			
-			draw_line_width(_p1.x, _p1.y, _p2.x, _p2.y, _width);
-			draw_circle(_p1.x, _p1.y, _width/2, false);
+			var _dist = point_distance(_p.x, _p.y, racer.x, racer.y);
+			
+			if (_dist < _nearest_dist)
+			{
+				_nearest_dist		= _dist;
+				_nearest_point_i	= i;
+			}
 		}
+		
+		var _p1 = track[_nearest_point_i];
+		
+		// find p1's neighbour which forms the line segment that is nearest(_p2), to complete the nearest line segment (_p1, _p2)
+		
+		var _p_left		= track[ wrap(_nearest_point_i-1, 0, _num_points) ];
+		var _p_right		= track[ wrap(_nearest_point_i+1, 0, _num_points) ];
+		
+		var _p1_dir		= point_direction(_p1.x, _p1.y, racer.x, racer.y);
+		var _p_left_dir		= point_direction(_p1.x, _p1.y, _p_left.x, _p_left.y);		// compare angles because if p1 is the closest point then the nearest line segment is determined by the smallest angle difference
+		var _p_right_dir	= point_direction(_p1.x, _p1.y, _p_right.x, _p_right.y);
+		
+		var _p_left_diff	= abs(_p1_dir - _p_left_dir);	// potential error: when angles are on either side of 360 or 0. may need to compare the wrapped version of these numbers for the smallest or something...
+		var _p_right_diff	= abs(_p1_dir - _p_right_dir);
+		
+		if (_p_left_diff >= 90 && _p_right_diff >= 90)
+		{
+			return _nearest_dist;	// if both of the aangles are more than 90 degrees, it means that _p1 is closer than any point on the two line segments, so distance to _p1 represents the shortest point on the track.
+		}
+		
+		var _p2			= (_p_left_diff < _p_right_diff) ? _p_left : _p_right;
+		var _p2_dir		= (_p_left_diff < _p_right_diff) ? _p_left_dir : _p_right_dir;
+		
+		show_debug_message("---");
+		show_debug_message([_p1_dir, _p_left_dir, _p_right_dir]);
+		show_debug_message([_p_left_diff, _p_right_diff]);
+		
+		// find the nearest point along the nearest line (p1, p2)
+		
+		var _p2_length		= point_distance(_p1.x, _p1.y, _p2.x, _p2.y);
+		var _frac_of_length	= _nearest_dist / (_nearest_dist + point_distance(_p2.x, _p2.y, racer.x, racer.y));	// the nearest point along the length of the line segment is found by adding the distance of each point to the racer together and finding the ratio of the nearest point's distance to the racer out of the total.
+		
+		var _p3_length		= _p2_length * _frac_of_length; // reduce length to the point along it that is closest to the racer.
+		
+		show_debug_message([_frac_of_length, _p2_length, _nearest_dist, (_nearest_dist + point_distance(_p2.x, _p2.y, racer.x, racer.y))]);
+		
+		var _p3	= {
+			x : _p1.x + lengthdir_x(_p3_length, _p2_dir),
+			y : _p1.y + lengthdir_y(_p3_length, _p2_dir)
+		}; // nearest point along line segment
+		
+		_nearest_dist		= point_distance(_p3.x, _p3.y, racer.x, racer.y);
+		show_debug_message(_nearest_dist);
+		return _nearest_dist;
 	};
 	
 	/// @description	Checks whether the finish line has been passed. Passing is defined as being closer to track[1] than track[0] when checkpoint is at track[1].
@@ -304,6 +372,25 @@ function ExampleRacer() : Example() constructor
 		}
 		
 		return false;
+	};
+	
+	/// @description		Draws the racetrack
+	/// @param {real}		_width		The width of the road to draw
+	/// @param {constant.Colour)	_colour		The colour to draw the road
+	/// @retuns			N/A
+	static draw_racetrack = function(_width, _colour) {
+		draw_set_color(_colour);
+		
+		var _num_points = array_length(track);
+		
+		for (var i = 0; i < _num_points; i++)
+		{
+			var _p1 = track[i];
+			var _p2	= track[(i+1) % _num_points];
+			
+			draw_line_width(_p1.x, _p1.y, _p2.x, _p2.y, _width);
+			draw_circle(_p1.x, _p1.y, _width/2, false);
+		}
 	};
 	
 	/// @description	Draws the racetrack
