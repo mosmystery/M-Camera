@@ -20,7 +20,7 @@ function ExampleRacer() : Example() constructor
 	track_radius	= irandom_range(512, 2048);	// half-width and half-height for entire racetrack.
 	minimap_scale	= 24/track_radius;		// scale to draw the minimap at.
 	
-	road_width	= 96;				// width (or diameter at corners) of the asphalt part of the road
+	road_width	= 112;				// width (or diameter at corners) of the asphalt part of the road
 	
 	checkpoint	= {
 		track_index	: 0,
@@ -103,7 +103,7 @@ function ExampleRacer() : Example() constructor
 		}
 		
 		// camera init
-		global.camera.set_shake_limits(32, 360/32, 0, 0.15, 1);
+		global.camera.set_shake_limits(16, 360/32, 0, 0.1, 1);
 		global.camera.set_interpolation(1/4, 1/8, 1/64);
 		
 		global.camera.set_angle_anchor(racer);
@@ -195,11 +195,11 @@ function ExampleRacer() : Example() constructor
 			// penalty
 			var _distance_over_road_edge			= distance_to_track() - (road_width/2);
 			
-			var _ratio_from_edge_to_max_penalty_dist	= _distance_over_road_edge / (road_width/2);
+			var _ratio_from_edge_to_max_penalty_dist	= _distance_over_road_edge / (road_width/4);
 			var _ratio_max_torque				= abs(racer.torque) / racer.max_torque;
 			
 			var _penalty_factor				= _ratio_from_edge_to_max_penalty_dist * _ratio_max_torque;
-			var _max_torque_penalty				= racer.max_torque/4;
+			var _max_torque_penalty				= racer.max_torque/2;
 			var _torque_penalty				= _penalty_factor * _max_torque_penalty;
 			
 			racer.torque					= racer.torque >= 0 ? min(racer.torque, racer.max_torque - _torque_penalty) : max(racer.torque, -(racer.max_torque + _torque_penalty));
@@ -213,11 +213,11 @@ function ExampleRacer() : Example() constructor
 	/// @returns		N/A
 	draw	= function() {
 		// draw track
-		draw_racetrack(road_width+64, $181C20);
-		draw_racetrack(road_width+32, $444448);
-		draw_racetrack(road_width+16, $111118);
-		draw_racetrack(road_width+8, $CCCCCC);
-		draw_racetrack(road_width, $111218);
+		draw_racetrack(road_width+48, $181C20);
+		draw_racetrack(road_width+16, $444448);
+		draw_racetrack(road_width, $111118);
+		draw_racetrack(road_width-8, $CCCCCC);
+		draw_racetrack(road_width-16, $111218);
 		draw_racetrack(4, $222228);
 		
 		// draw finish line
