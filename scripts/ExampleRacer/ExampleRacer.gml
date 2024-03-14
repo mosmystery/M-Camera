@@ -9,20 +9,23 @@ function ExampleRacer() : Example() constructor
 {
 	// config
 	
-	name		= "Racer Example";
-	ui_text		= "W / Up: accelerate\nS / Down / Space: break\nA / Left: turn left\nD / Right: turn right";
+	name			= "Racer Example";
+	ui_text			= "W / Up: accelerate\nS / Down / Space: break\nA / Left: turn left\nD / Right: turn right";
 	
-	racer		= undefined;			// racer object. See .create()
-	track		= undefined;			// pointarray of the track
-	minimap		= undefined;			// pointarray of the minimap
+	racer			= undefined;			// racer object. See .create()
+	track			= undefined;			// pointarray of the track
+	minimap			= undefined;			// pointarray of the minimap
 	
-	minimap_surface	= undefined;			// surface for drawing minimap to gui
-	speedo_surface	= undefined;			// surface for drawing speedometer to gui
+	minimap_surface		= undefined;			// surface for drawing minimap to gui
+	speedo_surface		= undefined;			// surface for drawing speedometer to gui
 	
-	track_radius	= irandom_range(512, 2048);	// half-width and half-height for entire racetrack.
-	minimap_scale	= 24/track_radius;		// scale to draw the minimap at.
+	track_radius		= irandom_range(512, 2048);	// half-width and half-height for entire racetrack.
+	minimap_scale		= 24/track_radius;		// scale to draw the minimap at.
 	
-	road_width	= 112;				// width (or diameter at corners) of the asphalt part of the road
+	road_width		= 112;				// width (or diameter at corners) of the asphalt part of the road
+	
+	penalty_indication	= false;			// whether to indicate penalty on GUI
+	penalty_indication_lerp	= 0;				// penalty_indication but with a lag
 	
 	checkpoint	= {
 		track_index	: 0,
@@ -192,8 +195,12 @@ function ExampleRacer() : Example() constructor
 		
 		// rumble and slowdown if offroad
 		
+		penalty_indication	= false;
+		
 		if (distance_to_track() > road_width/2)
 		{
+			penalty_indication				= true;
+			
 			// penalty
 			var _distance_over_road_edge			= distance_to_track() - (road_width/2);
 			
@@ -201,6 +208,7 @@ function ExampleRacer() : Example() constructor
 			var _ratio_max_torque				= abs(racer.torque) / racer.max_torque;
 			
 			var _penalty_factor				= _ratio_from_edge_to_max_penalty_dist * _ratio_max_torque;
+			
 			var _max_torque_penalty				= racer.max_torque/2;
 			var _torque_penalty				= _penalty_factor * _max_torque_penalty;
 			
@@ -531,6 +539,8 @@ function ExampleRacer() : Example() constructor
 		var _guage_angle_range	= -135;
 		var _needle_angle	= _guage_angle_start + (_needle_percent * _guage_angle_range);
 		
+		var _penalty_dot_radius	= 2.6;
+		
 		var _prev_halign	= draw_get_halign();
 		var _prev_valign	= draw_get_valign();
 		
@@ -542,6 +552,15 @@ function ExampleRacer() : Example() constructor
 		// initialise surface
 		surface_set_target(speedo_surface);
 		draw_clear_alpha(c_black, 0);
+		
+		// draw background semicircle
+		draw_set_color(c_black);
+		draw_circle(_speedometer_radius-1, _speedometer_radius-1, 8, false);
+		
+		// (undraw bottom of circle)
+		gpu_set_blendmode(bm_subtract);
+		draw_rectangle(-_speedometer_radius, _speedometer_radius+4, _speedometer_size, _speedometer_size, false);
+		gpu_set_blendmode(bm_normal);
 		
 		// draw guage ends
 		var _start_x2	= _speedometer_radius + lengthdir_x(_speedometer_radius, _guage_angle_start);
@@ -592,9 +611,19 @@ function ExampleRacer() : Example() constructor
 			draw_text(_speedometer_radius, _speedometer_radius, _gear_str);
 		}
 		
+		// draw penalty indicator
+		draw_set_color(c_black)
+		draw_circle((_speedometer_radius * 1.5)+1, _speedometer_radius, _penalty_dot_radius, false);
+		draw_circle((_speedometer_radius * 1.5)+2, _speedometer_radius, _penalty_dot_radius, false);
+		
+		penalty_indication_lerp = lerp(penalty_indication_lerp, real(penalty_indication), 0.2);
+		
+		draw_set_color(penalty_indication_lerp * $0000CC);
+		draw_circle((_speedometer_radius * 1.5)+2, _speedometer_radius - 1, _penalty_dot_radius, false);
+		
 		// draw surface
 		surface_reset_target();
-		draw_surface(speedo_surface, _minimap_x-_speedometer_radius, _minimap_y-_minimap_size);
+		draw_surface(speedo_surface, (global.camera.width/2) - _speedometer_radius, global.camera.height - _speedometer_size - 2);
 		
 		// reset align
 		draw_set_halign(_prev_halign);
