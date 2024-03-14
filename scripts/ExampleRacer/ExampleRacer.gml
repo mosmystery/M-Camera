@@ -197,14 +197,16 @@ function ExampleRacer() : Example() constructor
 			// penalty
 			var _distance_over_road_edge			= distance_to_track() - (road_width/2);
 			
-			var _ratio_from_edge_to_max_penalty_dist	= _distance_over_road_edge / (road_width/4);
+			var _ratio_from_edge_to_max_penalty_dist	= max(0, _distance_over_road_edge) / (road_width/8);
 			var _ratio_max_torque				= abs(racer.torque) / racer.max_torque;
 			
 			var _penalty_factor				= _ratio_from_edge_to_max_penalty_dist * _ratio_max_torque;
 			var _max_torque_penalty				= racer.max_torque/2;
 			var _torque_penalty				= _penalty_factor * _max_torque_penalty;
 			
-			racer.torque					= racer.torque >= 0 ? min(racer.torque, racer.max_torque - _torque_penalty) : max(racer.torque, -(racer.max_torque + _torque_penalty));
+			var _new_torque					= racer.torque >= 0 ? min(racer.torque, racer.max_torque - _torque_penalty) : max(racer.torque, -(racer.max_torque - _torque_penalty));
+			
+			racer.torque					= lerp(racer.torque, _new_torque, 0.1);
 			
 			// shake
 			global.camera.shake_to(_penalty_factor);
