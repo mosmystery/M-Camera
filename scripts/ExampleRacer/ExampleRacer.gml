@@ -237,6 +237,7 @@ function ExampleRacer() : Example() constructor
 	/// @returns		N/A
 	draw_gui = function() {
 		draw_minimap();
+		draw_times();
 	};
 	
 	
@@ -448,8 +449,11 @@ function ExampleRacer() : Example() constructor
 		
 		surface_reset_target();
 		draw_surface(minimap_surface,_minimap_x-_halfsize, _minimap_y-_halfsize);
-		
-		// draw times
+	};
+	
+	/// @description	Draws on-screen timer and lap times.
+	/// @retuns		N/A
+	static draw_times = function() {
 		if (finish.timer != 0) // if this isn't prior to the first crossing of the line.
 		{
 			var _time		= (get_timer() - finish.timer);
@@ -462,6 +466,10 @@ function ExampleRacer() : Example() constructor
 			
 			var _prev_halign	= draw_get_halign();
 			var _prev_valign	= draw_get_valign();
+			
+			var _size		= (track_radius * minimap_scale) * 2;
+			var _minimap_x		= global.camera.width-_size;
+			var _minimap_y		= global.camera.height-_size;
 			
 			// time
 			draw_set_valign(fa_bottom);
