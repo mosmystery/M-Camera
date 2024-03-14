@@ -15,7 +15,9 @@ function ExampleRacer() : Example() constructor
 	racer		= undefined;			// racer object. See .create()
 	track		= undefined;			// pointarray of the track
 	minimap		= undefined;			// pointarray of the minimap
+	
 	minimap_surface	= undefined;			// surface for drawing minimap to gui
+	speedo_surface	= undefined;			// surface for drawing speedometer to gui
 	
 	track_radius	= irandom_range(512, 2048);	// half-width and half-height for entire racetrack.
 	minimap_scale	= 24/track_radius;		// scale to draw the minimap at.
@@ -238,6 +240,7 @@ function ExampleRacer() : Example() constructor
 	draw_gui = function() {
 		draw_minimap();
 		draw_times();
+		draw_speedometer();
 	};
 	
 	
@@ -389,7 +392,7 @@ function ExampleRacer() : Example() constructor
 		}
 	};
 	
-	/// @description	Draws the racetrack
+	/// @description	Draws a minimap of the racetrack to the GUI
 	/// @retuns		N/A
 	static draw_minimap = function() {
 		var _size	= (track_radius * minimap_scale) * 2;
@@ -451,7 +454,7 @@ function ExampleRacer() : Example() constructor
 		draw_surface(minimap_surface,_minimap_x-_halfsize, _minimap_y-_halfsize);
 	};
 	
-	/// @description	Draws on-screen timer and lap times.
+	/// @description	Draws on-screen timer and lap times to the GUI.
 	/// @retuns		N/A
 	static draw_times = function() {
 		if (finish.timer != 0) // if this isn't prior to the first crossing of the line.
@@ -502,6 +505,98 @@ function ExampleRacer() : Example() constructor
 			draw_set_halign(_prev_halign);
 			draw_set_valign(_prev_valign);
 		}
+	};
+	
+	/// @description	Draws on-screen speedometer to GUI.
+	/// @retuns		N/A
+	static draw_speedometer = function() {
+		var _minimap_size	= (track_radius * minimap_scale) * 2;
+		var _minimap_halfsize	= _minimap_size/2;
+		
+		var _speedometer_size	= 24;
+		var _speedometer_radius	= _speedometer_size/2;
+		var _needle_length	= 5;
+		var _guage_ends_length	= 5;
+		
+		var _minimap_x		= global.camera.width - _minimap_size;
+		var _minimap_y		= global.camera.height - _minimap_size;
+		
+		var _gear		= ceil(racer.torque);
+		var _gear_str		= (_gear >= 1) ? string(_gear) : ((racer.torque == 0) ? "P" : "R");
+		var _needle_percent	= racer.torque - (_gear-1);
+		
+		var _guage_angle_start	= 180;
+		var _guage_angle_range	= -135;
+		var _needle_angle	= _guage_angle_start + (_needle_percent * _guage_angle_range);
+		
+		var _prev_halign	= draw_get_halign();
+		var _prev_valign	= draw_get_valign();
+		
+		if (!surface_exists(speedo_surface))
+		{
+			speedo_surface = surface_create(_speedometer_size, _speedometer_size);
+		}
+		
+		// initialise surface
+		surface_set_target(speedo_surface);
+		draw_clear_alpha(c_black, 0);
+		
+		// draw guage ends
+		var _start_x2	= _speedometer_radius + lengthdir_x(_speedometer_radius, _guage_angle_start);
+		var _start_y2	= _speedometer_radius + lengthdir_y(_speedometer_radius, _guage_angle_start);
+		var _start_x1	= _start_x2 + lengthdir_x(_guage_ends_length, _guage_angle_start - 180);
+		var _start_y1	= _start_y2 + lengthdir_y(_guage_ends_length, _guage_angle_start - 180);
+		var _end_x2	= _speedometer_radius + lengthdir_x(_speedometer_radius, _guage_angle_start + _guage_angle_range);
+		var _end_y2	= _speedometer_radius + lengthdir_y(_speedometer_radius, _guage_angle_start + _guage_angle_range);
+		var _end_x1	= _end_x2 + lengthdir_x(_guage_ends_length, (_guage_angle_start + _guage_angle_range) - 180);
+		var _end_y1	= _end_y2 + lengthdir_y(_guage_ends_length, (_guage_angle_start + _guage_angle_range) - 180);
+		
+		draw_set_color(c_black);
+		draw_line(_start_x1-1, _start_y1+1, _start_x2-1, _start_y2+1);
+		draw_line(_start_x1, _start_y1+1, _start_x2, _start_y2+1);
+		draw_line(_end_x1-1, _end_y1+1, _end_x2-1, _end_y2+1);
+		draw_line(_end_x1, _end_y1+1, _end_x2, _end_y2+1);
+		draw_set_color(c_grey);
+		draw_line(_start_x1, _start_y1, _start_x2, _start_y2);
+		draw_line(_end_x1, _end_y1, _end_x2, _end_y2);
+		
+		// draw needle
+		var _needle_x2	= _speedometer_radius + lengthdir_x(_speedometer_radius, _needle_angle);
+		var _needle_y2	= _speedometer_radius + lengthdir_y(_speedometer_radius, _needle_angle);
+		var _needle_x1	= _needle_x2 + lengthdir_x(_needle_length, _needle_angle - 180);
+		var _needle_y1	= _needle_y2 + lengthdir_y(_needle_length, _needle_angle - 180);
+		
+		draw_set_color(c_black);
+		draw_line(_needle_x1-1, _needle_y1+1, _needle_x2-1, _needle_y2+1);
+		draw_line(_needle_x1, _needle_y1+1, _needle_x2, _needle_y2+1);
+		draw_set_color($0000CC);
+		draw_line(_needle_x1, _needle_y1, _needle_x2, _needle_y2);
+		
+		// draw gear
+		draw_set_valign(fa_middle);
+		draw_set_halign(fa_center);
+		
+		draw_set_color(c_black);
+		draw_text(_speedometer_radius-1, _speedometer_radius+1, _gear_str);
+		draw_text(_speedometer_radius, _speedometer_radius+1, _gear_str);
+		
+		if (_gear >= 7)
+		{
+			draw_text_color(_speedometer_radius, _speedometer_radius, _gear_str, $20FFFF, c_yellow, c_green, c_lime, 1);
+		}
+		else
+		{
+			draw_set_color((racer.torque < 0) ? $0000AA : $CCCCCC);
+			draw_text(_speedometer_radius, _speedometer_radius, _gear_str);
+		}
+		
+		// draw surface
+		surface_reset_target();
+		draw_surface(speedo_surface, _minimap_x-_speedometer_radius, _minimap_y-_minimap_size);
+		
+		// reset align
+		draw_set_halign(_prev_halign);
+		draw_set_valign(_prev_valign);
 	};
 	
 	/// @description		Converts raw microseconds value to a displayable string.
