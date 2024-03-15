@@ -10,7 +10,7 @@ function ExampleRacer() : Example() constructor
 	// config
 	
 	name			= "Racer Example";
-	ui_text			= "W / Up: accelerate\nS / Down / Space: break\nA / Left: turn left\nD / Right: turn right";
+	ui_text			= "W / Up: accelerate\nS / Down / Space: break\nA / Left: turn left\nD / Right: turn right\nR: reset";
 	
 	racer			= undefined;			// racer object. See .create()
 	track			= undefined;			// pointarray of the track
@@ -61,13 +61,14 @@ function ExampleRacer() : Example() constructor
 	
 	
 	/// @description	The create event, for setting up the camera and example.
+	/// @param {bool}	_resetting	If the race is being reset.
 	/// @returns		N/A
-	create	= function() {	
+	create	= function(_resetting = false) {	
 		// generate racetrack
-		track_radius	= irandom_range(512, 2048);
+		track_radius	= _resetting ? track_radius : irandom_range(512, 2048);
 		minimap_scale	= 24/track_radius;
 		
-		track	= generate_racetrack_points();
+		track	= _resetting ? track : generate_racetrack_points();
 		minimap	= pointarray_scale(track, minimap_scale);
 		
 		// place racer on track
@@ -86,8 +87,8 @@ function ExampleRacer() : Example() constructor
 		finish.angle		= _racer_dir-90;
 		finish.to_be_passed	= true;
 		finish.timer		= 0;
-		finish.best_time	= infinity;
-		finish.last_lap_time	= infinity;
+		finish.best_time	= _resetting ? finish.best_time : infinity;
+		finish.last_lap_time	= _resetting ? finish.last_lap_time : infinity;
 		
 		// create checkpoint
 		var _num_points = 32;
@@ -121,8 +122,9 @@ function ExampleRacer() : Example() constructor
 	};
 	
 	/// @description	The destroy event, for cleaning up the example.
+	/// @param {bool}	_resetting	If the race is being reset.
 	/// @returns		N/A
-	destroy	= function() {
+	destroy	= function(_resetting = false) {
 		if (racer = undefined)
 		{
 			return;
@@ -131,7 +133,7 @@ function ExampleRacer() : Example() constructor
 		instance_destroy(racer, true);
 		
 		racer	= undefined;
-		track	= undefined;
+		track	= _resetting ? track : undefined;
 		minimap	= undefined;
 		
 		global.camera.set_position_anchor();	// unset position anchor, as racer no longer exists
@@ -141,8 +143,10 @@ function ExampleRacer() : Example() constructor
 		if (surface_exists(minimap_surface))
 		{
 			surface_free(minimap_surface);
+			surface_free(speedo_surface);
 			
 			minimap_surface = undefined;
+			speedo_surface = undefined;
 		}
 	};
 	
@@ -218,6 +222,15 @@ function ExampleRacer() : Example() constructor
 			
 			// shake
 			global.camera.shake_to(_penalty_factor);
+		}
+		
+		// reset
+		if (keyboard_check_pressed(ord("R")))
+		{
+			global.camera.reset(true, true);
+			
+			destroy(true);
+			create(true);
 		}
 	};
 	
@@ -467,9 +480,9 @@ function ExampleRacer() : Example() constructor
 	/// @description	Draws on-screen timer and lap times to the GUI.
 	/// @retuns		N/A
 	static draw_times = function() {
-		if (finish.timer != 0) // if this isn't prior to the first crossing of the line.
+		//if (finish.timer != 0) // if this isn't prior to the first crossing of the line.
 		{
-			var _time		= (get_timer() - finish.timer);
+			var _time		= (finish.timer == 0) ? 0 : (get_timer() - finish.timer);
 			var _best		= finish.best_time;
 			var _lap		= finish.last_lap_time == _best ? infinity : finish.last_lap_time;	// only get lap time if it is different from best time
 			
