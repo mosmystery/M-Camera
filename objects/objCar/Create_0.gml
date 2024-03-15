@@ -14,3 +14,10 @@ max_steering_angle	= 30;
 steering_rate		= 1.5;	// how responsive steering is
 
 car_angle	= 0;
+
+input = {
+	accelerate	: false,
+	decelerate	: false,
+	turn_left	: false,
+	turn_right	: false
+};

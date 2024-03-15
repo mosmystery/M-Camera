@@ -569,7 +569,6 @@ function ExampleRacer() : Example() constructor
 		// draw background semicircle
 		draw_set_color(c_black);
 		draw_circle(_speedometer_radius-1, _speedometer_radius-1, 8, false);
-		
 		// (undraw bottom of circle)
 		gpu_set_blendmode(bm_subtract);
 		draw_rectangle(-_speedometer_radius, _speedometer_radius+4, _speedometer_size, _speedometer_size, false);
@@ -629,7 +628,7 @@ function ExampleRacer() : Example() constructor
 		draw_circle((_speedometer_radius * 1.5)+1, _speedometer_radius, _penalty_dot_radius, false);
 		draw_circle((_speedometer_radius * 1.5)+2, _speedometer_radius, _penalty_dot_radius, false);
 		
-		penalty_indication_lerp = lerp(penalty_indication_lerp, real(penalty_indication), 0.2);
+		penalty_indication_lerp = lerp(penalty_indication_lerp, real(penalty_indication || racer.input.decelerate), 0.2);
 		
 		draw_set_color(penalty_indication_lerp * $0000CC);
 		draw_circle((_speedometer_radius * 1.5)+2, _speedometer_radius - 1, _penalty_dot_radius, false);

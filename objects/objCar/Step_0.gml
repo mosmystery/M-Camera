@@ -1,6 +1,6 @@
 // get inputs
 
-var _input = {
+input = {
 	accelerate	: keyboard_check(ord("W")) || keyboard_check(vk_up) || gamepad_button_check(0, gp_face1) || gamepad_button_check(0, gp_shoulderrb),
 	decelerate	: keyboard_check(ord("S")) || keyboard_check(vk_down) || keyboard_check(vk_space) || gamepad_button_check(0, gp_face2) || gamepad_button_check(0, gp_face3) || gamepad_button_check(0, gp_shoulderlb),
 	turn_left	: keyboard_check(ord("A")) || keyboard_check(vk_left) || gamepad_axis_value(0, gp_axislh)<-0.5 || gamepad_button_check(0, gp_padl),
@@ -11,27 +11,27 @@ var _input = {
 
 var _accel = accel - ((abs(torque)/max_torque) * accel); // make acceleration slower as max speed is approached
 
-if (_input.decelerate)
+if (input.decelerate)
 {
 	torque = approach(torque, -max_torque/2, (torque > 0) ? breaking_power : _accel); // only break until stopped, then reverse with _accel
 }
 
-if (_input.accelerate)
+if (input.accelerate)
 {
 	torque = approach(torque, max_torque, (torque >= 0) ? _accel : breaking_power); // accelerate with breaking power if reversing
 }
-else if (!_input.decelerate)
+else if (!input.decelerate)
 {
 	torque = approach(torque, 0, decel);
 }
 
 // turning
 
-if (_input.turn_left != _input.turn_right)
+if (input.turn_left != input.turn_right)
 {
 	var _max_steering_angle = max_steering_angle - ((abs(torque)/max_torque) * (max_steering_angle * 0.9));	// decrease max steering angle as approaching max torque
 	
-	_max_steering_angle = _input.turn_left ? -_max_steering_angle : _max_steering_angle;			// negate max steering angle if turning left
+	_max_steering_angle = input.turn_left ? -_max_steering_angle : _max_steering_angle;			// negate max steering angle if turning left
 	
 	steering_angle = approach(steering_angle, _max_steering_angle, steering_rate);
 }
