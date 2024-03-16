@@ -28,7 +28,7 @@ global.camera = new MCamera(320, 180, 4, 1);
 
 // optionally define other camera settings here
 global.camera.set_position_anchor(objPlayer);
-global.camera.set_interpolation_values(1/8, 1/4, 1);
+global.camera.set_interpolation(1/8, 1/4, 1);
 ```
 
 4. During the game, translate the camera or access any other methods like so:
@@ -36,7 +36,7 @@ global.camera.set_interpolation_values(1/8, 1/4, 1);
 ```gml
 // example settings
 global.camera.set_start_values(room_width/2, room_height/2, 0, 1);
-global.camera.set_interpolation_values(1/8, 1/4, 1);
+global.camera.set_interpolation(1/8, 1/4, 1);
 global.camera.set_debugging(true);
 global.camera.set_shake_limits(4, 22.5, 2);
 
