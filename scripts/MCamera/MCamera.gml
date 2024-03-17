@@ -177,6 +177,22 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		__shake_reset_transform();
 	};
 	
+	/// @description	The destroy event, for cleaning up the host object, anchors and boundary. Call this before deleting / dereferencing the camera struct.
+	/// @returns		N/A
+	static destroy	= function() {
+		anchors.position	= undefined;
+		anchors.angle		= undefined;
+		anchors.zoom		= undefined;
+		boundary		= undefined;
+		
+		if (host_object == undefined)
+		{
+			return;
+		}
+		
+		instance_destroy(host_object, true);
+	};
+	
 	/// @description	The Room Start event. Enables the view for this room.
 	/// @returns		N/A
 	static room_start = function() {

@@ -15,7 +15,6 @@
     {"name":"ExampleLoader","order":3,"path":"scripts/ExampleLoader/ExampleLoader.yy",},
     {"name":"examples_init","order":3,"path":"scripts/examples_init/examples_init.yy",},
     {"name":"interpolation_utils","order":4,"path":"scripts/interpolation_utils/interpolation_utils.yy",},
-    {"name":"MCamera","order":2,"path":"scripts/MCamera/MCamera.yy",},
     {"name":"pointarray","order":1,"path":"scripts/pointarray/pointarray.yy",},
     {"name":"sprCar","order":2,"path":"sprites/sprCar/sprCar.yy",},
     {"name":"sprFinishLine","order":3,"path":"sprites/sprFinishLine/sprFinishLine.yy",},

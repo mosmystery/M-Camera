@@ -125,7 +125,7 @@ function ExampleRacer() : Example() constructor
 	/// @param {bool}	_resetting	If the race is being reset.
 	/// @returns		N/A
 	destroy	= function(_resetting = false) {
-		if (racer = undefined)
+		if (racer == undefined)
 		{
 			return;
 		}
