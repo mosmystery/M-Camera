@@ -1,6 +1,7 @@
 {
   "FolderOrderSettings":[
     {"name":"Example Racer","order":4,"path":"folders/Examples/Example Racer.yy",},
+    {"name":"Example Settings","order":5,"path":"folders/Examples/Example Settings.yy",},
     {"name":"Utilities","order":1,"path":"folders/Examples/Utilities.yy",},
     {"name":"M-Camera v0.5.0 *","order":1,"path":"folders/M-Camera v0.5.0 *.yy",},
     {"name":"Utilities","order":1,"path":"folders/M-Camera v0.5.0 */Utilities.yy",},

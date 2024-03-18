@@ -313,6 +313,8 @@ function ExampleRacer() : Example() constructor
 		return _points;
 	};
 	
+	/// @description	Returns the distance to the center of the racetrack
+	/// @returns {real}	N/A
 	static distance_to_track = function() {
 		// find nearest point (_p1)
 		
