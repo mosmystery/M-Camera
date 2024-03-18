@@ -32,7 +32,7 @@ function ExampleSettings() : Example() constructor
 	/// @description	The create event, for setting up the camera and example.
 	/// @returns		N/A
 	create	= function() {
-		array_push(buttons, new Button(64, 64, 32, 16, "Click", function(){show_debug_message("clicked")}));
+		array_push(buttons, new Button(64, 64, 64, 16, "426x180", function(){global.camera.set_size(426, 180)}));
 		
 		num_buttons = array_length(buttons);
 	};

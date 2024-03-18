@@ -997,6 +997,18 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		return pixel_scale;
 	};
 	
+	/// @description	Sets the base width and height of the camera.
+	/// @param {real}	[_width=320]		The width of the display in pixels. Recomended to be a division of the width of your desired resolution, such as 1920/6=320, to suit 1920x1080 monitor resolution.
+	/// @param {real}	[_height=180]		The height of the display in pixels. Recomended to be a division of the height of your desired resolution, such as 1080/6=180, to suit 1920x1080 monitor resolution.
+	/// @returns		N/A
+	static set_size = function(_width=320, _height=180)
+	{
+		width	= _width;
+		height	= _height;
+		
+		reset_window();
+	};
+	
 	/// @description	Gets the window, application surface, and GUi to match the internal width, height, pixel_scale and window_scale:
 	///			GUI and window of 1x size matches width*height. Window is scaled to window_scale. Application surface is scaled by pixel_scale, to give greater resolution to pixels (when at a displayable window_scale).
 	/// @returns		N/A
