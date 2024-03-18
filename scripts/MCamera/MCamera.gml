@@ -1010,7 +1010,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	};
 	
 	/// @description	Sets the scale that is applied to width*height to determine the current window size, and then resets the window to that scale.
-	/// @param {real}	[_window_scale=4]			The scale to draw the display at when in windowed mode, as a multiple of width and height.
+	/// @param {real}	[_window_scale=4]	The scale to draw the display at when in windowed mode, as a multiple of width and height.
 	/// @returns		N/A
 	static set_window_scale = function(_window_scale=4)
 	{
@@ -1018,6 +1018,25 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		
 		reset_window();
 	};
+	
+	/// @description	Sets the scale that is applied to the application surface to give more resolution to sub-pixels.
+	///			Note: With a window scale of 1x, there is only 1 pixel on the monitor dedicated to each virtual pixel, so further divisions of that virtual pixel are not visible. Therefore, divisions of each virtual pixel, caused by pixel_scale being greater than 1, are only visible when window_scale is greater than 1.
+	/// @param {real}	[_pixel_scale=1]	The width and height of each pixel, in subpixels. _window_scale needs to be >= _pixel_scale for all sub-pixels to be visible.
+	///						Examples: Pass `1` for true-to-size pixels, `2` for pixels with a resolution of 2x2 subpixels, or pass the same value as _window_scale to match the subpixel size to the actual pixel size on the display.
+	/// @returns		N/A
+	static set_pixel_scale = function(_pixel_scale=4)
+	{
+		pixel_scale	= _pixel_scale;
+		
+		reset_window();
+	};
+	
+	
+	
+	
+
+
+	
 	
 	/// @description	Gets the window, application surface, and GUi to match the internal width, height, pixel_scale and window_scale:
 	///			GUI and window of 1x size matches width*height. Window is scaled to window_scale. Application surface is scaled by pixel_scale, to give greater resolution to pixels (when at a displayable window_scale).
