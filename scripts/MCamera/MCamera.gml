@@ -168,10 +168,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 		
 		// initialise window
-		surface_resize(application_surface, width * pixel_scale, height * pixel_scale);
-		display_set_gui_size(width, height);
-		window_set_size(width * window_scale, height * window_scale);
-		window_center();
+		reset_window();
 		
 		// initialise shake
 		__shake_reset_transform();
@@ -998,6 +995,17 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static get_pixel_scale = function()
 	{
 		return pixel_scale;
+	};
+	
+	/// @description	Gets the window, application surface, and GUi to match the internal width, height, pixel_scale and window_scale:
+	///			GUI and window of 1x size matches width*height. Window is scaled to window_scale. Application surface is scaled by pixel_scale, to give greater resolution to pixels (when at a displayable window_scale).
+	/// @returns		N/A
+	static reset_window = function()
+	{
+		surface_resize(application_surface, width * pixel_scale, height * pixel_scale);
+		display_set_gui_size(width, height);
+		window_set_size(width * window_scale, height * window_scale);
+		window_center();
 	};
 	
 	
