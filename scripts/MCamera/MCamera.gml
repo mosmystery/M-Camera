@@ -1009,6 +1009,16 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		reset_window();
 	};
 	
+	/// @description	Sets the scale that is applied to width*height to determine the current window size, and then resets the window to that scale.
+	/// @param {real}	[_window_scale=4]			The scale to draw the display at when in windowed mode, as a multiple of width and height.
+	/// @returns		N/A
+	static set_window_scale = function(_window_scale=4)
+	{
+		window_scale	= _window_scale;
+		
+		reset_window();
+	};
+	
 	/// @description	Gets the window, application surface, and GUi to match the internal width, height, pixel_scale and window_scale:
 	///			GUI and window of 1x size matches width*height. Window is scaled to window_scale. Application surface is scaled by pixel_scale, to give greater resolution to pixels (when at a displayable window_scale).
 	/// @returns		N/A
