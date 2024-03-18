@@ -965,6 +965,43 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
+		  //////////////
+		 // resizing //
+		//////////////
+	
+	
+	
+	/// @description	Gets the base width of the camera, prior any scaling.
+	/// @returns		N/A
+	static get_width = function()
+	{
+		return width;
+	};
+	
+	/// @description	Gets the base height of the camera, prior any scaling.
+	/// @returns		N/A
+	static get_height = function()
+	{
+		return height;
+	};
+	
+	/// @description	Gets the scale that is applied to width*height to determine the current window size.
+	/// @returns		N/A
+	static get_window_scale = function()
+	{
+		return window_scale;
+	};
+	
+	/// @description	Gets the scale that is applied to the application surface to give more resolution to sub-pixels.
+	///			Note: With a window scale of 1x, there is only 1 pixel on the monitor dedicated to each virtual pixel, so further divisions of that virtual pixel are not visible. Therefore, divisions of each virtual pixel, caused by pixel_scale being greater than 1, are only visible when window_scale is greater than 1.
+	/// @returns		N/A
+	static get_pixel_scale = function()
+	{
+		return pixel_scale;
+	};
+	
+	
+	
 		  /////////////
 		 // utility //
 		/////////////
