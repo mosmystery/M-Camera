@@ -141,15 +141,15 @@ function ExampleLoader() constructor
 			
 			draw_set_colour(c_black);
 			draw_set_valign(fa_bottom);
-			draw_text(_margin-1, global.camera.height-_margin+1, _global_text);
-			draw_text(_margin, global.camera.height-_margin+1, _global_text);
+			draw_text(_margin-1, global.camera.get_height()-_margin+1, _global_text);
+			draw_text(_margin, global.camera.get_height()-_margin+1, _global_text);
 			draw_set_valign(fa_top);
 			draw_text(_margin-1, _margin+1, _local_text);
 			draw_text(_margin, _margin+1, _local_text);
 			
 			draw_set_colour(c_dkgrey);
 			draw_set_valign(fa_bottom);
-			draw_text(_margin, global.camera.height-_margin, _global_text);
+			draw_text(_margin, global.camera.get_height()-_margin, _global_text);
 			draw_set_valign(fa_top);
 			draw_text(_margin, _margin, _local_text);
 		}

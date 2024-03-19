@@ -472,8 +472,8 @@ function ExampleRacer() : Example() constructor
 		draw_circle_color(_halfsize+(racer.x*minimap_scale), _halfsize+(racer.y*minimap_scale), 2, c_yellow, c_yellow, false);
 		
 		// draw surface
-		var _minimap_x	= global.camera.width-_size;
-		var _minimap_y	= global.camera.height-_size;
+		var _minimap_x	= global.camera.get_width()-_size;
+		var _minimap_y	= global.camera.get_height()-_size;
 		
 		surface_reset_target();
 		draw_surface(minimap_surface,_minimap_x-_halfsize, _minimap_y-_halfsize);
@@ -496,19 +496,19 @@ function ExampleRacer() : Example() constructor
 			var _prev_valign	= draw_get_valign();
 			
 			var _size		= (track_radius * minimap_scale) * 2;
-			var _minimap_x		= global.camera.width-_size;
-			var _minimap_y		= global.camera.height-_size;
+			var _minimap_x		= global.camera.get_width()-_size;
+			var _minimap_y		= global.camera.get_height()-_size;
 			
 			// time
 			draw_set_valign(fa_bottom);
 			draw_set_halign(fa_middle);
 			
 			draw_set_color(c_black);
-			draw_text(_minimap_x-1, (global.camera.height-8)+1, _time_string);
-			draw_text(_minimap_x, (global.camera.height-8)+1, _time_string);
+			draw_text(_minimap_x-1, (global.camera.get_height()-8)+1, _time_string);
+			draw_text(_minimap_x, (global.camera.get_height()-8)+1, _time_string);
 			
 			draw_set_color($CCCCCC);
-			draw_text(_minimap_x, global.camera.height-8, _time_string);
+			draw_text(_minimap_x, global.camera.get_height()-8, _time_string);
 			
 			// best time
 			draw_set_valign(fa_top);
@@ -543,8 +543,8 @@ function ExampleRacer() : Example() constructor
 		var _needle_length	= 5;
 		var _guage_ends_length	= 5;
 		
-		var _minimap_x		= global.camera.width - _minimap_size;
-		var _minimap_y		= global.camera.height - _minimap_size;
+		var _minimap_x		= global.camera.get_width() - _minimap_size;
+		var _minimap_y		= global.camera.get_height() - _minimap_size;
 		
 		var _gear		= ceil(racer.torque);
 		var _gear_str		= (_gear >= 1) ? string(_gear) : ((racer.torque == 0) ? "P" : "R");
@@ -637,7 +637,7 @@ function ExampleRacer() : Example() constructor
 		
 		// draw surface
 		surface_reset_target();
-		draw_surface(speedo_surface, (global.camera.width/2) - _speedometer_radius, global.camera.height - _speedometer_size - 2);
+		draw_surface(speedo_surface, (global.camera.get_width()/2) - _speedometer_radius, global.camera.get_height() - _speedometer_size - 2);
 		
 		// reset align
 		draw_set_halign(_prev_halign);

@@ -1031,13 +1031,6 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		reset_window();
 	};
 	
-	
-	
-	
-
-
-	
-	
 	/// @description	Gets the window, application surface, and GUi to match the internal width, height, pixel_scale and window_scale:
 	///			GUI and window of 1x size matches width*height. Window is scaled to window_scale. Application surface is scaled by pixel_scale, to give greater resolution to pixels (when at a displayable window_scale).
 	/// @returns		N/A
