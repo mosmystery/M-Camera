@@ -1128,26 +1128,16 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		debug.active = _is_debugging;
 	};
 	
-	/// @description	Finds the x position of the mouse on the GUI. Useful for drawing a mouse cursor to the GUI.
+	/// @description	Finds the x position of the mouse on the GUI, rounded to the nearest pixel. Useful for drawing a mouse cursor to the GUI.
 	/// @returns {real}	Returns an x position relative to the GUI.
 	static find_gui_mouse_x = function() {
-		if (window_get_fullscreen())
-		{
-			return find_gui_position(mouse_x, mouse_y).x;
-		}
-		
-		return window_mouse_get_x() / window_scale;
+		return round_towards(window_mouse_get_x() / window_scale, -infinity);
 	};
 	
-	/// @description	Finds the y position of the mouse on the GUI. Useful for drawing a mouse cursor to the GUI.
+	/// @description	Finds the y position of the mouse on the GUI, rounded to the nearest pixel. Useful for drawing a mouse cursor to the GUI.
 	/// @returns {real}	Returns an y position relative to the GUI.
 	static find_gui_mouse_y = function() {
-		if (window_get_fullscreen())
-		{
-			return find_gui_position(mouse_x, mouse_y).y;
-		}
-		
-		return window_mouse_get_y() / window_scale;
+		return round_towards(window_mouse_get_y() / window_scale, -infinity);
 	};
 	
 	/// @description	Converts an x,y position in the world to co-ordinates on the GUI and returns it in a struct. Useful for drawing tracking icons on the GUI.
