@@ -186,10 +186,13 @@ function ExampleSettings() : Example() constructor
 			gui_center_x	= global.camera.get_width() / 2;
 			gui_center_y	= global.camera.get_height() / 2;
 			
+			var _view_x	= global.camera.view_x();
+			var _view_y	= global.camera.view_y();
+			
 			// buttons
 			for (var i = 0; i < num_buttons; i++)
 			{
-				buttons[i].step(gui_center_x + x, gui_center_y + y + (i*line_height), line_width, line_height);
+				buttons[i].step(_view_x + gui_center_x + x, _view_y + gui_center_y + y + (i*line_height), line_width, line_height);
 			}
 		};
 		
