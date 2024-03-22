@@ -12,8 +12,12 @@ function ExampleSettings() : Example() constructor
 	name		= "Settings Example";
 	ui_text		= "Mouse L: click";
 	
+	sections	= [];
+	num_sections	= 0;
+	
 	buttons		= [];
 	num_buttons	= 0;
+	
 	
 	
 	
@@ -32,14 +36,58 @@ function ExampleSettings() : Example() constructor
 	/// @description	The create event, for setting up the camera and example.
 	/// @returns		N/A
 	create	= function() {
-		array_push(buttons, new Button(64, 64, 64, 16, "426x180", function(){global.camera.set_size(426, 180)}));
+		// sections
+		var _line_width		= 96;
+		var _line_height	= 10;
 		
-		num_buttons = array_length(buttons);
+		var _x			= -(_line_width/2);
+		
+		sections		= [
+			new Section(_x, -(_line_height * 7), _line_width, _line_height, "Base Resolution", [
+				new Button(0, 0, 0, 0, "240x180 (3:4)",  function(){global.camera.set_size(240, 180)}, function(){return global.camera.get_width() == 240}),
+				new Button(0, 0, 0, 0, "320x180 (16:9)", function(){global.camera.set_size(320, 180)}, function(){return global.camera.get_width() == 320}),
+				new Button(0, 0, 0, 0, "426x180 (21:9)", function(){global.camera.set_size(426, 180)}, function(){return global.camera.get_width() == 426})
+			]),
+			new Section(_x, -(_line_height * 2), _line_width, _line_height, "Window Scale", [
+				new Button(0, 0, 0, 0, "1", function(){global.camera.set_window_scale(1)}, function(){return global.camera.get_window_scale() == 1}),
+				new Button(0, 0, 0, 0, "2", function(){global.camera.set_window_scale(2)}, function(){return global.camera.get_window_scale() == 2}),
+				new Button(0, 0, 0, 0, "4", function(){global.camera.set_window_scale(4)}, function(){return global.camera.get_window_scale() == 4}),
+				new Button(0, 0, 0, 0, "6", function(){global.camera.set_window_scale(6)}, function(){return global.camera.get_window_scale() == 6})
+			]),
+			new Section(_x, _line_height * 4, _line_width, _line_height, "Subpixels per Pixel", [
+				new Button(0, 0, 0, 0, "1x1", function(){global.camera.set_pixel_scale(1)}, function(){return global.camera.get_pixel_scale() == 1}),
+				new Button(0, 0, 0, 0, "2x2", function(){global.camera.set_pixel_scale(2)}, function(){return global.camera.get_pixel_scale() == 2}),
+				new Button(0, 0, 0, 0, "3x3", function(){global.camera.set_pixel_scale(3)}, function(){return global.camera.get_pixel_scale() == 3}),
+				new Button(0, 0, 0, 0, "4x4", function(){global.camera.set_pixel_scale(4)}, function(){return global.camera.get_pixel_scale() == 4})
+			])
+		];
+		
+		num_sections	= array_length(sections);
+		
+		// standalone buttons
+		
+		buttons		= [];
+		
+		num_buttons	= array_length(buttons);
 	};
 	
 	/// @description	The destroy event, for cleaning up the example.
 	/// @returns		N/A
 	destroy	= function() {
+		// sections
+		for (var i = 0; i < num_sections; i++)
+		{
+			sections[i].destroy();
+			
+			delete sections[i];
+			
+			sections[i] = undefined;
+		}
+		
+		sections	= [];
+		num_sections	= 0;
+		
+		// buttons
 		for (var i = 0; i < num_buttons; i++)
 		{
 			delete buttons[i];
@@ -47,12 +95,20 @@ function ExampleSettings() : Example() constructor
 			buttons[i] = undefined;
 		}
 		
-		buttons	= [];
+		buttons		= [];
+		num_buttons	= 0;
 	};
 	
 	/// @description	The step event, for code that needs to run every frame.
 	/// @returns		N/A
 	step	= function() {
+		// sections
+		for (var i = 0; i < num_sections; i++)
+		{
+			sections[i].step();
+		}
+		
+		// buttons
 		for (var i = 0; i < num_buttons; i++)
 		{
 			buttons[i].step();
@@ -62,15 +118,25 @@ function ExampleSettings() : Example() constructor
 	/// @description	The draw event, for drawing the example.
 	/// @returns		N/A
 	draw	= function() {
-		for (var i = 0; i < num_buttons; i++)
-		{
-			buttons[i].draw();
-		}
+		
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
 	/// @returns		N/A
 	draw_gui = function() {
+		// sections
+		for (var i = 0; i < num_sections; i++)
+		{
+			sections[i].draw();
+		}
+		
+		// buttons
+		for (var i = 0; i < num_buttons; i++)
+		{
+			buttons[i].draw();
+		}
+		
+		// cursor
 		draw_sprite(sprMouse, 0, global.camera.find_gui_mouse_x(), global.camera.find_gui_mouse_y());
 	};
 	
@@ -82,28 +148,120 @@ function ExampleSettings() : Example() constructor
 	
 	
 	
+	/// @description		A section of UI settings
+	/// @param {real}		_x		The x co-ordinate of the top-left of the first button, relative to the center of the gui.
+	/// @param {real}		_y		The y co-ordinate of the top_left of the first button, relative to the center of the gui.
+	/// @param {real}		_line_width	The max width of each button.
+	/// @param {real}		_line_height	The height of each 
+	/// @param {string}		_name		The name of the section.
+	/// @returns {struct.Button}
+	static Section = function(_x, _y, _line_width, _line_height, _name="Section", _buttons=[]) constructor {
+		name		= _name;
+		x		= _x;
+		y		= _y;
+		buttons		= _buttons;
+		num_buttons	= array_length(buttons);
+		
+		line_width	= _line_width
+		line_height	= _line_height;
+		
+		outline_padding	= line_height / 2;
+		
+		gui_center_x	= 0;	// automatically updated in .step()
+		gui_center_y	= 0;
+		
+		static destroy = function() {
+			for (var i = 0; i < num_buttons; i++)
+			{
+				delete buttons[i];
+			
+				buttons[i] = undefined;
+			}
+		
+			buttons		= [];
+			num_buttons	= 0;
+		};
+		
+		static step = function() {
+			gui_center_x	= global.camera.get_width() / 2;
+			gui_center_y	= global.camera.get_height() / 2;
+			
+			// buttons
+			for (var i = 0; i < num_buttons; i++)
+			{
+				buttons[i].step(gui_center_x + x, gui_center_y + y + (i*line_height), line_width, line_height);
+			}
+		};
+		
+		static draw = function() {
+			var _x		= gui_center_x + x;
+			var _y		= gui_center_y + y;
+			
+			var _x1		= _x - outline_padding;
+			var _y1		= _y - outline_padding;
+			var _x2		= _x + line_width + outline_padding;
+			var _y2		= _y + (line_height * num_buttons) + outline_padding;
+			
+			// outline
+			draw_set_color(c_white);
+			draw_rectangle(_x1, _y1, _x2, _y2, false);
+			
+			draw_set_color(c_black);
+			draw_rectangle(_x1 + 1, _y1 + 1, _x2 - 1, _y2 - 1, false);
+			
+			// heading
+			var _text_width = string_width(name);
+			var _text_height = string_height(name);
+			
+			var _reset_halign	= draw_get_halign();
+			var _reset_valign	= draw_get_valign();
+			
+			draw_set_halign(fa_left);
+			draw_set_valign(fa_bottom);
+			
+			draw_set_color(c_black);
+			draw_rectangle(_x - 1, _y - _text_height, _x + _text_width + 1, _y, false);
+			
+			draw_set_color(c_white);
+			draw_text(_x, _y, name);
+			
+			draw_set_halign(_reset_halign);
+			draw_set_valign(_reset_valign);
+			
+			// buttons
+			for (var i = 0; i < num_buttons; i++)
+			{
+				buttons[i].draw(_x, _y + (i*line_height), line_width, line_height);
+			}
+		};
+	};
+	
 	/// @description		A UI button to click.
-	/// @param {real}		_x		The x co-ordinate of the button.
-	/// @param {real}		_y		The y co-ordinate of the button.
+	/// @param {real}		_x		The x co-ordinate of the button. If button part of a section, then relative to its place in the section. (See .Section())
+	/// @param {real}		_y		The y co-ordinate of the button. If button part of a section, then relative to its place in the section. (See .Section())
 	/// @param {real}		_width		The width of the button.
 	/// @param {real}		_height		The height of the button.
 	/// @param {string}		_text		The text on the button.
 	/// @param {function}		_fn_click	The function to call when the button is clicked.
+	/// @param {function}		_fn_active	The function to check whether the button is visually active or not. For example, if the screen is currently 360x180, then that button may appear active.
 	/// @returns {struct.Button}
-	static Button = function(_x, _y, _width, _height, _text="Click me", _fn_click=function(){}) constructor {
+	static Button = function(_x, _y, _width, _height, _text="Button", _fn_click=function(){}, _fn_active=function(){return true}) constructor {
 		x		= _x;
 		y		= _y;
 		width		= _width;
 		height		= _height;
 		text		= _text;
 		fn_click	= _fn_click;
+		fn_active	= _fn_active;
 		
 		state		= 0;
 		hover		= false;
+		active		= false;
 		
-		static step = function() {
+		static step = function(_x = x, _y = y, _width = width, _height = height) {
 			state	= mouse_check_button(mb_left) + mouse_check_button_pressed(mb_left) - mouse_check_button_released(mb_left);	// -1 = released, 0 = none, 1 = held, 2 = pressed
-			hover	= (mouse_x == clamp(mouse_x, x, x+width)) && (mouse_y == clamp(mouse_y, y, y+height));
+			hover	= (mouse_x == clamp(mouse_x, _x, _x+(_width-1))) && (mouse_y == clamp(mouse_y, _y, _y+(_height-1)));
+			active	= fn_active();
 			
 			if (state == 2 && hover)
 			{
@@ -111,29 +269,31 @@ function ExampleSettings() : Example() constructor
 			}
 		};
 		
-		static draw = function() {
+		static draw = function(_x = x, _y = y, _width = width, _height = height) {
 			var _reset_halign	= draw_get_halign();
 			var _reset_valign	= draw_get_valign();
-			var _y_offset		= hover ? real(state>=1)*2 : 0;
+			
+			var _x1		= _x;
+			var _y1		= _y;
+			var _x2		= _x + _width;
+			var _y2		= _y + _height;
 			
 			draw_set_halign(fa_center);
 			draw_set_valign(fa_middle);
-			
-			// hole
-			draw_set_color(c_grey);
-			draw_rectangle(x, y+2, x+width, y+height+2, true);
-			
-			// button rect
-			draw_set_color(hover ? $CCCCCC : c_dkgrey);
-			draw_rectangle(x, y+_y_offset, x+width, y+height+_y_offset, false);
-			
-			// button outline
-			draw_set_color($CCCCCC);
-			draw_rectangle(x, y+_y_offset, x+width, y+height+_y_offset, true);
+						
+			// hover rect
+			if (hover)
+			{
+				draw_set_color(c_white);
+				draw_rectangle(_x1, _y1, _x2, _y2, false);
+				
+				draw_set_color(c_black);
+				draw_rectangle(_x1 + 1, _y1 + 1, _x2 - 1, _y2 - 1, false);
+			}
 			
 			// text
-			draw_set_color(hover ? c_black : c_grey);
-			draw_text(x+(width/2), y+(height/2)+_y_offset, text);
+			draw_set_color(active ? c_white : c_dkgrey);
+			draw_text(_x+(_width/2), _y+(_height/2)+1, text);
 			
 			draw_set_halign(_reset_halign);
 			draw_set_valign(_reset_valign);

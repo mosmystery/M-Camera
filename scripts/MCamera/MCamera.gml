@@ -968,14 +968,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
-	/// @description	Gets the base width of the camera, prior any scaling.
+	/// @description	Gets the base width of the camera, prior any scaling. See set_size() to set width or height.
 	/// @returns {real}
 	static get_width = function()
 	{
 		return width;
 	};
 	
-	/// @description	Gets the base height of the camera, prior any scaling.
+	/// @description	Gets the base height of the camera, prior any scaling. See set_size() to set width or height.
 	/// @returns {real}
 	static get_height = function()
 	{

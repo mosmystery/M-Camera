@@ -19,5 +19,5 @@ function examples_init()
 	
 	global.loader.install(new ExampleSettings());	// Install example settings.
 	global.loader.install(new ExampleEditor());	// Install example editor.
-	global.loader.install(new ExampleRacer());	// Install example racer.
+	global.loader.install(new ExampleRacer());	// Install example racer.	
 }
