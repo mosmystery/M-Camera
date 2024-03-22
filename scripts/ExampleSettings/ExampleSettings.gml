@@ -18,8 +18,10 @@ function ExampleSettings() : Example() constructor
 	buttons		= [];
 	num_buttons	= 0;
 	
-	time		= 0;	// timer for drawing moving shapes, to showcase pixel_scale
-	loop_frame	= 600;	// how many frames afterwhich to loop time
+	time		= 0;		// timer for drawing moving shapes, to showcase pixel_scale
+	loop_frame	= 600;		// how many frames afterwhich to loop time
+	
+	match_scales	= false;	// whether to match Subpixels per Pixel to the Window Scale (true) or not (false)
 	
 	
 	
@@ -51,16 +53,16 @@ function ExampleSettings() : Example() constructor
 				new Button(0, 0, 0, 0, "426x180 (21:9)", function(){global.camera.set_size(426, 180)}, function(){return global.camera.get_width() == 426})
 			]),
 			new Section(_x, -(_line_height * 2), _line_width, _line_height, "Window Scale", [
-				new Button(0, 0, 0, 0, "1", function(){global.camera.set_window_scale(1)}, function(){return global.camera.get_window_scale() == 1}),
-				new Button(0, 0, 0, 0, "2", function(){global.camera.set_window_scale(2)}, function(){return global.camera.get_window_scale() == 2}),
-				new Button(0, 0, 0, 0, "4", function(){global.camera.set_window_scale(4)}, function(){return global.camera.get_window_scale() == 4}),
-				new Button(0, 0, 0, 0, "6", function(){global.camera.set_window_scale(6)}, function(){return global.camera.get_window_scale() == 6})
+				new Button(0, 0, 0, 0, "1", function(){global.camera.set_window_scale(1); if (match_scales){global.camera.set_pixel_scale(1)}}, function(){return global.camera.get_window_scale() == 1}),
+				new Button(0, 0, 0, 0, "2", function(){global.camera.set_window_scale(2); if (match_scales){global.camera.set_pixel_scale(2)}}, function(){return global.camera.get_window_scale() == 2}),
+				new Button(0, 0, 0, 0, "4", function(){global.camera.set_window_scale(4); if (match_scales){global.camera.set_pixel_scale(4)}}, function(){return global.camera.get_window_scale() == 4}),
+				new Button(0, 0, 0, 0, "6", function(){global.camera.set_window_scale(6); if (match_scales){global.camera.set_pixel_scale(6)}}, function(){return global.camera.get_window_scale() == 6})
 			]),
 			new Section(_x, _line_height * 4, _line_width, _line_height, "Subpixels per Pixel", [
-				new Button(0, 0, 0, 0, "1x1", function(){global.camera.set_pixel_scale(1)}, function(){return global.camera.get_pixel_scale() == 1}),
-				new Button(0, 0, 0, 0, "2x2", function(){global.camera.set_pixel_scale(2)}, function(){return global.camera.get_pixel_scale() == 2}),
-				new Button(0, 0, 0, 0, "3x3", function(){global.camera.set_pixel_scale(3)}, function(){return global.camera.get_pixel_scale() == 3}),
-				new Button(0, 0, 0, 0, "Window Scale", function(){global.camera.set_pixel_scale(global.camera.get_window_scale())}, function(){return global.camera.get_pixel_scale() == global.camera.get_window_scale()})
+				new Button(0, 0, 0, 0, "1x1", function(){match_scales = false; global.camera.set_pixel_scale(1)}, function(){return global.camera.get_pixel_scale() == 1}),
+				new Button(0, 0, 0, 0, "2x2", function(){match_scales = false; global.camera.set_pixel_scale(2)}, function(){return global.camera.get_pixel_scale() == 2}),
+				new Button(0, 0, 0, 0, "3x3", function(){match_scales = false; global.camera.set_pixel_scale(3)}, function(){return global.camera.get_pixel_scale() == 3}),
+				new Button(0, 0, 0, 0, "Window Scale", function(){match_scales = true; global.camera.set_pixel_scale(global.camera.get_window_scale())}, function(){return global.camera.get_pixel_scale() == global.camera.get_window_scale()})
 			])
 		];
 		
