@@ -18,6 +18,8 @@ function ExampleSettings() : Example() constructor
 	buttons		= [];
 	num_buttons	= 0;
 	
+	time		= 0;	// timer for drawing moving shapes, to showcase pixel_scale
+	loop_frame	= 600;	// how many frames afterwhich to loop time
 	
 	
 	
@@ -44,7 +46,7 @@ function ExampleSettings() : Example() constructor
 		
 		sections		= [
 			new Section(_x, -(_line_height * 7), _line_width, _line_height, "Base Resolution", [
-				new Button(0, 0, 0, 0, "240x180 (3:4)",  function(){global.camera.set_size(240, 180)}, function(){return global.camera.get_width() == 240}),
+				new Button(0, 0, 0, 0, "240x180 (4:3)",  function(){global.camera.set_size(240, 180)}, function(){return global.camera.get_width() == 240}),
 				new Button(0, 0, 0, 0, "320x180 (16:9)", function(){global.camera.set_size(320, 180)}, function(){return global.camera.get_width() == 320}),
 				new Button(0, 0, 0, 0, "426x180 (21:9)", function(){global.camera.set_size(426, 180)}, function(){return global.camera.get_width() == 426})
 			]),
@@ -102,6 +104,8 @@ function ExampleSettings() : Example() constructor
 	/// @description	The step event, for code that needs to run every frame.
 	/// @returns		N/A
 	step	= function() {
+		time = (time + 1) % loop_frame;
+		
 		// sections
 		for (var i = 0; i < num_sections; i++)
 		{
@@ -118,7 +122,21 @@ function ExampleSettings() : Example() constructor
 	/// @description	The draw event, for drawing the example.
 	/// @returns		N/A
 	draw	= function() {
+		var _t	= time / loop_frame; // time, normalised
 		
+		// shapes for demonstrating pixel_scale
+		var _world_center_x	= global.camera.view_x() + (global.camera.get_width() / 2);
+		var _world_center_y	= global.camera.view_y() + (global.camera.get_height() / 2);
+		
+		var _demo_center_x	= _world_center_x + 86;
+		var _demo_center_y	= _world_center_y;
+		
+		// circles
+		for (var i = 1; i <= 10; i++)
+		{
+			draw_set_colour(c_dkgrey);
+			draw_circle(_demo_center_x, i * 16, i, false);
+		}
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
