@@ -60,7 +60,7 @@ function ExampleSettings() : Example() constructor
 				new Button(0, 0, 0, 0, "1x1", function(){global.camera.set_pixel_scale(1)}, function(){return global.camera.get_pixel_scale() == 1}),
 				new Button(0, 0, 0, 0, "2x2", function(){global.camera.set_pixel_scale(2)}, function(){return global.camera.get_pixel_scale() == 2}),
 				new Button(0, 0, 0, 0, "3x3", function(){global.camera.set_pixel_scale(3)}, function(){return global.camera.get_pixel_scale() == 3}),
-				new Button(0, 0, 0, 0, "4x4", function(){global.camera.set_pixel_scale(4)}, function(){return global.camera.get_pixel_scale() == 4})
+				new Button(0, 0, 0, 0, "Window Scale", function(){global.camera.set_pixel_scale(global.camera.get_window_scale())}, function(){return global.camera.get_pixel_scale() == global.camera.get_window_scale()})
 			])
 		];
 		
