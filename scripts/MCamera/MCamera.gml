@@ -968,6 +968,18 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
+	/// @description	Returns the camera's x co-ordinate, equivalent to the center of the screen.
+	/// @returns {real}	Returns the camera's x co-ordinate, equivalent to the center of the screen.
+	static get_x = function() {
+		return x;
+	};
+	
+	/// @description	Returns the camera's y co-ordinate, equivalent to the center of the screen.
+	/// @returns {real}	Returns the camera's y co-ordinate, equivalent to the center of the screen.
+	static get_y = function() {
+		return y;
+	};
+	
 	/// @description	Gets the base width of the camera, prior any scaling. See set_size() to set width or height.
 	/// @returns {real}
 	static get_width = function()
