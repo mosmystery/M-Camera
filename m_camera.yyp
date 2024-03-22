@@ -43,6 +43,7 @@
     {"id":{"name":"range_operations","path":"scripts/range_operations/range_operations.yy",},},
     {"id":{"name":"rounding","path":"scripts/rounding/rounding.yy",},},
     {"id":{"name":"sprBlock","path":"sprites/sprBlock/sprBlock.yy",},},
+    {"id":{"name":"sprGuy","path":"sprites/sprGuy/sprGuy.yy",},},
     {"id":{"name":"sprCar","path":"sprites/sprCar/sprCar.yy",},},
     {"id":{"name":"sprFinishLine","path":"sprites/sprFinishLine/sprFinishLine.yy",},},
     {"id":{"name":"sprMouse","path":"sprites/sprMouse/sprMouse.yy",},},

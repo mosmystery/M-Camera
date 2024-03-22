@@ -19,7 +19,7 @@ function ExampleSettings() : Example() constructor
 	num_buttons	= 0;
 	
 	time		= 0;		// timer for drawing moving shapes, to showcase pixel_scale
-	loop_frame	= 600;		// how many frames afterwhich to loop time
+	loop_frame	= 300;		// how many frames afterwhich to loop time
 	
 	match_scales	= false;	// whether to match Subpixels per Pixel to the Window Scale (true) or not (false)
 	
@@ -137,8 +137,16 @@ function ExampleSettings() : Example() constructor
 		for (var i = 1; i <= 10; i++)
 		{
 			draw_set_colour(c_dkgrey);
-			draw_circle(_demo_center_x, i * 16, i, false);
+			draw_circle(_demo_center_x, (_demo_center_y - (16*5)) + (i * 16), i, false);
 		}
+		
+		// guy on tiles
+		for (var i = -3; i <= 3; i++)
+		{
+			draw_sprite(sprBlock, 0, (_demo_center_x - 4) + (i*8), _demo_center_y);
+		}
+		
+		draw_sprite(sprGuy, 0, (_demo_center_x - 4) + (sin(degtorad(_t * 360)) * 16), _demo_center_y - 8)
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
