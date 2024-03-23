@@ -15,9 +15,6 @@ function ExampleSettings() : Example() constructor
 	sections	= [];
 	num_sections	= 0;
 	
-	buttons		= [];
-	num_buttons	= 0;
-	
 	time		= 0;		// timer for drawing moving shapes, to showcase pixel_scale
 	loop_frame	= 600;		// how many frames afterwhich to loop time
 	
@@ -48,31 +45,25 @@ function ExampleSettings() : Example() constructor
 		
 		sections		= [
 			new Section(_x, -(_line_height * 7), _line_width, _line_height, "Base Resolution", [
-				new Button(0, 0, 0, 0, "240x180 (4:3)",  function(){global.camera.set_size(240, 180)}, function(){return global.camera.get_width() == 240}),
-				new Button(0, 0, 0, 0, "320x180 (16:9)", function(){global.camera.set_size(320, 180)}, function(){return global.camera.get_width() == 320}),
-				new Button(0, 0, 0, 0, "426x180 (21:9)", function(){global.camera.set_size(426, 180)}, function(){return global.camera.get_width() == 426})
+				new Button("240x180 (4:3)",  function(){global.camera.set_size(240, 180)}, function(){return global.camera.get_width() == 240}),
+				new Button("320x180 (16:9)", function(){global.camera.set_size(320, 180)}, function(){return global.camera.get_width() == 320}),
+				new Button("426x180 (21:9)", function(){global.camera.set_size(426, 180)}, function(){return global.camera.get_width() == 426})
 			]),
 			new Section(_x, -(_line_height * 2), _line_width, _line_height, "Window Scale", [
-				new Button(0, 0, 0, 0, "1", function(){global.camera.set_window_scale(1); if (match_scales){global.camera.set_pixel_scale(1)}}, function(){return global.camera.get_window_scale() == 1}),
-				new Button(0, 0, 0, 0, "2", function(){global.camera.set_window_scale(2); if (match_scales){global.camera.set_pixel_scale(2)}}, function(){return global.camera.get_window_scale() == 2}),
-				new Button(0, 0, 0, 0, "4", function(){global.camera.set_window_scale(4); if (match_scales){global.camera.set_pixel_scale(4)}}, function(){return global.camera.get_window_scale() == 4}),
-				new Button(0, 0, 0, 0, "6", function(){global.camera.set_window_scale(6); if (match_scales){global.camera.set_pixel_scale(6)}}, function(){return global.camera.get_window_scale() == 6})
+				new Button("1", function(){global.camera.set_window_scale(1); if (match_scales){global.camera.set_pixel_scale(1)}}, function(){return global.camera.get_window_scale() == 1}),
+				new Button("2", function(){global.camera.set_window_scale(2); if (match_scales){global.camera.set_pixel_scale(2)}}, function(){return global.camera.get_window_scale() == 2}),
+				new Button("4", function(){global.camera.set_window_scale(4); if (match_scales){global.camera.set_pixel_scale(4)}}, function(){return global.camera.get_window_scale() == 4}),
+				new Button("6", function(){global.camera.set_window_scale(6); if (match_scales){global.camera.set_pixel_scale(6)}}, function(){return global.camera.get_window_scale() == 6})
 			]),
 			new Section(_x, _line_height * 4, _line_width, _line_height, "Subpixels per Pixel", [
-				new Button(0, 0, 0, 0, "1x1", function(){match_scales = false; global.camera.set_pixel_scale(1)}, function(){return global.camera.get_pixel_scale() == 1}),
-				new Button(0, 0, 0, 0, "2x2", function(){match_scales = false; global.camera.set_pixel_scale(2)}, function(){return global.camera.get_pixel_scale() == 2}),
-				new Button(0, 0, 0, 0, "3x3", function(){match_scales = false; global.camera.set_pixel_scale(3)}, function(){return global.camera.get_pixel_scale() == 3}),
-				new Button(0, 0, 0, 0, "Window Scale", function(){match_scales = true; global.camera.set_pixel_scale(global.camera.get_window_scale())}, function(){return global.camera.get_pixel_scale() == global.camera.get_window_scale()})
+				new Button("1x1", function(){match_scales = false; global.camera.set_pixel_scale(1)}, function(){return global.camera.get_pixel_scale() == 1}),
+				new Button("2x2", function(){match_scales = false; global.camera.set_pixel_scale(2)}, function(){return global.camera.get_pixel_scale() == 2}),
+				new Button("3x3", function(){match_scales = false; global.camera.set_pixel_scale(3)}, function(){return global.camera.get_pixel_scale() == 3}),
+				new Button("Window Scale", function(){match_scales = true; global.camera.set_pixel_scale(global.camera.get_window_scale())}, function(){return global.camera.get_pixel_scale() == global.camera.get_window_scale()})
 			])
 		];
 		
 		num_sections	= array_length(sections);
-		
-		// standalone buttons
-		
-		buttons		= [];
-		
-		num_buttons	= array_length(buttons);
 	};
 	
 	/// @description	The destroy event, for cleaning up the example.
@@ -90,17 +81,6 @@ function ExampleSettings() : Example() constructor
 		
 		sections	= [];
 		num_sections	= 0;
-		
-		// buttons
-		for (var i = 0; i < num_buttons; i++)
-		{
-			delete buttons[i];
-			
-			buttons[i] = undefined;
-		}
-		
-		buttons		= [];
-		num_buttons	= 0;
 	};
 	
 	/// @description	The step event, for code that needs to run every frame.
@@ -112,12 +92,6 @@ function ExampleSettings() : Example() constructor
 		for (var i = 0; i < num_sections; i++)
 		{
 			sections[i].step();
-		}
-		
-		// buttons
-		for (var i = 0; i < num_buttons; i++)
-		{
-			buttons[i].step();
 		}
 	};
 	
@@ -165,12 +139,6 @@ function ExampleSettings() : Example() constructor
 		for (var i = 0; i < num_sections; i++)
 		{
 			sections[i].draw();
-		}
-		
-		// buttons
-		for (var i = 0; i < num_buttons; i++)
-		{
-			buttons[i].draw();
 		}
 		
 		// cursor
@@ -277,19 +245,15 @@ function ExampleSettings() : Example() constructor
 	};
 	
 	/// @description		A UI button to click.
-	/// @param {real}		_x		The x co-ordinate of the button. If button part of a section, then relative to its place in the section. (See .Section())
-	/// @param {real}		_y		The y co-ordinate of the button. If button part of a section, then relative to its place in the section. (See .Section())
-	/// @param {real}		_width		The width of the button.
-	/// @param {real}		_height		The height of the button.
 	/// @param {string}		_text		The text on the button.
 	/// @param {function}		_fn_click	The function to call when the button is clicked.
 	/// @param {function}		_fn_active	The function to check whether the button is visually active or not. For example, if the screen is currently 360x180, then that button may appear active.
 	/// @returns {struct.Button}
-	static Button = function(_x, _y, _width, _height, _text="Button", _fn_click=function(){}, _fn_active=function(){return true}) constructor {
-		x		= _x;
-		y		= _y;
-		width		= _width;
-		height		= _height;
+	static Button = function(_text="Button", _fn_click=function(){}, _fn_active=function(){return true}) constructor {
+		x		= 0;	// The x co-ordinate of the button. If button part of a section, then relative to its place in the section. (See .Section())
+		y		= 0;	// The y co-ordinate of the button. If button part of a section, then relative to its place in the section. (See .Section())
+		width		= 0;
+		height		= 0;
 		text		= _text;
 		fn_click	= _fn_click;
 		fn_active	= _fn_active;
