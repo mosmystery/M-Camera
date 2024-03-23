@@ -131,11 +131,17 @@ function ExampleSettings() : Example() constructor
 		var _demo_center_y	= global.camera.get_y();
 		
 		// circles
+		draw_set_colour(c_dkgrey);
+		
 		for (var i = 1; i <= 10; i++)
 		{
-			draw_set_colour(c_dkgrey);
 			draw_circle(_demo_center_x, (_demo_center_y - (16*5.5)) + (i * 16), i, false);
 		}
+		
+		// scaling tile
+		var _scale = 1.5 + (cos(degtorad((_t*2) * 360)) * 0.5);
+		
+		draw_sprite_ext(sprBlock, 0, (_demo_center_x - 3) - ((_scale-1)*4), (_demo_center_y - 43) - ((_scale-1)*4), _scale, _scale, 0, c_white, 1);
 		
 		// guy on tiles
 		for (var i = -3; i <= 3; i++)
