@@ -126,27 +126,24 @@ function ExampleSettings() : Example() constructor
 	draw	= function() {
 		var _t	= time / loop_frame; // time, normalised
 		
-		// shapes for demonstrating pixel_scale
-		var _world_center_x	= global.camera.view_x() + (global.camera.get_width() / 2);
-		var _world_center_y	= global.camera.view_y() + (global.camera.get_height() / 2);
-		
-		var _demo_center_x	= _world_center_x + 86;
-		var _demo_center_y	= _world_center_y;
+		// shapes for demonstrating pixel_scale		
+		var _demo_center_x	= global.camera.get_x() + 86;
+		var _demo_center_y	= global.camera.get_y();
 		
 		// circles
 		for (var i = 1; i <= 10; i++)
 		{
 			draw_set_colour(c_dkgrey);
-			draw_circle(_demo_center_x, (_demo_center_y - (16*5)) + (i * 16), i, false);
+			draw_circle(_demo_center_x, (_demo_center_y - (16*5.5)) + (i * 16), i, false);
 		}
 		
 		// guy on tiles
 		for (var i = -3; i <= 3; i++)
 		{
-			draw_sprite(sprBlock, 0, (_demo_center_x - 4) + (i*8), _demo_center_y);
+			draw_sprite(sprBlock, 0, (_demo_center_x - 4) + (i*8), _demo_center_y + 5);
 		}
 		
-		draw_sprite(sprGuy, 0, (_demo_center_x - 4) + (sin(degtorad(_t * 360)) * 16), _demo_center_y - 8)
+		draw_sprite(sprGuy, 0, (_demo_center_x - 4) + (sin(degtorad(_t * 360)) * 16), _demo_center_y - 3)
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
