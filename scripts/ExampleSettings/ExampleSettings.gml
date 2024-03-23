@@ -19,7 +19,7 @@ function ExampleSettings() : Example() constructor
 	num_buttons	= 0;
 	
 	time		= 0;		// timer for drawing moving shapes, to showcase pixel_scale
-	loop_frame	= 300;		// how many frames afterwhich to loop time
+	loop_frame	= 600;		// how many frames afterwhich to loop time
 	
 	match_scales	= false;	// whether to match Subpixels per Pixel to the Window Scale (true) or not (false)
 	
@@ -127,7 +127,7 @@ function ExampleSettings() : Example() constructor
 		var _t	= time / loop_frame; // time, normalised
 		
 		// shapes for demonstrating pixel_scale		
-		var _demo_center_x	= global.camera.get_x() + 86;
+		var _demo_center_x	= global.camera.get_x() + 87;
 		var _demo_center_y	= global.camera.get_y();
 		
 		// circles
@@ -143,7 +143,13 @@ function ExampleSettings() : Example() constructor
 			draw_sprite(sprBlock, 0, (_demo_center_x - 4) + (i*8), _demo_center_y + 5);
 		}
 		
-		draw_sprite(sprGuy, 0, (_demo_center_x - 4) + (sin(degtorad(_t * 360)) * 16), _demo_center_y - 3)
+		draw_sprite(sprGuy, 0, (_demo_center_x) + (sin(degtorad((_t*2) * 360)) * 16), _demo_center_y + 1);
+		
+		// car
+		var _x = lengthdir_x(6, _t * 360);
+		var _y = lengthdir_y(6, _t * 360);
+		
+		draw_sprite_ext(sprCar, 0, _x + (_demo_center_x) + 1, _y + (_demo_center_y) + 57, 1, 1, (_t * 360) + 90, c_white, 1);
 	};
 	
 	/// @description	The draw gui event, for any drawing to the gui.
