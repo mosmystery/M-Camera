@@ -12,7 +12,7 @@
   "overriddenProperties":[],
   "parent":{
     "name":"Utilities",
-    "path":"folders/M-Camera v0.5.0 */Utilities.yy",
+    "path":"folders/M-Camera v0.6.0/Utilities.yy",
   },
   "parentObjectId":null,
   "persistent":true,

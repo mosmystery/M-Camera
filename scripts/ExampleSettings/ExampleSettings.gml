@@ -147,9 +147,9 @@ function ExampleSettings() : Example() constructor
 	
 	
 	
-		  ////////////////////////
-		 // supporting methods //
-		////////////////////////
+		  /////////////////////
+		 // UI constructors //
+		/////////////////////
 	
 	
 	
@@ -284,7 +284,7 @@ function ExampleSettings() : Example() constructor
 			
 			draw_set_halign(fa_center);
 			draw_set_valign(fa_middle);
-						
+			
 			// hover rect
 			if (hover)
 			{
