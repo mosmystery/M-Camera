@@ -17,7 +17,7 @@ function examples_init()
 	
 	global.loader	= new ExampleLoader();		// Create ExampleLoader, a console for installing and loading Examples
 	
-	global.loader.install(new ExampleSettings());	// Install example settings.
-	global.loader.install(new ExampleEditor());	// Install example editor.
-	global.loader.install(new ExampleRacer());	// Install example racer.	
+	global.loader.install(new ExampleEditor());
+	global.loader.install(new ExampleRacer());
+	global.loader.install(new ExampleSettings());
 }

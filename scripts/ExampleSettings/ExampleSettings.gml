@@ -113,7 +113,7 @@ function ExampleSettings() : Example() constructor
 		}
 		
 		// scaling tile
-		var _scale = 1.5 + (cos(degtorad((_t*2) * 360)) * 0.5);
+		var _scale = 1.5 + (sin(degtorad((_t*2) * 360)) * 0.5);
 		
 		draw_sprite_ext(sprBlock, 0, (_demo_center_x - 3) - ((_scale-1)*4), (_demo_center_y - 43) - ((_scale-1)*4), _scale, _scale, 0, c_white, 1);
 		
