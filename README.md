@@ -39,6 +39,9 @@ global.camera.set_start_values(room_width/2, room_height/2, 0, 1);
 global.camera.set_interpolation(1/8, 1/4, 1);
 global.camera.set_debugging(true);
 global.camera.set_shake_limits(4, 22.5, 2);
+global.camera.set_size(320, 180);
+global.camera.set_window_scale(4);
+global.camera.set_pixel_scale(1);
 
 // example translation
 global.camera.move_to(x, y);
