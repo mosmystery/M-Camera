@@ -62,9 +62,7 @@ global.camera.unset_boundary();
 
 ### Viewing the M-Camera example
 
-1. Download the latest source code file from the [Releases](https://github.com/mosmystery/M-Camera/releases) page.
-2. Unzip the source code file and open `m_camera.yyp` in GameMaker.
-3. Run the build.
+For the latest released Windows executable of the M-Camera example demo, download and unzip the latest `m_camera_demo` zip file from the [Releases](https://github.com/mosmystery/M-Camera/releases) page.
 
 ## Credits
 
