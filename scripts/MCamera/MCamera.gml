@@ -1074,6 +1074,20 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	
 	
+	/// @description	Gets the current angle of the camera, in degrees. See .rotate_to() or .rotate_by() to set the angle.
+	/// @returns {real}
+	static get_angle = function()
+	{
+		return angle;
+	};
+	
+	/// @description	Gets the current zoom (magnification) of the camera, in multiples of length along each axis. See .zoom_to() or .zoom_by() to set the zoom.
+	/// @returns {real}
+	static get_zoom = function()
+	{
+		return zoom;
+	};
+	
 	/// @description	Sets the view and id for this camera.
 	/// @param {real}	[_view=0]	View number [0..7].
 	/// @returns		N/A
