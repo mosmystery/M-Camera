@@ -68,7 +68,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	anchors		= {
 		position	: undefined,	// See .set_position_anchor()
-		angle		: undefined,	// See .set_rotation_anchor()
+		angle		: undefined,	// See .set_angle_anchor()
 		zoom		: undefined	// See .set_zoom_anchor()
 	};
 	
@@ -616,6 +616,18 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns							N/A
 	static set_zoom_anchor = function(_zoom_anchor=undefined) {
 		anchors.zoom = _zoom_anchor;
+	};
+	
+	/// @description						Sets the position, angle, and zoom anchors for the camera. See .set_position_anchor(), .set_angle_anchor() and .set_zoom_anchor() for details.
+	///								Note: If the data type you pass is a copy and not a reference, the camera will remain anchored to the x,y position as when first set. In this case, consider setting the anchor each frame if it should not be static.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_position_anchor=undefined]		The position anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=_position_anchor]	The angle anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
+	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=_angle_anchor]		The zoom anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
+	/// @returns							N/A
+	static set_anchors = function(_position_anchor=undefined, _angle_anchor=_position_anchor, _zoom_anchor=_angle_anchor) {
+		set_position_anchor(_position_anchor);
+		set_angle_anchor(_angle_anchor);
+		set_zoom_anchor(_zoom_anchor);
 	};
 	
 	/// @description	Sets the minimum and maximum limits for the camera zoom.
