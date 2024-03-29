@@ -156,79 +156,79 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		// create host object
 		if (_create_host_object_for_me)
 		{
-			host_object		= instance_create_depth(0, 0, -1, objMCamera);
-			host_object.camera	= self;
+			self.host_object	= instance_create_depth(0, 0, -1, objMCamera);
+			self.host_object.camera	= self;
 		}
 	
 		// set target position
-		if (anchors.position != undefined)
+		if (self.anchors.position != undefined)
 		{
-			target.x	= anchors.position.x;
-			target.y	= anchors.position.y;
+			self.target.x	= self.anchors.position.x;
+			self.target.y	= self.anchors.position.y;
 		}
 		
 		// initialise window
-		reset_window();
+		self.reset_window();
 		
 		// initialise shake
-		__shake_reset_transform();
+		self.__shake_reset_transform();
 	};
 	
 	/// @description	The destroy event, for cleaning up the host object, anchors and boundary. Call this before deleting / dereferencing the camera struct.
 	/// @returns		N/A
 	static destroy	= function() {
-		anchors.position	= undefined;
-		anchors.angle		= undefined;
-		anchors.zoom		= undefined;
-		boundary		= undefined;
+		self.anchors.position	= undefined;
+		self.anchors.angle	= undefined;
+		self.anchors.zoom	= undefined;
+		self.boundary		= undefined;
 		
-		if (host_object == undefined)
+		if (self.host_object == undefined)
 		{
 			return;
 		}
 		
-		instance_destroy(host_object, true);
+		instance_destroy(self.host_object, true);
 	};
 	
 	/// @description	The Room Start event. Enables the view for this room.
 	/// @returns		N/A
 	static room_start = function() {
 		view_enabled		= true;
-		view_visible[view]	= true;
+		view_visible[self.view]	= true;
 	};
 	
 	/// @description	The End Step event. Updates the camera tranform.
 	/// @returns		N/A
 	static end_step = function() {
 		// update transform
-		previous.x	= x;
-		previous.y	= y;
-		previous.angle	= angle;
-		previous.zoom	= zoom;
+		self.previous.x		= self.x;
+		self.previous.y		= self.y;
+		self.previous.angle	= self.angle;
+		self.previous.zoom	= self.zoom;
 		
-		x		= interpolation.fn_position(x, target.x, interpolation.position);
-		y		= interpolation.fn_position(y, target.y, interpolation.position);
-		angle		= interpolation.fn_angle(angle, target.angle, interpolation.angle);
-		zoom		= interpolation.fn_zoom(zoom, target.zoom, interpolation.zoom);
+		self.x		= self.interpolation.fn_position(self.x, self.target.x, self.interpolation.position);
+		self.y		= self.interpolation.fn_position(self.y, self.target.y, self.interpolation.position);
+		self.angle	= self.interpolation.fn_angle(self.angle, self.target.angle, self.interpolation.angle);
+		self.zoom	= self.interpolation.fn_zoom(self.zoom, self.target.zoom, self.interpolation.zoom);
 		
 		// apply constraints
-		__enforce_zoom_anchor(anchors.zoom);
-		__enforce_angle_anchor(anchors.angle);
-		__enforce_position_anchor(anchors.position);
-		__apply_panning(anchors.angle);
-		__clamp_to_boundary(boundary);
-		__update_shake(anchors.angle, anchors.zoom);
+		self.__enforce_zoom_anchor(self.anchors.zoom);
+		self.__enforce_angle_anchor(self.anchors.angle);
+		self.__enforce_position_anchor(self.anchors.position);
+		self.__apply_panning(self.anchors.angle);
+		self.__clamp_to_boundary(self.boundary);
+		self.__update_shake(self.anchors.angle, self.anchors.zoom);
 		
 		// update view
-		camera_set_view_size(id, view_width() / shake.zoom, view_height() / shake.zoom);
-		camera_set_view_angle(id, angle + shake.angle);
-		camera_set_view_pos(id, view_x() + shake.x, view_y() + shake.y);
+		camera_set_view_size(self.id, self.view_width() / self.shake.zoom, self.view_height() / self.shake.zoom);
+		camera_set_view_angle(self.id, self.angle + self.shake.angle);
+		camera_set_view_pos(self.id, self.view_x() + self.shake.x, self.view_y() + self.shake.y);
 	};
 	
 	/// @description	The Draw End event, for drawing the camera debug overlay.
 	/// @returns		N/A
 	static draw_end = function() {
-		__debug_draw();
+		self.__debug_draw();
 	};
 	
 	
