@@ -17,119 +17,119 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 {
 	// camera
 	
-	host_object	= undefined;		// See .create()
+	self.host_object	= undefined;			// See .create()
 	
-	view		= 0;			// See .set_view()
-	id		= view_camera[view];	// The view port id for this camera. See view_camera in the manual.
+	self.view		= 0;				// See .set_view()
+	self.id			= view_camera[self.view];	// The view port id for this camera. See view_camera in the manual.
 	
-	width		= _width;		// The base, unscaled width of the view
-	height		= _height;		// The base, unscaled height of the view
-	window_scale	= _window_scale;	// The scale of width, height to apply to the window.
-	pixel_scale	= _pixel_scale;		// The detail (width, height) of each pixel. Scales the application surface, but not the window or view. Only noticable at window scales higher than 1.
+	self.width		= _width;			// The base, unscaled width of the view
+	self.height		= _height;			// The base, unscaled height of the view
+	self.window_scale	= _window_scale;		// The scale of width, height to apply to the window.
+	self.pixel_scale	= _pixel_scale;			// The detail (width, height) of each pixel. Scales the application surface, but not the window or view. Only noticable at window scales higher than 1.
 	
-	x		= width/2;		// The current x position for this camera. Equivalent to the center of the screen in world co-ordinates.
-	y		= height/2;		// The current y position for this camera. Equivalent to the center of the screen in world co-ordinates.
-	angle		= 0;			// The current angle for this camera, in degrees.
-	zoom		= 1;			// The current zoom factor for this camera. <1 = zoom in, else 1 = normal, else <0 = zoom out.
+	self.x			= self.width/2;			// The current x position for this camera. Equivalent to the center of the screen in world co-ordinates.
+	self.y			= self.height/2;		// The current y position for this camera. Equivalent to the center of the screen in world co-ordinates.
+	self.angle		= 0;				// The current angle for this camera, in degrees.
+	self.zoom		= 1;				// The current zoom factor for this camera. <1 = zoom in, else 1 = normal, else <0 = zoom out.
 	
 	// transform
 	
-	start		= {
-		x	: x,
-		y	: y,
-		angle	: angle,
-		zoom	: zoom
-	};					// See .set_start_values() .reset()
+	self.start		= {
+		x	: self.x,
+		y	: self.y,
+		angle	: self.angle,
+		zoom	: self.zoom
+	};						// See .set_start_values() .reset()
 	
-	previous	= {
-		x	: x,
-		y	: y,
-		angle	: angle,
-		zoom	: zoom
-	};					// The transform values from the previous step.
+	self.previous		= {
+		x	: self.x,
+		y	: self.y,
+		angle	: self.angle,
+		zoom	: self.zoom
+	};						// The transform values from the previous step.
 	
-	target		= {
-		x	: x,			// See .move_to(),	.move_by()
-		y	: y,			// See .move_to(),	.move_by()
-		angle	: angle,		// See .rotate_to(),	.rotate_by()
-		zoom	: zoom			// See .zoom_to(),	.zoom_by()
-	};					// See .transform_to(),	.transform_by()
+	self.target		= {
+		x	: self.x,			// See .move_to(),	.move_by()
+		y	: self.y,			// See .move_to(),	.move_by()
+		angle	: self.angle,			// See .rotate_to(),	.rotate_by()
+		zoom	: self.zoom			// See .zoom_to(),	.zoom_by()
+	};						// See .transform_to(),	.transform_by()
 	
-	interpolation	= {
-		position	: 1,		// See .set_position_interpolation()
-		angle		: 1,		// See .set_angle_interpolation()
-		zoom		: 1,		// See .set_zoom_interpolation()
-		fn_position	: lerp,		// Custom interpolation function. See .set_position_interpolation()
-		fn_angle	: lerp,		// Custom interpolation function. See .set_angle_interpolation()
-		fn_zoom		: lerp		// Custom interpolation function. See .set_zoom_interpolation()
+	self.interpolation	= {
+		position	: 1,			// See .set_position_interpolation()
+		angle		: 1,			// See .set_angle_interpolation()
+		zoom		: 1,			// See .set_zoom_interpolation()
+		fn_position	: lerp,			// Custom interpolation function. See .set_position_interpolation()
+		fn_angle	: lerp,			// Custom interpolation function. See .set_angle_interpolation()
+		fn_zoom		: lerp			// Custom interpolation function. See .set_zoom_interpolation()
 	};
 	
 	// constraints
 	
-	anchors		= {
-		position	: undefined,	// See .set_position_anchor()
-		angle		: undefined,	// See .set_angle_anchor()
-		zoom		: undefined	// See .set_zoom_anchor()
+	self.anchors		= {
+		position	: undefined,		// See .set_position_anchor()
+		angle		: undefined,		// See .set_angle_anchor()
+		zoom		: undefined		// See .set_zoom_anchor()
 	};
 	
-	boundary	= undefined;		// See .set_boundary()
+	self.boundary	= undefined;			// See .set_boundary()
 	
-	zoom_min	= 1/power(2, 16);	// See .set_zoom_limits()
-	zoom_max	= power(2, 16);		// See .set_zoom_limits()
+	self.zoom_min	= 1/power(2, 16);		// See .set_zoom_limits()
+	self.zoom_max	= power(2, 16);			// See .set_zoom_limits()
 	
 	// panning
 	
-	panning		= {
-		active	: false,		// Whether panning mode is active or not. See .is_panning()
+	self.panning		= {
+		active	: false,			// Whether panning mode is active or not. See .is_panning()
 		start	: {
-			x	: x,
-			y	: y,
-			angle	: angle,
-			zoom	: zoom
-		},				// The user-defined starting transform values for the pan. See .start_panning()
+			x	: self.x,
+			y	: self.y,
+			angle	: self.angle,
+			zoom	: self.zoom
+		},					// The user-defined starting transform values for the pan. See .start_panning()
 		target	: {
-			x	: x,
-			y	: y,
-			angle	: angle,
-			zoom	: zoom
-		}				// The user-defined target transform values for the pan. See .start_panning()
-	};					// See .is_panning(), .start_panning(), .stop_panning(), .pan_to()
+			x	: self.x,
+			y	: self.y,
+			angle	: self.angle,
+			zoom	: self.zoom
+		}					// The user-defined target transform values for the pan. See .start_panning()
+	};						// See .is_panning(), .start_panning(), .stop_panning(), .pan_to()
 	
 	// shake
 	
-	shake = {
-		x			: 0,	// The shake x position offset.
-		y			: 0,	// The shake y position offset.
-		angle			: 0,	// The shake angle offset.
-		zoom			: 1,	// The shake zoom offset.
-		intensity		: 0,	// The intensity of the shake. Is a multiplier for the transform values. 0 = No shake. 1 = match transform to limits. See .shake_to()
-		intensity_falloff_rate	: 0.05,	// The falloff rate of intensity each step. See .set_shake_interpolation()
-		fn_intensity		: lerp,	// Custom interpolation function for the intensity falloff. See .set_shake_interpolation()
-		coarseness		: 0.25,	// How coarse the raw transform values should change each step. 1 = white noise. >0 <1 = brown noise. See .set_shake_limits()
+	self.shake = {
+		x			: 0,		// The shake x position offset.
+		y			: 0,		// The shake y position offset.
+		angle			: 0,		// The shake angle offset.
+		zoom			: 1,		// The shake zoom offset.
+		intensity		: 0,		// The intensity of the shake. Is a multiplier for the transform values. 0 = No shake. 1 = match transform to limits. See .shake_to()
+		intensity_falloff_rate	: 0.05,		// The falloff rate of intensity each step. See .set_shake_interpolation()
+		fn_intensity		: lerp,		// Custom interpolation function for the intensity falloff. See .set_shake_interpolation()
+		coarseness		: 0.25,		// How coarse the raw transform values should change each step. 1 = white noise. >0 <1 = brown noise. See .set_shake_limits()
 		raw	: {
 			distance	: 0,
 			direction	: 0,
 			angle		: 0,
 			zoom		: 0
-		},				// The raw internal tranform values. These are used to calculate shake.x .y .angle .zoom
+		},					// The raw internal tranform values. These are used to calculate shake.x .y .angle .zoom
 		limits : {
 			radius		: 4,
 			angle		: 22.5,
 			zoom		: 1,
 			intensity	: 1
-		}				// The maximum range for shake transform values. See .set_shake_limits()
-	};					// See .set_shake_limits(), .set_shake_interpolation() .shake_to()
+		}					// The maximum range for shake transform values. See .set_shake_limits()
+	};						// See .set_shake_limits(), .set_shake_interpolation() .shake_to()
 	
 	// debug
 	
-	debug		= {
-		active		: false,	// See .is_debugging(), .set_debugging()
+	self.debug		= {
+		active		: false,		// See .is_debugging(), .set_debugging()
 		rotation	: {
-			points	: []		// For internal use. Used to store and display the rotation arc in debug mode.
+			points	: []			// For internal use. Used to store and display the rotation arc in debug mode.
 		},
 		panning		: {
-			camera_start_x	: x,	// The camera's starting x co-ordinate during panning.
-			camera_start_y	: y	// The camera's starting y co-ordinate during panning.
+			camera_start_x	: self.x,	// The camera's starting x co-ordinate during panning.
+			camera_start_y	: self.y	// The camera's starting y co-ordinate during panning.
 		}
 	};
 	
