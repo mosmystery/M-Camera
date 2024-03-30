@@ -599,7 +599,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_position_anchor=undefined]	The position anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
 	/// @returns							N/A
 	static set_position_anchor = function(_position_anchor=undefined) {
-		anchors.position = _position_anchor;
+		self.anchors.position = _position_anchor;
 	};
 	
 	/// @description						Sets the angle anchor for the camera to pivot around when rotating. Useful for keeping a position at the same place on the screen, such as the player position, the mouse position, the center of the level or a Vector2.
@@ -607,7 +607,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=undefined]	The angle anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
 	/// @returns							N/A
 	static set_angle_anchor = function(_angle_anchor=undefined) {
-		anchors.angle = _angle_anchor;
+		self.anchors.angle = _angle_anchor;
 	};
 	
 	/// @description						Sets the zoom anchor for the camera to zoom towards or away from. Useful for zooming towards or away from a point of interest, such as in cutscenes, or the mouse in an editor or strategy game.
@@ -615,7 +615,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=undefined]	The zoom anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
 	/// @returns							N/A
 	static set_zoom_anchor = function(_zoom_anchor=undefined) {
-		anchors.zoom = _zoom_anchor;
+		self.anchors.zoom = _zoom_anchor;
 	};
 	
 	/// @description						Sets the position, angle, and zoom anchors for the camera. See .set_position_anchor(), .set_angle_anchor() and .set_zoom_anchor() for details.
@@ -625,9 +625,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=_angle_anchor]		The zoom anchor. Must contain an x and y value if not undefined. Pass undefined to remove anchor. Make sure to remove the anchor if it no longer exists, such as for destroyed instances.
 	/// @returns							N/A
 	static set_anchors = function(_position_anchor=undefined, _angle_anchor=_position_anchor, _zoom_anchor=_angle_anchor) {
-		set_position_anchor(_position_anchor);
-		set_angle_anchor(_angle_anchor);
-		set_zoom_anchor(_zoom_anchor);
+		self.set_position_anchor(_position_anchor);
+		self.set_angle_anchor(_angle_anchor);
+		self.set_zoom_anchor(_zoom_anchor);
 	};
 	
 	/// @description	Sets the minimum and maximum limits for the camera zoom.
@@ -638,8 +638,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		var _min = 1/power(2, 16);
 		var _max = power(2, 16);
 		
-		zoom_min = clamp(_zoom_min, _min, _max);
-		zoom_max = clamp(_zoom_max, max(_min, _zoom_min), _max);
+		self.zoom_min = clamp(_zoom_min, _min, _max);
+		self.zoom_max = clamp(_zoom_max, max(_min, _zoom_min), _max);
 	};
 	
 	/// @description	Defines the boundary for the camera to clamp to. Useful for keeping the camera within the bounds of a level or area. Unset with .unset_boundary(). Note: The outer bounds may be visible while the camera is rotating or zoomed out.
@@ -649,7 +649,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_y2=room_height]	The bottom edge of the boundary.
 	/// @returns		N/A
 	static set_boundary = function(_x1=0, _y1=0, _x2=room_width, _y2=room_height) {
-		boundary = {
+		self.boundary = {
 			x1 : _x1,
 			y1 : _y1,
 			x2 : _x2,
@@ -660,7 +660,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	Unsets the position boundary for the camera, ensuring the camera's position is not limited. Set with .set_boundary()
 	/// @returns		N/A
 	static unset_boundary = function() {
-		boundary = undefined;
+		self.boundary = undefined;
 	};
 	
 	
@@ -677,11 +677,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_anglestart=0]		The starting angle.
 	/// @param {real}	[_zoomstart=1]		The starting zoom.
 	/// @returns		N/A
-	static set_start_values = function(_xstart = width/2, _ystart = height/2, _anglestart = 0, _zoomstart = 1) {
-		start.x		= _xstart;
-		start.y		= _ystart;
-		start.angle	= _anglestart;
-		start.zoom	= _zoomstart;
+	static set_start_values = function(_xstart = self.width/2, _ystart = self.height/2, _anglestart = 0, _zoomstart = 1) {
+		self.start.x		= _xstart;
+		self.start.y		= _ystart;
+		self.start.angle	= _anglestart;
+		self.start.zoom		= _zoomstart;
 	};
 	
 	/// @description	Sets the interpolation factor and function for transforming the x, y position towards target.x/.y. Essentially how fast x/y should approach target.x/.y.
@@ -689,8 +689,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {function}	[_fn_interpolate=lerp]	Optional custom interpolation function for updating the camera's x and y values. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
 	static set_position_interpolation = function(_value=1, _fn_interpolate=lerp) {
-		interpolation.position		= _value;
-		interpolation.fn_position	= _fn_interpolate;
+		self.interpolation.position		= _value;
+		self.interpolation.fn_position	= _fn_interpolate;
 	};
 	
 	/// @description	Sets the interpolation factor and function for transforming the angle towards target.angle. Essentially how fast angle should approach target.angle.
@@ -698,8 +698,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {function}	[_fn_interpolate=lerp]	Optional custom interpolation function for updating the camera's angle. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
 	static set_angle_interpolation = function(_value=1, _fn_interpolate=lerp) {
-		interpolation.angle	= _value;
-		interpolation.fn_angle	= _fn_interpolate;
+		self.interpolation.angle	= _value;
+		self.interpolation.fn_angle	= _fn_interpolate;
 	};
 	
 	/// @description	Sets the interpolation factor and function for transforming the zoom towards target.zoom. Essentially how fast zoom should approach target.zoom.
@@ -707,8 +707,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {function}	[_fn_interpolate=lerp]	Optional custom interpolation function for updating the camera's zoom. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
 	static set_zoom_interpolation = function(_value=1, _fn_interpolate=lerp) {
-		interpolation.zoom	= _value;
-		interpolation.fn_zoom	= _fn_interpolate;
+		self.interpolation.zoom		= _value;
+		self.interpolation.fn_zoom	= _fn_interpolate;
 	};
 	
 	/// @description	Sets the interpolation factors for moving, rotating and zooming the camera. Does not change the interpolation functions. Essentially how fast x, y, angle and zoom should approach their respective target values.
@@ -717,9 +717,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_zoom_interpolation=1]		The zoom interpolation factor, as a fraction between 0 and 1. 1 = instant interpolation. 0 = no change.
 	/// @returns		N/A
 	static set_interpolation = function(_position_interpolation=1, _angle_interpolation=1, _zoom_interpolation=1) {
-		set_position_interpolation(_position_interpolation, interpolation.fn_position);
-		set_angle_interpolation(_angle_interpolation, interpolation.fn_angle);
-		set_zoom_interpolation(_zoom_interpolation, interpolation.fn_zoom);
+		self.set_position_interpolation(_position_interpolation, self.interpolation.fn_position);
+		self.set_angle_interpolation(_angle_interpolation, self.interpolation.fn_angle);
+		self.set_zoom_interpolation(_zoom_interpolation, self.interpolation.fn_zoom);
 	};
 	
 	
