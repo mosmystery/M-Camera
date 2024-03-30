@@ -242,97 +242,97 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting position.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.position]	The position anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
-	static __enforce_position_anchor = function(_anchor=anchors.position) {
+	static __enforce_position_anchor = function(_anchor=self.anchors.position) {
 		if (_anchor != undefined)
 		{
-			target.x = _anchor.x;
-			target.y = _anchor.y;
+			self.target.x = _anchor.x;
+			self.target.y = _anchor.y;
 		}
 	};
 	
 	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting angle.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
-	static __enforce_angle_anchor = function(_anchor=anchors.angle) {
-		if (angle != previous.angle && _anchor != undefined)
+	static __enforce_angle_anchor = function(_anchor=self.anchors.angle) {
+		if (self.angle != self.previous.angle && _anchor != undefined)
 		{
-			if (is_debugging() && abs(previous.angle - angle) >= 0.5)
+			if (self.is_debugging() && abs(self.previous.angle - self.angle) >= 0.5)
 			{
-				array_push(debug.rotation.points, {
-					x : x,
-					y : y
+				array_push(self.debug.rotation.points, {
+					x : self.x,
+					y : self.y
 				});
 			}
 			
-			var _distance	= point_distance(_anchor.x, _anchor.y, x, y);
-			var _direction	= point_direction(_anchor.x, _anchor.y, x, y) + (previous.angle - angle);
+			var _distance	= point_distance(_anchor.x, _anchor.y, self.x, self.y);
+			var _direction	= point_direction(_anchor.x, _anchor.y, self.x, self.y) + (self.previous.angle - self.angle);
 			
 			var _relative_x	= lengthdir_x(_distance, _direction);
 			var _relative_y	= lengthdir_y(_distance, _direction);
 			
-			target.x	= _anchor.x + _relative_x;
-			target.y	= _anchor.y + _relative_y;
+			self.target.x	= _anchor.x + _relative_x;
+			self.target.y	= _anchor.y + _relative_y;
 			
-			x		= target.x;
-			y		= target.y;
+			self.x		= self.target.x;
+			self.y		= self.target.y;
 		}
 	};
 	
 	/// @description						For internal use. Updates the camera position based on _anchor's position, to keep the anchor at the same place on-screen while adjusting zoom.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
-	static __enforce_zoom_anchor = function(_anchor=anchors.zoom) {
-		if (zoom != previous.zoom && _anchor != undefined)
+	static __enforce_zoom_anchor = function(_anchor=self.anchors.zoom) {
+		if (self.zoom != self.previous.zoom && _anchor != undefined)
 		{
-			var _screen_ratio_w	= (_anchor.x - view_x_previous()) / view_width_previous();
-			var _screen_ratio_h	= (_anchor.y - view_y_previous()) / view_height_previous();
+			var _screen_ratio_w	= (_anchor.x - self.view_x_previous()) / self.view_width_previous();
+			var _screen_ratio_h	= (_anchor.y - self.view_y_previous()) / self.view_height_previous();
 			
-			target.x		= (_anchor.x - (_screen_ratio_w * view_width())) + (view_width()/2);
-			target.y		= (_anchor.y - (_screen_ratio_h * view_height())) + (view_height()/2);
+			self.target.x		= (_anchor.x - (_screen_ratio_w * self.view_width())) + (self.view_width()/2);
+			self.target.y		= (_anchor.y - (_screen_ratio_h * self.view_height())) + (self.view_height()/2);
 			
-			x			= target.x;
-			y			= target.y;
+			self.x			= self.target.x;
+			self.y			= self.target.y;
 		}
 	};
 	
 	/// @description						For internal use. Updates the camera position based on the panning start and target values, and angle angle.
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_angle_anchor=anchors.angle]	The angle anchor. Must contain an x and y value if not undefined.
 	/// @returns							N/A
-	static __apply_panning = function(_angle_anchor=anchors.angle) {
-		if (!is_panning())
+	static __apply_panning = function(_angle_anchor=self.anchors.angle) {
+		if (!self.is_panning())
 		{
 			return;
 		}
 		
 		if (_angle_anchor == undefined)
 		{
-			target.x	-= panning.target.x - panning.start.x;
-			target.y	-= panning.target.y - panning.start.y;
+			self.target.x	-= self.panning.target.x - self.panning.start.x;
+			self.target.y	-= self.panning.target.y - self.panning.start.y;
 			
-			x		= target.x;
-			y		= target.y;
+			self.x		= self.target.x;
+			self.y		= self.target.y;
 			
 			return;
 		}
 		
-		var _angle_diff		= panning.start.angle - previous.angle;
+		var _angle_diff		= self.panning.start.angle - self.previous.angle;
 		
-		var _pan_distance	= point_distance(_angle_anchor.x, _angle_anchor.y, panning.start.x, panning.start.y);
-		var _pan_direction	= point_direction(_angle_anchor.x, _angle_anchor.y, panning.start.x, panning.start.y) + _angle_diff;
+		var _pan_distance	= point_distance(_angle_anchor.x, _angle_anchor.y, self.panning.start.x, self.panning.start.y);
+		var _pan_direction	= point_direction(_angle_anchor.x, _angle_anchor.y, self.panning.start.x, self.panning.start.y) + _angle_diff;
 		
 		var _rotated_pan_x	= _angle_anchor.x + lengthdir_x(_pan_distance, _pan_direction);
 		var _rotated_pan_y	= _angle_anchor.y + lengthdir_y(_pan_distance, _pan_direction);
 		
-		var _relative_target_x	= panning.target.x - _rotated_pan_x;
-		var _relative_target_y	= panning.target.y - _rotated_pan_y;
+		var _relative_target_x	= self.panning.target.x - _rotated_pan_x;
+		var _relative_target_y	= self.panning.target.y - _rotated_pan_y;
 		
 		var _angle_is_cardinal	= (_angle_diff+360) mod 90 <= math_get_epsilon() || (_angle_diff+360) mod 90 >= 90 - math_get_epsilon();
 		
-		target.x		-= _angle_is_cardinal ? _relative_target_x : round(_relative_target_x);		// round co-ordinates at odd relative angles to avoid jitteriness
-		target.y		-= _angle_is_cardinal ? _relative_target_y : round(_relative_target_y);		// round co-ordinates at odd relative angles to avoid jitteriness
+		self.target.x		-= _angle_is_cardinal ? _relative_target_x : round(_relative_target_x);		// round co-ordinates at odd relative angles to avoid jitteriness
+		self.target.y		-= _angle_is_cardinal ? _relative_target_y : round(_relative_target_y);		// round co-ordinates at odd relative angles to avoid jitteriness
 		
-		x			= target.x;
-		y			= target.y;
+		self.x			= self.target.x;
+		self.y			= self.target.y;
 	};
 	
 	/// @description		For internal use. Clamps the camera position to be within boundary _rect.
@@ -341,20 +341,20 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __clamp_to_boundary = function(_rect = boundary) {
 		if (_rect != undefined)
 		{
-			var _width_ratio	= abs( lengthdir_x(1, angle) );
-			var _height_ratio	= abs( lengthdir_y(1, angle) );
+			var _width_ratio	= abs( lengthdir_x(1, self.angle) );
+			var _height_ratio	= abs( lengthdir_y(1, self.angle) );
 			
-			var _rotated_width	= (_width_ratio * view_width()) + (_height_ratio * view_height());
-			var _rotated_height	= (_width_ratio * view_height()) + (_height_ratio * view_width());
+			var _rotated_width	= (_width_ratio * self.view_width()) + (_height_ratio * self.view_height());
+			var _rotated_height	= (_width_ratio * self.view_height()) + (_height_ratio * self.view_width());
 			
 			var _boundary_width	= _rect.x2 - _rect.x1;
 			var _boundary_height	= _rect.y2 - _rect.y1;
 			
-			target.x		= (_rotated_width > _boundary_width)	? (_rect.x1 + _boundary_width/2)	: clamp(x, _rect.x1 + (_rotated_width/2), _rect.x2 - (_rotated_width/2));
-			target.y		= (_rotated_height > _boundary_height)	? (_rect.y1 + _boundary_height/2)	: clamp(y, _rect.y1 + (_rotated_height/2), _rect.y2 - (_rotated_height/2));
+			self.target.x		= (_rotated_width > _boundary_width)	? (_rect.x1 + _boundary_width/2)	: clamp(x, _rect.x1 + (_rotated_width/2), _rect.x2 - (_rotated_width/2));
+			self.target.y		= (_rotated_height > _boundary_height)	? (_rect.y1 + _boundary_height/2)	: clamp(y, _rect.y1 + (_rotated_height/2), _rect.y2 - (_rotated_height/2));
 			
-			x			= target.x;
-			y			= target.y;
+			self.x			= self.target.x;
+			self.y			= self.target.y;
 		}
 	};
 	
@@ -363,88 +363,88 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {struct,id.Instance,asset.GMObject,undefined}	[_zoom_anchor=anchors.zoom]	The zoom anchor. Must contain an x and y value if not undefined.
 	///								Warning: if _zoom_anchor does not equal that of .__enforce_zoom_anchor(), the camera will drift when simultaneously zooming and shaking.
 	/// @returns		N/A
-	static __update_shake = function(_angle_anchor=anchors.angle, _zoom_anchor=anchors.zoom) {
-		if (shake.intensity == 0)
+	static __update_shake = function(_angle_anchor=self.anchors.angle, _zoom_anchor=self.anchors.zoom) {
+		if (self.shake.intensity == 0)
 		{
 			return;
 		}
 		
-		with (shake)
+		with (self.shake)
 		{
 			// set raw values
-			raw.distance	+= coarseness * random_range(-limits.radius, limits.radius);
-			raw.direction	+= coarseness * random_range(-180, 180);
-			raw.angle	+= coarseness * random_range(-limits.angle, limits.angle);
-			raw.zoom	+= coarseness * random_range(-limits.zoom, limits.zoom);
+			self.raw.distance	+= self.coarseness * random_range(-self.limits.radius, self.limits.radius);
+			self.raw.direction	+= self.coarseness * random_range(-180, 180);
+			self.raw.angle		+= self.coarseness * random_range(-self.limits.angle, self.limits.angle);
+			self.raw.zoom		+= self.coarseness * random_range(-self.limits.zoom, self.limits.zoom);
 			
-			raw.distance	= reflect(raw.distance, -limits.radius, limits.radius);
-			raw.direction	= wrap(raw.direction, -180, 180);
-			raw.angle	= reflect(raw.angle, 0, limits.angle);
-			raw.zoom	= reflect(raw.zoom, -(limits.zoom/2), limits.zoom/2);
+			self.raw.distance	= reflect(self.raw.distance, -self.limits.radius, self.limits.radius);
+			self.raw.direction	= wrap(self.raw.direction, -180, 180);
+			self.raw.angle		= reflect(self.raw.angle, 0, self.limits.angle);
+			self.raw.zoom		= reflect(self.raw.zoom, -(self.limits.zoom/2), self.limits.zoom/2);
 			
 			// set output values
-			x		= lengthdir_x(intensity * raw.distance, raw.direction);
-			y		= lengthdir_y(intensity * raw.distance, raw.direction);
-			angle		= (intensity * raw.angle) - (intensity * (limits.angle/2));
-			zoom		= power(sqrt(2), intensity * raw.zoom);
+			self.x			= lengthdir_x(self.intensity * self.raw.distance, self.raw.direction);
+			self.y			= lengthdir_y(self.intensity * self.raw.distance, self.raw.direction);
+			self.angle		= (self.intensity * self.raw.angle) - (self.intensity * (self.limits.angle/2));
+			self.zoom		= power(sqrt(2), self.intensity * self.raw.zoom);
 			
 			// enforce zoom anchor
 			if (_zoom_anchor != undefined)
 			{
-				var _diff_width		= (other.view_width()/zoom) - other.view_width();
-				var _diff_height	= (other.view_height()/zoom) - other.view_height();
+				var _diff_width		= (other.view_width()/self.zoom) - other.view_width();
+				var _diff_height	= (other.view_height()/self.zoom) - other.view_height();
 				
 				var _screen_ratio_w	= (_zoom_anchor.x-other.view_x()) / other.view_width();
 				var _screen_ratio_h	= (_zoom_anchor.y-other.view_y()) / other.view_height();
 				
-				x			-= _screen_ratio_w * _diff_width;
-				y			-= _screen_ratio_h * _diff_height;
+				self.x			-= _screen_ratio_w * _diff_width;
+				self.y			-= _screen_ratio_h * _diff_height;
 			}
 			
 			// enforce angle anchor
 			if (_angle_anchor != undefined)
 			{
 				var _distance	= point_distance(_angle_anchor.x, _angle_anchor.y, other.x, other.y);
-				var _direction	= point_direction(_angle_anchor.x, _angle_anchor.y, other.x, other.y) - angle;
+				var _direction	= point_direction(_angle_anchor.x, _angle_anchor.y, other.x, other.y) - self.angle;
 				
 				var _relative_x	= lengthdir_x(_distance, _direction);
 				var _relative_y	= lengthdir_y(_distance, _direction);
 				
-				x		+= (_angle_anchor.x + _relative_x) - other.x;
-				y		+= (_angle_anchor.y + _relative_y) - other.y;
+				self.x		+= (_angle_anchor.x + _relative_x) - other.x;
+				self.y		+= (_angle_anchor.y + _relative_y) - other.y;
 			}
 			
 			// intensity falloff
-			intensity	= fn_intensity(intensity, 0, intensity_falloff_rate);
+			self.intensity	= self.fn_intensity(self.intensity, 0, self.intensity_falloff_rate);
 		}
 		
 		// reset transform
-		if (abs(shake.intensity) <= math_get_epsilon())
+		if (abs(self.shake.intensity) <= math_get_epsilon())
 		{
-			shake.intensity	= 0;
+			self.shake.intensity	= 0;
 			
-			__shake_reset_transform();
+			self.__shake_reset_transform();
 		}
 	};
 	
 	/// @description	For internal use. Resets the shake transform to initial values.
 	/// @returns		N/A
 	static __shake_reset_transform = function() {
-		shake.raw.distance	= 0;
-		shake.raw.direction	= random(360)-180;
-		shake.raw.angle		= shake.limits.angle/2;
-		shake.raw.zoom		= 0;
+		self.shake.raw.distance		= 0;
+		self.shake.raw.direction	= random(360)-180;
+		self.shake.raw.angle		= self.shake.limits.angle/2;
+		self.shake.raw.zoom		= 0;
 		
-		shake.x			= 0;
-		shake.y			= 0;
-		shake.angle		= 0;
-		shake.zoom		= 1;
+		self.shake.x			= 0;
+		self.shake.y			= 0;
+		self.shake.angle		= 0;
+		self.shake.zoom			= 1;
 	};
 	
 	/// @description	For internal use. Draws the debug display.
 	/// @returns		N/A
 	static __debug_draw = function() {
-		if (!is_debugging())
+		if (!self.is_debugging())
 		{
 			return;
 		}
@@ -459,44 +459,44 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		var _col_zoom_anchor	= c_blue;
 		var _col_pan_line	= c_green;
 			
-		var _nav_dots_radius	= 2 / zoom;
-		var _nav_ring_radius	= 16 / zoom;
-		var _nav_dotring_radius	= _nav_ring_radius + (4 / zoom);
+		var _nav_dots_radius	= 2 / self.zoom;
+		var _nav_ring_radius	= 16 / self.zoom;
+		var _nav_dotring_radius	= _nav_ring_radius + (4 / self.zoom);
 		var _dot_radius		= clamp(4, _nav_dots_radius, _nav_ring_radius);
 			
 		var _po			= 1; // pixel offset
 			
 		// boundary
-		if (boundary != undefined)
+		if (self.boundary != undefined)
 		{
-			draw_rectangle_colour(boundary.x1+0.5, boundary.y1+0.5, boundary.x2-1.5, boundary.y2-1.5, _col_boundary, _col_boundary, _col_boundary, _col_boundary, true);
+			draw_rectangle_colour(self.boundary.x1+0.5, self.boundary.y1+0.5, self.boundary.x2-1.5, self.boundary.y2-1.5, _col_boundary, _col_boundary, _col_boundary, _col_boundary, true);
 		}
 		
 			// dots
 		
 		// rotation arc
-		var _rot_arc_length = array_length(debug.rotation.points);
+		var _rot_arc_length = array_length(self.debug.rotation.points);
 			
 		if (_rot_arc_length >= 1)
 		{
-			draw_pointarray(0, 0, debug.rotation.points, false, pr_linestrip, _col_rot_arc);
-			draw_circle_color(debug.rotation.points[0].x-_po, debug.rotation.points[0].y-_po, _dot_radius, _col_rot_arc, _col_rot_arc, false);
-			draw_circle_color(debug.rotation.points[_rot_arc_length-1].x-_po, debug.rotation.points[_rot_arc_length-1].y-_po, _dot_radius, _col_rot_arc, _col_rot_arc, false);
+			draw_pointarray(0, 0, self.debug.rotation.points, false, pr_linestrip, _col_rot_arc);
+			draw_circle_color(self.debug.rotation.points[0].x-_po, self.debug.rotation.points[0].y-_po, _dot_radius, _col_rot_arc, _col_rot_arc, false);
+			draw_circle_color(self.debug.rotation.points[_rot_arc_length-1].x-_po, self.debug.rotation.points[_rot_arc_length-1].y-_po, _dot_radius, _col_rot_arc, _col_rot_arc, false);
 		}
 			
 		// rotation anchor
 		if (anchors.angle != undefined)
 		{
-			draw_circle_color(anchors.angle.x-_po, anchors.angle.y-_po, _dot_radius, _col_rot_anchor, _col_rot_anchor, false);
+			draw_circle_color(self.anchors.angle.x-_po, self.anchors.angle.y-_po, _dot_radius, _col_rot_anchor, _col_rot_anchor, false);
 		}
 		
 		// pan line
 		if (is_panning())
 		{
-			var _x1 = panning.start.x;
-			var _y1 = panning.start.y;
-			var _x2 = target.x + (panning.start.x - debug.panning.camera_start_x);
-			var _y2 = target.y + (panning.start.y - debug.panning.camera_start_y);
+			var _x1 = self.panning.start.x;
+			var _y1 = self.panning.start.y;
+			var _x2 = self.target.x + (self.panning.start.x - self.debug.panning.camera_start_x);
+			var _y2 = self.target.y + (self.panning.start.y - self.debug.panning.camera_start_y);
 			
 			draw_line_color(_x1, _y1, _x2, _y2, _col_pan_line, _col_pan_line);
 			draw_circle_color(_x1-_po, _y1-_po, _dot_radius, _col_pan_line, _col_pan_line, false);
@@ -504,9 +504,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 			
 		// zoom anchor
-		if (anchors.zoom != undefined)
+		if (self.anchors.zoom != undefined)
 		{
-			draw_circle_color(anchors.zoom.x-_po, anchors.zoom.y-_po, _dot_radius, _col_zoom_anchor, _col_zoom_anchor, false);
+			draw_circle_color(self.anchors.zoom.x-_po, self.anchors.zoom.y-_po, _dot_radius, _col_zoom_anchor, _col_zoom_anchor, false);
 		}
 			
 		// view
@@ -516,9 +516,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		draw_circle_color(_view_x-_po, _view_y-_po, _dot_radius, _col_view, _col_view, false);
 			
 		// position target dot
-		if (anchors.position != undefined)
+		if (self.anchors.position != undefined)
 		{
-			draw_circle_color(anchors.position.x-_po, anchors.position.y-_po, _dot_radius, _col_target, _col_target, false);
+			draw_circle_color(self.anchors.position.x-_po, self.anchors.position.y-_po, _dot_radius, _col_target, _col_target, false);
 		}
 		
 			// nav ring
@@ -526,27 +526,27 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		// dots
 		if (_rot_arc_length >= 1)
 		{
-			__debug_draw_nav_dot(debug.rotation.points[0].x, debug.rotation.points[0].y, _nav_dots_radius, _nav_dotring_radius, _col_rot_arc);					// rotation arc start
-			__debug_draw_nav_dot(debug.rotation.points[_rot_arc_length-1].x, debug.rotation.points[_rot_arc_length-1].y, _nav_dots_radius, _nav_dotring_radius, _col_rot_arc);	// rotation arc end
+			self.__debug_draw_nav_dot(self.debug.rotation.points[0].x, debug.rotation.points[0].y, _nav_dots_radius, _nav_dotring_radius, _col_rot_arc);					// rotation arc start
+			self.__debug_draw_nav_dot(self.debug.rotation.points[_rot_arc_length-1].x, self.debug.rotation.points[_rot_arc_length-1].y, _nav_dots_radius, _nav_dotring_radius, _col_rot_arc);	// rotation arc end
 		}
 		
-		__debug_draw_nav_anchor_dot(anchors.angle, _nav_dots_radius, _nav_dotring_radius, _col_rot_anchor);	// rotation anchor
-		__debug_draw_nav_anchor_dot(anchors.zoom, _nav_dots_radius, _nav_dotring_radius, _col_zoom_anchor);	// zoom anchor
+		self.__debug_draw_nav_anchor_dot(self.anchors.angle, _nav_dots_radius, _nav_dotring_radius, _col_rot_anchor);	// rotation anchor
+		self.__debug_draw_nav_anchor_dot(self.anchors.zoom, _nav_dots_radius, _nav_dotring_radius, _col_zoom_anchor);	// zoom anchor
 		
 		if (is_panning())
 		{
-			var _x2 = target.x + (panning.start.x - debug.panning.camera_start_x);
-			var _y2 = target.y + (panning.start.y - debug.panning.camera_start_y);
+			var _x2 = self.target.x + (self.panning.start.x - self.debug.panning.camera_start_x);
+			var _y2 = self.target.y + (self.panning.start.y - self.debug.panning.camera_start_y);
 			
-			__debug_draw_nav_dot(panning.start.x, panning.start.y, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);	// pan line start
-			__debug_draw_nav_dot(_x2, _y2, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);			// pan line end
+			self.__debug_draw_nav_dot(self.panning.start.x, self.panning.start.y, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);	// pan line start
+			self.__debug_draw_nav_dot(_x2, _y2, _nav_dots_radius, _nav_dotring_radius, _col_pan_line);			// pan line end
 		}
 		
 		__debug_draw_nav_dot(_view_x, _view_y, _nav_dots_radius, _nav_dotring_radius, _col_view);		// view
 		
-		if (is_struct(target) || instance_exists(target))
+		if (is_struct(self.target) || instance_exists(self.target))
 		{
-			__debug_draw_nav_dot(target.x, target.y, _nav_dots_radius, _nav_dotring_radius, _col_target);	// target
+			self.__debug_draw_nav_dot(self.target.x, self.target.y, _nav_dots_radius, _nav_dotring_radius, _col_target);	// target
 		}
 		
 		// ring
@@ -562,14 +562,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {constant.Color}	_col			The colour to draw the dot.
 	/// @returns			N/A
 	static __debug_draw_nav_dot = function(_x, _y, _nav_dots_radius, _nav_dotring_radius, _col) {
-		if (_nav_dotring_radius < point_distance(x, y, _x, _y))
+		if (_nav_dotring_radius < point_distance(self.x, self.y, _x, _y))
 		{
-			var _direction	= point_direction(x, y, _x, _y);
+			var _direction	= point_direction(self.x, self.y, _x, _y);
 			
 			var _point_x	= lengthdir_x(_nav_dotring_radius, _direction);
 			var _point_y	= lengthdir_y(_nav_dotring_radius, _direction);
 					
-			draw_circle_color(x+_point_x-1, y+_point_y-1, _nav_dots_radius, _col, _col, false);
+			draw_circle_color(self.x+_point_x-1, self.y+_point_y-1, _nav_dots_radius, _col, _col, false);
 		}
 	};
 	
@@ -582,7 +582,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static __debug_draw_nav_anchor_dot = function(_anchor, _nav_dots_radius, _nav_dotring_radius, _col) {
 		if (is_struct(_anchor) || instance_exists(_anchor))
 		{
-			__debug_draw_nav_dot(_anchor.x, _anchor.y, _nav_dots_radius, _nav_dotring_radius, _col);
+			self.__debug_draw_nav_dot(_anchor.x, _anchor.y, _nav_dots_radius, _nav_dotring_radius, _col);
 		}
 	};
 	
