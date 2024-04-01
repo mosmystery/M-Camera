@@ -734,9 +734,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_target_x=target.x]		The new target.x position for the camera.
 	/// @param {real}	[_target_y=target.y]		The new target.y position for the camera.
 	/// @returns		N/A
-	static move_to = function(_target_x=target.x, _target_y=target.y) {
-		target.x = _target_x;
-		target.y = _target_y;
+	static move_to = function(_target_x=self.target.x, _target_y=self.target.y) {
+		self.target.x = _target_x;
+		self.target.y = _target_y;
 	};
 	
 	/// @description	Moves the camera target.x/.y by a relative amount.
@@ -744,32 +744,32 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_y=0]				The y value to move target.y by.
 	/// @returns		N/A
 	static move_by = function(_x=0, _y=0) {
-		move_to(target.x + _x, target.y + _y);
+		self.move_to(self.target.x + _x, self.target.y + _y);
 	};
 	
 	/// @description	Sets the target.angle for the camera.
 	/// @param {real}	[_target_angle=target.angle]	The new target angle for the camera, in degrees.
 	/// @returns		N/A
-	static rotate_to = function(_target_angle=target.angle) {
-		if (is_debugging())
+	static rotate_to = function(_target_angle=self.target.angle) {
+		if (self.is_debugging())
 		{
-			debug.rotation.points = [];
+			self.debug.rotation.points = [];
 		}
 		
-		target.angle	= _target_angle;
+		self.target.angle	= _target_angle;
 		
 		// wrap angle values to interpolate in the correct direction
-		if (abs(target.angle - angle) == 180)
+		if (abs(self.target.angle - self.angle) == 180)
 		{
-			target.angle = choose(angle-180, angle+180);
+			self.target.angle = choose(self.angle-180, self.angle+180);
 		}
 		else
 		{
-			target.angle = wrap(target.angle, 0, 360);
+			self.target.angle = wrap(self.target.angle, 0, 360);
 			
-			while (abs(target.angle - angle) > 180)
+			while (abs(self.target.angle - self.angle) > 180)
 			{
-				angle	= (angle < target.angle) ? angle + 360 : angle - 360;
+				self.angle	= (self.angle < self.target.angle) ? self.angle + 360 : self.angle - 360;
 			}
 		}
 	};
@@ -778,21 +778,21 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_degrees=0]		How many degrees to rotate the camera by. >0 = clockwise, <0 = counter clockwise. 0 = no change.
 	/// @returns		N/A
 	static rotate_by = function(_degrees=0) {
-		rotate_to(target.angle + _degrees);
+		self.rotate_to(self.target.angle + _degrees);
 	};
 	
 	/// @description	Sets the target.zoom factor for the camera.
 	/// @param {real}	[_target_zoom=target.zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
 	/// @returns		N/A
-	static zoom_to = function(_target_zoom=target.zoom) {
-		target.zoom = clamp(_target_zoom, zoom_min, zoom_max);
+	static zoom_to = function(_target_zoom=self.target.zoom) {
+		self.target.zoom = clamp(_target_zoom, self.zoom_min, self.zoom_max);
 	};
 	
 	/// @description	Sets the target.zoom factor relative to the current target.zoom.
 	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
 	/// @returns		N/A
 	static zoom_by = function(_zoom_factor=1) {
-		zoom_to(target.zoom * _zoom_factor);
+		self.zoom_to(self.target.zoom * _zoom_factor);
 	};
 	
 	/// @description	Sets the target values for the camera.
@@ -801,10 +801,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_target_angle=target.angle]	The new target angle for the camera, in degrees.
 	/// @param {real}	[_target_zoom=target.zoom]	The new target zoom for the camera. >1 = zoom in, else 1 = normal zoom, else >0 = zoom out.
 	/// @returns		N/A
-	static transform_to = function(_target_x=x, _target_y=y, _target_angle=angle, _target_zoom=zoom) {
-		move_to(_target_x, _target_y);
-		rotate_to(_target_angle);
-		zoom_to(_target_zoom);
+	static transform_to = function(_target_x=self.x, _target_y=self.y, _target_angle=self.angle, _target_zoom=self.zoom) {
+		self.move_to(_target_x, _target_y);
+		self.rotate_to(_target_angle);
+		self.zoom_to(_target_zoom);
 	};
 	
 	/// @description	Sets the camera target by a relative amount.
@@ -814,9 +814,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_zoom_factor=1]	The new relative target zoom for the camera. >1 = multiply (zoom in), >0 = divide (zoom out). Examples: 2 = double current zoom, 0.5 = halve current zoom.
 	/// @returns		N/A
 	static transform_by = function(_x=0, _y=0, _degrees=0, _zoom_factor=1) {
-		move_by(_x, _y);
-		rotate_by(_degrees);
-		zoom_by(_zoom_factor);
+		self.move_by(_x, _y);
+		self.rotate_by(_degrees);
+		self.zoom_by(_zoom_factor);
 	};
 	
 	/// @description	Resets the camera back to the start values and stops panning. See .set_start_values() and .stop_panning().
@@ -825,44 +825,44 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {bool}	[_reset_settings=false]		Whether to unset shake settings, anchors, limits, boundary, interpolation, and start values (true) or not (false).
 	/// @returns		N/A
 	static reset = function(_reset_shake=false, _reset_settings=false) {
-		if (is_debugging())
+		if (self.is_debugging())
 		{
-			debug.rotation.points = [];
+			self.debug.rotation.points = [];
 		}
 		
-		stop_panning();
+		self.stop_panning();
 		
 		if (_reset_shake)
 		{
-			shake_to(0, true);
+			self.shake_to(0, true);
 		}
 		
 		if (_reset_settings)
 		{
-			set_position_anchor();		// unset position anchor
-			set_angle_anchor();		// unset angle anchor
-			set_zoom_anchor();		// unset zoom anchor
-			set_zoom_limits();		// unset zoom limits
-			unset_boundary();		// unset boundary
+			self.set_position_anchor();		// unset position anchor
+			self.set_angle_anchor();		// unset angle anchor
+			self.set_zoom_anchor();			// unset zoom anchor
+			self.set_zoom_limits();			// unset zoom limits
+			self.unset_boundary();			// unset boundary
 			
-			set_start_values();		// unset custom start values
-			set_position_interpolation();	// unset custom position interpolation value and function
-			set_angle_interpolation();	// unset custom angle interpolation value and function
-			set_zoom_interpolation();	// unset custom zoom interpolation value and function
+			self.set_start_values();		// unset custom start values
+			self.set_position_interpolation();	// unset custom position interpolation value and function
+			self.set_angle_interpolation();		// unset custom angle interpolation value and function
+			self.set_zoom_interpolation();		// unset custom zoom interpolation value and function
 			
-			set_shake_limits();		// unset custom shake limits
-			set_shake_interpolation();	// unset custom shake interpolation value and function
+			self.set_shake_limits();		// unset custom shake limits
+			self.set_shake_interpolation();		// unset custom shake interpolation value and function
 		}
 		
-		target.x	= start.x;
-		target.y	= start.y;
-		target.angle	= start.angle;
-		target.zoom	= start.zoom;
+		self.target.x		= self.start.x;
+		self.target.y		= self.start.y;
+		self.target.angle	= self.start.angle;
+		self.target.zoom	= self.start.zoom;
 		
-		x		= target.x;
-		y		= target.y;
-		angle		= target.angle;
-		zoom		= target.zoom;
+		self.x			= self.target.x;
+		self.y			= self.target.y;
+		self.angle		= self.target.angle;
+		self.zoom		= self.target.zoom;
 	};
 	
 	
