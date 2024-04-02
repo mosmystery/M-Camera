@@ -935,11 +935,11 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_intensity=1]		The maximum intensity of the shake. Supports any number below infinity. See .shake_to() and .shake_by()
 	/// @returns		N/A
 	static set_shake_limits = function(_radius=4, _angle=22.5, _zoom=0.25, _coarseness=0.25, _intensity=1) {
-		shake.limits.radius	= _radius;
-		shake.limits.angle	= _angle;
-		shake.limits.zoom	= _zoom;
-		shake.coarseness	= _coarseness;
-		shake.limits.intensity	= _intensity;
+		self.shake.limits.radius	= _radius;
+		self.shake.limits.angle		= _angle;
+		self.shake.limits.zoom		= _zoom;
+		self.shake.coarseness		= _coarseness;
+		self.shake.limits.intensity	= _intensity;
 	};
 	
 	/// @description	Sets the interpolation factor and function for reducing the intensity of the shake. Essentially how fast intensity should approach 0.
@@ -947,8 +947,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {function}	[_fn_interpolate=lerp]	Optional custom interpolation function for fading intensity. Takes 3 arguments (_current, _target, _factor) and returns a real value, indicating the new _current value. Recommended that _factor of 0 returns _current and _factor of 1 returns _target.
 	/// @returns		N/A
 	static set_shake_interpolation = function(_value=0.05, _fn_interpolate=lerp) {
-		shake.intensity_falloff_rate	= _value;
-		shake.fn_intensity		= _fn_interpolate;
+		self.shake.intensity_falloff_rate	= _value;
+		self.shake.fn_intensity			= _fn_interpolate;
 	};
 	
 	/// @description	Sets the intensity for the shake.
@@ -958,10 +958,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	static shake_to = function(_intensity, _reset_transform=true) {
 		if (_reset_transform)
 		{
-			__shake_reset_transform();
+			self.__shake_reset_transform();
 		}
 		
-		shake.intensity	= clamp(_intensity, -shake.limits.intensity, shake.limits.intensity);
+		self.shake.intensity	= clamp(_intensity, -self.shake.limits.intensity, self.shake.limits.intensity);
 	};
 	
 	/// @description	Adds _intensity on to the intensity for the shake. Useful for increasing the shake with consecutive hits.
@@ -969,7 +969,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {bool}	[_reset_transform=false]	Whether to reset the initial transform values before the shake (true) or not (false).
 	/// @returns		N/A
 	static shake_by = function(_intensity, _reset_transform=false) {
-		shake_to(shake.intensity+_intensity, _reset_transform);
+		self.shake_to(self.shake.intensity+_intensity, _reset_transform);
 	};
 	
 	
