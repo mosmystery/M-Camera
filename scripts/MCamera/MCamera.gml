@@ -876,7 +876,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	Checks if camera is in panning mode. Useful to check before using .pan_to(). Start panning mode with .start_panning(), stop panning mode with .stop_panning().
 	/// @returns {bool}	Returns panning (true) or not (false).
 	static is_panning = function() {
-		return panning.active;
+		return self.panning.active;
 	};
 	
 	/// @description	Starts camera panning mode and sets start values. Start panning mode before using .pan_to()
@@ -884,38 +884,38 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	_from_y		The y co-ordinate from which you wish to pan from. Is used for calculations in .pan_to()
 	/// @returns		N/A
 	static start_panning = function(_from_x, _from_y) {
-		panning.active		= true;
-		panning.start.x		= _from_x;
-		panning.start.y		= _from_y;
-		panning.start.angle	= angle;
-		panning.start.zoom	= zoom;
-		panning.target.x	= _from_x;
-		panning.target.y	= _from_y;
-		panning.target.angle	= angle;
-		panning.target.zoom	= zoom;
+		self.panning.active			= true;
+		self.panning.start.x			= _from_x;
+		self.panning.start.y			= _from_y;
+		self.panning.start.angle		= angle;
+		self.panning.start.zoom			= zoom;
+		self.panning.target.x			= _from_x;
+		self.panning.target.y			= _from_y;
+		self.panning.target.angle		= angle;
+		self.panning.target.zoom		= zoom;
 		
-		debug.panning.camera_start_x	= x;
-		debug.panning.camera_start_y	= y;
+		self.debug.panning.camera_start_x	= x;
+		self.debug.panning.camera_start_y	= y;
 	};
 	
 	/// @description	Stops camera panning mode. Call this method when you have finished panning with .pan_to()
 	/// @returns		N/A
 	static stop_panning = function() {
-		panning.active		= false;
+		self.panning.active		= false;
 	};
 	
 	/// @description	Sets target panning co-ordinates. Only call this function when in panning mode. See .start_panning(), .stop_panning() and .is_panning().
 	/// @param {real}	[_to_x=panning.start.x]	The x co-ordinate to which to pan.
 	/// @param {real}	[_to_y=panning.start.y]	The y co-ordinate to which to pan.
 	/// @returns		N/A
-	static pan_to = function(_to_x=panning.start.x, _to_y=panning.start.y) {
-		if (!is_panning())
+	static pan_to = function(_to_x=self.panning.start.x, _to_y=self.panning.start.y) {
+		if (!self.is_panning())
 		{
 			throw ("Error: MCamera() attempting to use .pan_to() outside of panning mode. Check panning mode with .is_panning(), start panning mode with .start_panning(), and stop panning mode with .stop_panning()");
 		}
 		
-		panning.target.x	= _to_x;
-		panning.target.y	= _to_y;
+		self.panning.target.x	= _to_x;
+		self.panning.target.y	= _to_y;
 	};
 	
 	
