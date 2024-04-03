@@ -887,15 +887,15 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		self.panning.active			= true;
 		self.panning.start.x			= _from_x;
 		self.panning.start.y			= _from_y;
-		self.panning.start.angle		= angle;
-		self.panning.start.zoom			= zoom;
+		self.panning.start.angle		= self.angle;
+		self.panning.start.zoom			= self.zoom;
 		self.panning.target.x			= _from_x;
 		self.panning.target.y			= _from_y;
-		self.panning.target.angle		= angle;
-		self.panning.target.zoom		= zoom;
+		self.panning.target.angle		= self.angle;
+		self.panning.target.zoom		= self.zoom;
 		
-		self.debug.panning.camera_start_x	= x;
-		self.debug.panning.camera_start_y	= y;
+		self.debug.panning.camera_start_x	= self.x;
+		self.debug.panning.camera_start_y	= self.y;
 	};
 	
 	/// @description	Stops camera panning mode. Call this method when you have finished panning with .pan_to()
@@ -983,34 +983,34 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @description	Returns the camera's x co-ordinate, equivalent to the center of the screen.
 	/// @returns {real}	Returns the camera's x co-ordinate, equivalent to the center of the screen.
 	static get_x = function() {
-		return x;
+		return self.x;
 	};
 	
 	/// @description	Returns the camera's y co-ordinate, equivalent to the center of the screen.
 	/// @returns {real}	Returns the camera's y co-ordinate, equivalent to the center of the screen.
 	static get_y = function() {
-		return y;
+		return self.y;
 	};
 	
 	/// @description	Gets the base width of the camera, prior any scaling. See set_size() to set width or height.
 	/// @returns {real}
 	static get_width = function()
 	{
-		return width;
+		return self.width;
 	};
 	
 	/// @description	Gets the base height of the camera, prior any scaling. See set_size() to set width or height.
 	/// @returns {real}
 	static get_height = function()
 	{
-		return height;
+		return self.height;
 	};
 	
 	/// @description	Gets the scale that is applied to width*height to determine the current window size.
 	/// @returns {real}
 	static get_window_scale = function()
 	{
-		return window_scale;
+		return self.window_scale;
 	};
 	
 	/// @description	Gets the scale that is applied to the application surface to give more resolution to sub-pixels.
@@ -1018,7 +1018,7 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns {real}
 	static get_pixel_scale = function()
 	{
-		return pixel_scale;
+		return self.pixel_scale;
 	};
 	
 	/// @description	Sets the base width and height of the camera.
@@ -1027,10 +1027,10 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns		N/A
 	static set_size = function(_width=320, _height=180)
 	{
-		width	= _width;
-		height	= _height;
+		self.width	= _width;
+		self.height	= _height;
 		
-		reset_window();
+		self.reset_window();
 	};
 	
 	/// @description	Sets the scale that is applied to width*height to determine the current window size, and then resets the window to that scale.
@@ -1038,9 +1038,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns		N/A
 	static set_window_scale = function(_window_scale=4)
 	{
-		window_scale	= _window_scale;
+		self.window_scale	= _window_scale;
 		
-		reset_window();
+		self.reset_window();
 	};
 	
 	/// @description	Sets the scale that is applied to the application surface to give more resolution to sub-pixels.
@@ -1050,9 +1050,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns		N/A
 	static set_pixel_scale = function(_pixel_scale=4)
 	{
-		pixel_scale	= _pixel_scale;
+		self.pixel_scale	= _pixel_scale;
 		
-		reset_window();
+		self.reset_window();
 	};
 	
 	/// @description	Gets the window, application surface, and GUi to match the internal width, height, pixel_scale and window_scale:
@@ -1060,9 +1060,9 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns		N/A
 	static reset_window = function()
 	{
-		surface_resize(application_surface, width * pixel_scale, height * pixel_scale);
-		display_set_gui_size(width, height);
-		window_set_size(width * window_scale, height * window_scale);
+		surface_resize(application_surface,self.width * self.pixel_scale, self.height * self.pixel_scale);
+		display_set_gui_size(self.width, self.height);
+		window_set_size(self.width * self.window_scale, self.height * self.window_scale);
 		window_center();
 	};
 	
@@ -1205,5 +1205,5 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	
 	// init
 	
-	create(_create_host_object_for_me);
+	self.create(_create_host_object_for_me);
 }
