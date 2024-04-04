@@ -510,8 +510,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		}
 			
 		// view
-		var _view_x = camera_get_view_x(id);
-		var _view_y = camera_get_view_y(id);
+		var _view_x = camera_get_view_x(self.id);
+		var _view_y = camera_get_view_y(self.id);
 			
 		draw_circle_color(_view_x-_po, _view_y-_po, _dot_radius, _col_view, _col_view, false);
 			
@@ -1078,14 +1078,14 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns {real}
 	static get_angle = function()
 	{
-		return angle;
+		return self.angle;
 	};
 	
 	/// @description	Gets the current zoom (magnification) of the camera, in multiples of length along each axis. See .zoom_to() or .zoom_by() to set the zoom.
 	/// @returns {real}
 	static get_zoom = function()
 	{
-		return zoom;
+		return self.zoom;
 	};
 	
 	/// @description	Sets the view and id for this camera.
@@ -1093,89 +1093,89 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @returns		N/A
 	static set_view = function(_view=0)
 	{
-		view	= _view;
-		id	= view_camera[view];
+		self.view	= _view;
+		self.id		= view_camera[self.view];
 	};
 	
 	/// @description	Returns this camera's x position in the world.
 	/// @returns {real}	camera x.
 	static view_x = function()
 	{
-		return x - (view_width()/2);
+		return self.x - (self.view_width()/2);
 	};
 	
 	/// @description	Returns this camera's y position in the world.
 	/// @returns {real}	camera y.
 	static view_y = function()
 	{
-		return y - (view_height()/2);
+		return self.y - (self.view_height()/2);
 	};
 	
 	/// @description	Returns this camera's width scaled by zoom.
 	/// @returns {real}	width scaled by zoom.
 	static view_width = function()
 	{
-		return width/zoom;
+		return self.width/self.zoom;
 	};
 	
 	/// @description	Returns this camera's height scaled by zoom.
 	/// @returns {real}	height scaled by zoom.
 	static view_height = function()
 	{
-		return height/zoom;
+		return self.height/self.zoom;
 	};
 	
 	/// @description	Returns this camera's previous x position in the world.
 	/// @returns {real}	camera x previous.
 	static view_x_previous = function()
 	{
-		return previous.x - (view_width_previous()/2);
+		return self.previous.x - (self.view_width_previous()/2);
 	};
 	
 	/// @description	Returns this camera's previous y position in the world.
 	/// @returns {real}	camera y previous.
 	static view_y_previous = function()
 	{
-		return previous.y - (view_height_previous()/2);
+		return self.previous.y - (self.view_height_previous()/2);
 	};
 	
 	/// @description	Returns this camera's width scaled by previous zoom.
 	/// @returns {real}	width scaled by previous zoom.
 	static view_width_previous = function()
 	{
-		return width / previous.zoom;
+		return self.width / self.previous.zoom;
 	};
 	
 	/// @description	Returns this camera's height scaled by previous zoom.
 	/// @returns {real}	height scaled by previous zoom.
 	static view_height_previous = function()
 	{
-		return height / previous.zoom;
+		return self.height / self.previous.zoom;
 	};
 	
 	/// @description	Returns if debug mode is active (true) or not (false).
 	/// @returns {bool}	Returns if debug mode is active (true) or not (false).
 	static is_debugging = function() {
-		return debug.active;
+		return self.debug.active;
 	};
 	
 	/// @description	Activates or deactivates debug mode. When debug mode is active, the debug display is drawn to the screen.
 	/// @param {bool}	[_is_debugging]		Whether to turn debug mode on (true) or off (false). Toggles on/off by default.
 	/// @returns		N/A
 	static set_debugging = function(_is_debugging=!debug.active) {
-		debug.active = _is_debugging;
+		self.debug.active = _is_debugging;
 	};
 	
 	/// @description	Finds the x position of the mouse on the GUI, rounded to the nearest pixel. Useful for drawing a mouse cursor to the GUI.
 	/// @returns {real}	Returns an x position relative to the GUI.
 	static find_gui_mouse_x = function() {
-		return round_towards(window_mouse_get_x() / window_scale, -infinity);
+		return round_towards(window_mouse_get_x() / self.window_scale, -infinity);
 	};
 	
 	/// @description	Finds the y position of the mouse on the GUI, rounded to the nearest pixel. Useful for drawing a mouse cursor to the GUI.
 	/// @returns {real}	Returns an y position relative to the GUI.
 	static find_gui_mouse_y = function() {
-		return round_towards(window_mouse_get_y() / window_scale, -infinity);
+		return round_towards(window_mouse_get_y() / self.window_scale, -infinity);
 	};
 	
 	/// @description	Converts an x,y position in the world to co-ordinates on the GUI and returns it in a struct. Useful for drawing tracking icons on the GUI.
@@ -1183,8 +1183,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 	/// @param {real}	[_y=0]		The y co-ordinate in the world.
 	/// @returns {struct}	Returns a Vector2 / struct containing an x and y value.
 	static find_gui_position = function(_x, _y) {
-		var _gui_x = (_x - camera_get_view_x(id)) * zoom;
-		var _gui_y = (_y - camera_get_view_y(id)) * zoom;
+		var _gui_x = (_x - camera_get_view_x(self.id)) * self.zoom;
+		var _gui_y = (_y - camera_get_view_y(self.id)) * self.zoom;
 		
 		var _gui_center_x = display_get_gui_width()/2;
 		var _gui_center_y = display_get_gui_height()/2;
@@ -1192,8 +1192,8 @@ function MCamera(_width = 320, _height = 180, _window_scale = 4, _pixel_scale = 
 		var _position_len = point_distance(_gui_center_x, _gui_center_y, _gui_x, _gui_y);
 		var _position_dir = point_direction(_gui_center_x, _gui_center_y, _gui_x, _gui_y);
 		
-		var _rotated_x = lengthdir_x(_position_len, _position_dir+angle);
-		var _rotated_y = lengthdir_y(_position_len, _position_dir+angle);
+		var _rotated_x = lengthdir_x(_position_len, _position_dir + self.angle);
+		var _rotated_y = lengthdir_y(_position_len, _position_dir + self.angle);
 		
 		return {
 			x : _gui_center_x + _rotated_x,
