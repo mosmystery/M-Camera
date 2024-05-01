@@ -3,8 +3,8 @@
     {"name":"Example Racer","order":4,"path":"folders/Examples/Example Racer.yy",},
     {"name":"Example Settings","order":5,"path":"folders/Examples/Example Settings.yy",},
     {"name":"Utilities","order":1,"path":"folders/Examples/Utilities.yy",},
-    {"name":"M-Camera v0.6.0","order":1,"path":"folders/M-Camera v0.6.0.yy",},
-    {"name":"Utilities","order":1,"path":"folders/M-Camera v0.6.0/Utilities.yy",},
+    {"name":"M-Camera v0.6.1","order":1,"path":"folders/M-Camera v0.6.1.yy",},
+    {"name":"Utilities","order":1,"path":"folders/M-Camera v0.6.1/Utilities.yy",},
   ],
   "ResourceOrderSettings":[
     {"name":"fntSystem","order":1,"path":"fonts/fntSystem/fntSystem.yy",},
